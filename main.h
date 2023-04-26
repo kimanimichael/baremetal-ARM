@@ -1,3 +1,4 @@
 void start();
-unsigned factorial(unsigned n);
+void delay(unsigned int counter);
+int *swap(int *x, int *y);
 int main();

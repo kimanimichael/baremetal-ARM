@@ -41,13 +41,21 @@ void delay(unsigned int counter)
     while(counter-- >0){}
 }
 
+int *swap(int *x, int *y)
+{
+    static int temp[2];
+    temp[0] = *x;
+    temp[1] = *y;
+    *y = temp[0];
+    *x = temp[1];
+    return temp;
+}
+
 int main()
 {
-    unsigned volatile x;
-
-    x = factorial(0U);
-    x = 2U+ 3U*factorial(1U);
-    (void)factorial(7U);
+    int p = 1000000;
+    int q = 1000000/2;
+    int *z = swap(&p, &q);
 
     GPIO_CLK_ADDRESS |= 0x2;
     GPIO_MODER |= (0b01 << 14);
@@ -55,25 +63,12 @@ int main()
     while (1)
     {
         GPIO_OUPTUT_R |= (0b01 << 7);
-        delay(300000);
+        delay(z[0]);
 
         GPIO_OUPTUT_R &= ~(0b1 << 7);
-        delay(300000);
+        delay(z[1]);
     }
     
 }
 
-unsigned factorial(unsigned n)
-{
-    unsigned foo[6];
-    foo[n] = n;
-    if (n == 0U)
-    {
-        return 1U;
-    }
-    else
-    {
-        return foo[n] * factorial(n-1);
-    }
-}
 
