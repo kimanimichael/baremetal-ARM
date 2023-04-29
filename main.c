@@ -1,4 +1,5 @@
 #include "main.h"
+#include "stdint.h"
 
 #define GPIO_CLK_ADDRESS (*((unsigned int *)(0x40023830)))
 #define GPIO_MODER (*((unsigned int *)(0x40020400)))
@@ -32,7 +33,7 @@ void start()
     {
         *dest++ = 0;
     }
-    
+    int k = 1;
     main();
 }
 
@@ -51,11 +52,23 @@ int *swap(int *x, int *y)
     return temp;
 }
 
+uint8_t u8a, u8b;
+uint16_t u16c, u16d;
+uint32_t u32e, u32f;
+
+int8_t s8;
+int16_t s16;
+int32_t s32;
+
 int main()
 {
-    int p = 1000000;
-    int q = 1000000/2;
-    int *z = swap(&p, &q);
+    u8a = sizeof(u8a);
+    u16c = sizeof(uint16_t);
+    u32e = sizeof(uint32_t);
+
+    u16c = 40000U;
+    u16d = 30000U;
+    u32e = (uint32_t)u16c +u16d;  // Trully portable code. Works in 16 - bit processors
 
     GPIO_CLK_ADDRESS |= 0x2;
     GPIO_MODER |= (0b01 << 14);
@@ -63,10 +76,10 @@ int main()
     while (1)
     {
         GPIO_OUPTUT_R |= (0b01 << 7);
-        delay(z[0]);
+        delay(1000000);
 
         GPIO_OUPTUT_R &= ~(0b1 << 7);
-        delay(z[1]);
+        delay(1000000);
     }
     
 }
