@@ -1,0 +1,94 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x0000000020000000 0x0000000000030000 rw
+ROM              0x0000000008000000 0x0000000000200000 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000008000000      0x14c
+ *(.vectors)
+ .vectors       0x0000000008000000        0x8 main.o
+                0x0000000008000000                vectors
+ *(.text)
+ .text          0x0000000008000008      0x144 main.o
+                0x0000000008000008                start
+                0x0000000008000074                main
+                0x000000000800014c                . = ALIGN (0x4)
+ *(.rodata)
+
+.glue_7         0x000000000800014c        0x0
+ .glue_7        0x000000000800014c        0x0 linker stubs
+
+.glue_7t        0x000000000800014c        0x0
+ .glue_7t       0x000000000800014c        0x0 linker stubs
+
+.vfp11_veneer   0x000000000800014c        0x0
+ .vfp11_veneer  0x000000000800014c        0x0 linker stubs
+
+.v4_bx          0x000000000800014c        0x0
+ .v4_bx         0x000000000800014c        0x0 linker stubs
+
+.iplt           0x000000000800014c        0x0
+ .iplt          0x000000000800014c        0x0 main.o
+
+.rel.dyn        0x000000000800014c        0x0
+ .rel.iplt      0x000000000800014c        0x0 main.o
+
+.data           0x0000000020000000        0x0 load address 0x000000000800014c
+                0x0000000020000000                _data_start = .
+ *(.data)
+ .data          0x0000000020000000        0x0 main.o
+                0x0000000020000000                . = ALIGN (0x4)
+                0x0000000020000000                _data_end = .
+                0x000000000800014c                _data_lma = LOADADDR (.data)
+
+.igot.plt       0x0000000020000000        0x0 load address 0x000000000800014c
+ .igot.plt      0x0000000020000000        0x0 main.o
+
+.bss            0x0000000020000000       0x40 load address 0x000000000800014c
+                0x0000000020000000                _bss_start = .
+ *(.bss)
+ .bss           0x0000000020000000       0x40 main.o
+                0x0000000020000000                p1
+                0x0000000020000008                p2
+                0x0000000020000010                mk
+                0x0000000020000020                rm
+ *(COMMON)
+                0x0000000020000040                . = ALIGN (0x4)
+                0x0000000020000040                _bss_end = .
+LOAD main.o
+OUTPUT(main.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x0000000000000000      0x213
+ .debug_info    0x0000000000000000      0x213 main.o
+
+.debug_abbrev   0x0000000000000000      0x114
+ .debug_abbrev  0x0000000000000000      0x114 main.o
+
+.debug_aranges  0x0000000000000000       0x20
+ .debug_aranges
+                0x0000000000000000       0x20 main.o
+
+.debug_line     0x0000000000000000       0xba
+ .debug_line    0x0000000000000000       0xba main.o
+
+.debug_str      0x0000000000000000      0x145
+ .debug_str     0x0000000000000000      0x145 main.o
+                                        0x17f (size before relaxing)
+
+.comment        0x0000000000000000       0x49
+ .comment       0x0000000000000000       0x49 main.o
+                                         0x4a (size before relaxing)
+
+.ARM.attributes
+                0x0000000000000000       0x2e
+ .ARM.attributes
+                0x0000000000000000       0x2e main.o
+
+.debug_frame    0x0000000000000000       0x54
+ .debug_frame   0x0000000000000000       0x54 main.o
