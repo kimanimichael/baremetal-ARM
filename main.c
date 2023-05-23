@@ -1,9 +1,13 @@
-#include "main.h"
+#include "defs.h"
+#include "delay.h"
 #include "stdint.h"
 
-#define GPIO_CLK_ADDRESS (*((unsigned int *)(0x40023830)))
-#define GPIO_MODER (*((unsigned int *)(0x40020400)))
-#define GPIO_OUPTUT_R (*((unsigned int *)(0x40020414)))
+#include "include/stm32f429xx.h"
+
+#define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
+#define GPIOB_MODER (*((unsigned int *)(0x40020400)))
+#define GPIOB_ODR (*((unsigned int *)(0x40020414)))
+
 
 extern unsigned int *_data_start;
 extern unsigned int *_data_end;
@@ -33,53 +37,72 @@ void start()
     {
         *dest++ = 0;
     }
-    int k = 1;
     main();
 }
 
-void delay(unsigned int counter)
+typedef struct 
 {
-    while(counter-- >0){}
-}
+    long x;
+    long y;
+} point;
 
-int *swap(int *x, int *y)
+point p1, p2;
+
+typedef struct
 {
-    static int temp[2];
-    temp[0] = *x;
-    temp[1] = *y;
-    *y = temp[0];
-    *x = temp[1];
-    return temp;
-}
+    /* data */
+    point p, q;
+} player;
 
-uint8_t u8a, u8b;
-uint16_t u16c, u16d;
-uint32_t u32e, u32f;
+player mk;
 
-int8_t s8;
-int16_t s16;
-int32_t s32;
+typedef struct 
+{
+    /* data */
+    point corners[4];
+} rectangle;
+
+rectangle rm;
 
 int main()
 {
-    u8a = sizeof(u8a);
-    u16c = sizeof(uint16_t);
-    u32e = sizeof(uint32_t);
+    mk.p.x = 10; //mk position p
+    mk.p.y = 20; //mk position p
 
-    u16c = 40000U;
-    u16d = 30000U;
-    u32e = (uint32_t)u16c +u16d;  // Trully portable code. Works in 16 - bit processors
+    mk.q.x = 30; //mk position q
+    mk.q.y = 45; //mk position q
 
-    GPIO_CLK_ADDRESS |= 0x2;
-    GPIO_MODER |= (0b01 << 14);
+    rm.corners[0].x = 0;
+    rm.corners[0].y = 0;
+    rm.corners[1].x = 10;
+    rm.corners[1].y = 0;
+    rm.corners[2].x = 10;
+    rm.corners[2].y = 5;
+    rm.corners[3].x = 0;
+    rm.corners[3].y = 5;
+
+
+    
+    p1.x = 1000000;
+    p1.y = 1000000;
+    p2 = p1;
+
+    point *pp;
+    player *pl;
+
+    pp = &p1;
+    pl = &mk;
+
+    RCC_AH1BEN |= 0x2;
+    GPIOB_MODER |= (0b01 << 14);
 
     while (1)
     {
-        GPIO_OUPTUT_R |= (0b01 << 7);
-        delay(1000000);
+        GPIOB_ODR |= (0b01 << 7);
+        delay((*pp).x);
 
-        GPIO_OUPTUT_R &= ~(0b1 << 7);
-        delay(1000000);
+        GPIOB_ODR &= ~(0b1 << 7);
+        delay((*pp).y);
     }
     
 }
