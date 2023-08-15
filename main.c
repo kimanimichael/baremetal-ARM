@@ -19,8 +19,16 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 {
     (unsigned int *)0x20030000, //Pointer to the top of our stack memory
     (unsigned int *)start, // Pointer to our reset handler - also our startup code
+    (unsigned int *)NMI, //NMI
 };
-
+void NMI () 
+{
+    while (1)
+    {
+        /* code */
+    }
+    
+}
 void start()
 {
     unsigned int *src, *dest;

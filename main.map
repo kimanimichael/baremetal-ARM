@@ -9,50 +9,51 @@ ROM              0x0000000008000000 0x0000000000200000 xr
 Linker script and memory map
 
 
-.text           0x0000000008000000      0x134
+.text           0x0000000008000000      0x13c
  *(.vectors)
- .vectors       0x0000000008000000        0x8 main.o
+ .vectors       0x0000000008000000        0xc main.o
                 0x0000000008000000                vectors
  *(.text)
- .text          0x0000000008000008       0x20 delay.o
-                0x0000000008000008                delay
- .text          0x0000000008000028      0x10c main.o
-                0x0000000008000028                start
-                0x0000000008000094                main
-                0x0000000008000134                . = ALIGN (0x4)
+ .text          0x000000000800000c       0x20 delay.o
+                0x000000000800000c                delay
+ .text          0x000000000800002c      0x110 main.o
+                0x000000000800002c                NMI
+                0x0000000008000032                start
+                0x000000000800009c                main
+                0x000000000800013c                . = ALIGN (0x4)
  *(.rodata)
 
-.glue_7         0x0000000008000134        0x0
- .glue_7        0x0000000008000134        0x0 linker stubs
+.glue_7         0x000000000800013c        0x0
+ .glue_7        0x000000000800013c        0x0 linker stubs
 
-.glue_7t        0x0000000008000134        0x0
- .glue_7t       0x0000000008000134        0x0 linker stubs
+.glue_7t        0x000000000800013c        0x0
+ .glue_7t       0x000000000800013c        0x0 linker stubs
 
-.vfp11_veneer   0x0000000008000134        0x0
- .vfp11_veneer  0x0000000008000134        0x0 linker stubs
+.vfp11_veneer   0x000000000800013c        0x0
+ .vfp11_veneer  0x000000000800013c        0x0 linker stubs
 
-.v4_bx          0x0000000008000134        0x0
- .v4_bx         0x0000000008000134        0x0 linker stubs
+.v4_bx          0x000000000800013c        0x0
+ .v4_bx         0x000000000800013c        0x0 linker stubs
 
-.iplt           0x0000000008000134        0x0
- .iplt          0x0000000008000134        0x0 main.o
+.iplt           0x000000000800013c        0x0
+ .iplt          0x000000000800013c        0x0 main.o
 
-.rel.dyn        0x0000000008000134        0x0
- .rel.iplt      0x0000000008000134        0x0 main.o
+.rel.dyn        0x000000000800013c        0x0
+ .rel.iplt      0x000000000800013c        0x0 main.o
 
-.data           0x0000000020000000        0x0 load address 0x0000000008000134
+.data           0x0000000020000000        0x0 load address 0x000000000800013c
                 0x0000000020000000                _data_start = .
  *(.data)
  .data          0x0000000020000000        0x0 delay.o
  .data          0x0000000020000000        0x0 main.o
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _data_end = .
-                0x0000000008000134                _data_lma = LOADADDR (.data)
+                0x000000000800013c                _data_lma = LOADADDR (.data)
 
-.igot.plt       0x0000000020000000        0x0 load address 0x0000000008000134
+.igot.plt       0x0000000020000000        0x0 load address 0x000000000800013c
  .igot.plt      0x0000000020000000        0x0 main.o
 
-.bss            0x0000000020000000       0x20 load address 0x0000000008000134
+.bss            0x0000000020000000       0x20 load address 0x000000000800013c
                 0x0000000020000000                _bss_start = .
  *(.bss)
  .bss           0x0000000020000000        0x0 delay.o
@@ -68,13 +69,13 @@ LOAD main.o
 OUTPUT(main.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x0000000000000000      0x222
+.debug_info     0x0000000000000000      0x238
  .debug_info    0x0000000000000000       0x53 delay.o
- .debug_info    0x0000000000000053      0x1cf main.o
+ .debug_info    0x0000000000000053      0x1e5 main.o
 
-.debug_abbrev   0x0000000000000000      0x14f
+.debug_abbrev   0x0000000000000000      0x169
  .debug_abbrev  0x0000000000000000       0x4c delay.o
- .debug_abbrev  0x000000000000004c      0x103 main.o
+ .debug_abbrev  0x000000000000004c      0x11d main.o
 
 .debug_aranges  0x0000000000000000       0x40
  .debug_aranges
@@ -82,9 +83,9 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000020       0x20 main.o
 
-.debug_line     0x0000000000000000       0xfd
+.debug_line     0x0000000000000000      0x107
  .debug_line    0x0000000000000000       0x4b delay.o
- .debug_line    0x000000000000004b       0xb2 main.o
+ .debug_line    0x000000000000004b       0xbc main.o
 
 .debug_str      0x0000000000000000      0x158
  .debug_str     0x0000000000000000       0xae delay.o
@@ -104,6 +105,6 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000000000002e       0x2e main.o
 
-.debug_frame    0x0000000000000000       0x8c
+.debug_frame    0x0000000000000000       0xa4
  .debug_frame   0x0000000000000000       0x38 delay.o
- .debug_frame   0x0000000000000038       0x54 main.o
+ .debug_frame   0x0000000000000038       0x6c main.o
