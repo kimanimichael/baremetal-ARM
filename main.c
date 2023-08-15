@@ -56,13 +56,13 @@ typedef struct
 
 player mk;
 
-typedef struct 
-{
-    /* data */
-    point corners[4];
-} rectangle;
+// typedef struct 
+// {
+//     /* data */
+//     point corners[4];
+// } rectangle;
 
-rectangle rm;
+// rectangle rm;
 
 int main()
 {
@@ -72,14 +72,14 @@ int main()
     mk.q.x = 30; //mk position q
     mk.q.y = 45; //mk position q
 
-    rm.corners[0].x = 0;
-    rm.corners[0].y = 0;
-    rm.corners[1].x = 10;
-    rm.corners[1].y = 0;
-    rm.corners[2].x = 10;
-    rm.corners[2].y = 5;
-    rm.corners[3].x = 0;
-    rm.corners[3].y = 5;
+    // rm.corners[0].x = 0;
+    // rm.corners[0].y = 0;
+    // rm.corners[1].x = 10;
+    // rm.corners[1].y = 0;
+    // rm.corners[2].x = 10;
+    // rm.corners[2].y = 5;
+    // rm.corners[3].x = 0;
+    // rm.corners[3].y = 5;
 
 
     
