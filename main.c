@@ -5,6 +5,10 @@
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
 #define GPIOB_MODER (*((unsigned int *)(0x40020400)))
 #define GPIOB_ODR (*((unsigned int *)(0x40020414)))
+/**
+ * @brief point represents a struct that has members x and y
+ * @author @Mike-Kimani
+*/
 typedef struct 
 {
     long x;
@@ -20,13 +24,16 @@ typedef struct
 
 player mk;
 
-// typedef struct 
-// {
-//     /* data */
-//     point corners[4];
-// } rectangle;
+/**
+ * @bug Unexplained behaviour with struct below
+*/
+typedef struct 
+{
+    /* data */
+    point corners[4];
+} rectangle;
 
-// rectangle rm;
+rectangle rm;
 
 int main()
 {
@@ -36,14 +43,14 @@ int main()
     mk.q.x = 30; //mk position q
     mk.q.y = 45; //mk position q
 
-    // rm.corners[0].x = 0;
-    // rm.corners[0].y = 0;
-    // rm.corners[1].x = 10;
-    // rm.corners[1].y = 0;
-    // rm.corners[2].x = 10;
-    // rm.corners[2].y = 5;
-    // rm.corners[3].x = 0;
-    // rm.corners[3].y = 5;
+    rm.corners[0].x = 0;
+    rm.corners[0].y = 0;
+    rm.corners[1].x = 10;
+    rm.corners[1].y = 0;
+    rm.corners[2].x = 10;
+    rm.corners[2].y = 5;
+    rm.corners[3].x = 0;
+    rm.corners[3].y = 5;
     
     p1.x = 1000000;
     p1.y = 2000000;

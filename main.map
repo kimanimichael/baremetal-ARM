@@ -9,7 +9,7 @@ ROM              0x0000000008000000 0x0000000000200000 xr
 Linker script and memory map
 
 
-.text           0x0000000008000000      0x26f
+.text           0x0000000008000000      0x2a3
  *(.vectors)
  .vectors       0x0000000008000000       0x28 startup.o
                 0x0000000008000000                vectors
@@ -30,31 +30,31 @@ Linker script and memory map
                 0x0000000008000138                assert_failed
  .text          0x0000000008000148       0x20 delay.o
                 0x0000000008000148                delay
- .text          0x0000000008000168       0xa4 main.o
+ .text          0x0000000008000168       0xd8 main.o
                 0x0000000008000168                main
-                0x000000000800020c                . = ALIGN (0x4)
+                0x0000000008000240                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x000000000800020c       0x63 startup.o
+ .rodata        0x0000000008000240       0x63 startup.o
 
-.glue_7         0x0000000008000270        0x0
- .glue_7        0x0000000008000270        0x0 linker stubs
+.glue_7         0x00000000080002a4        0x0
+ .glue_7        0x00000000080002a4        0x0 linker stubs
 
-.glue_7t        0x0000000008000270        0x0
- .glue_7t       0x0000000008000270        0x0 linker stubs
+.glue_7t        0x00000000080002a4        0x0
+ .glue_7t       0x00000000080002a4        0x0 linker stubs
 
-.vfp11_veneer   0x0000000008000270        0x0
- .vfp11_veneer  0x0000000008000270        0x0 linker stubs
+.vfp11_veneer   0x00000000080002a4        0x0
+ .vfp11_veneer  0x00000000080002a4        0x0 linker stubs
 
-.v4_bx          0x0000000008000270        0x0
- .v4_bx         0x0000000008000270        0x0 linker stubs
+.v4_bx          0x00000000080002a4        0x0
+ .v4_bx         0x00000000080002a4        0x0 linker stubs
 
-.iplt           0x0000000008000270        0x0
- .iplt          0x0000000008000270        0x0 startup.o
+.iplt           0x00000000080002a4        0x0
+ .iplt          0x00000000080002a4        0x0 startup.o
 
-.rel.dyn        0x0000000008000270        0x0
- .rel.iplt      0x0000000008000270        0x0 startup.o
+.rel.dyn        0x00000000080002a4        0x0
+ .rel.iplt      0x00000000080002a4        0x0 startup.o
 
-.data           0x0000000020000000        0x0 load address 0x000000000800026f
+.data           0x0000000020000000        0x0 load address 0x00000000080002a3
                 0x0000000020000000                _data_start = .
  *(.data)
  .data          0x0000000020000000        0x0 startup.o
@@ -63,24 +63,25 @@ Linker script and memory map
  .data          0x0000000020000000        0x0 main.o
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _data_end = .
-                0x000000000800026f                _data_lma = LOADADDR (.data)
+                0x00000000080002a3                _data_lma = LOADADDR (.data)
 
-.igot.plt       0x0000000020000000        0x0 load address 0x000000000800026f
+.igot.plt       0x0000000020000000        0x0 load address 0x00000000080002a3
  .igot.plt      0x0000000020000000        0x0 startup.o
 
-.bss            0x0000000020000000       0x20 load address 0x000000000800026f
+.bss            0x0000000020000000       0x40 load address 0x00000000080002a3
                 0x0000000020000000                _bss_start = .
  *(.bss)
  .bss           0x0000000020000000        0x0 startup.o
  .bss           0x0000000020000000        0x0 bsp.o
  .bss           0x0000000020000000        0x0 delay.o
- .bss           0x0000000020000000       0x20 main.o
+ .bss           0x0000000020000000       0x40 main.o
                 0x0000000020000000                p1
                 0x0000000020000008                p2
                 0x0000000020000010                mk
+                0x0000000020000020                rm
  *(COMMON)
-                0x0000000020000020                . = ALIGN (0x4)
-                0x0000000020000020                _bss_end = .
+                0x0000000020000040                . = ALIGN (0x4)
+                0x0000000020000040                _bss_end = .
 LOAD startup.o
 LOAD bsp.o
 LOAD delay.o
@@ -88,17 +89,17 @@ LOAD main.o
 OUTPUT(main.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x0000000000000000      0x5e1
+.debug_info     0x0000000000000000      0x625
  .debug_info    0x0000000000000000      0x16d startup.o
  .debug_info    0x000000000000016d      0x2e7 bsp.o
  .debug_info    0x0000000000000454       0x53 delay.o
- .debug_info    0x00000000000004a7      0x13a main.o
+ .debug_info    0x00000000000004a7      0x17e main.o
 
-.debug_abbrev   0x0000000000000000      0x2bb
+.debug_abbrev   0x0000000000000000      0x2de
  .debug_abbrev  0x0000000000000000       0xbf startup.o
  .debug_abbrev  0x00000000000000bf      0x10e bsp.o
  .debug_abbrev  0x00000000000001cd       0x4c delay.o
- .debug_abbrev  0x0000000000000219       0xa2 main.o
+ .debug_abbrev  0x0000000000000219       0xc5 main.o
 
 .debug_aranges  0x0000000000000000       0x80
  .debug_aranges
@@ -110,21 +111,21 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000060       0x20 main.o
 
-.debug_line     0x0000000000000000      0x2b9
+.debug_line     0x0000000000000000      0x2c2
  .debug_line    0x0000000000000000       0xa4 startup.o
  .debug_line    0x00000000000000a4      0x14b bsp.o
  .debug_line    0x00000000000001ef       0x4b delay.o
- .debug_line    0x000000000000023a       0x7f main.o
+ .debug_line    0x000000000000023a       0x88 main.o
 
-.debug_str      0x0000000000000000      0x26f
+.debug_str      0x0000000000000000      0x281
  .debug_str     0x0000000000000000      0x196 startup.o
                                         0x1d0 (size before relaxing)
  .debug_str     0x0000000000000196       0xaa bsp.o
                                         0x1dc (size before relaxing)
  .debug_str     0x0000000000000240       0x16 delay.o
                                          0xbb (size before relaxing)
- .debug_str     0x0000000000000256       0x19 main.o
-                                        0x135 (size before relaxing)
+ .debug_str     0x0000000000000256       0x2b main.o
+                                        0x147 (size before relaxing)
 
 .comment        0x0000000000000000       0x49
  .comment       0x0000000000000000       0x49 startup.o
