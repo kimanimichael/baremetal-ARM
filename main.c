@@ -2,52 +2,9 @@
 #include "delay.h"
 #include "stdint.h"
 
-#include "include/stm32f429xx.h"
-
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
 #define GPIOB_MODER (*((unsigned int *)(0x40020400)))
 #define GPIOB_ODR (*((unsigned int *)(0x40020414)))
-
-
-extern unsigned int *_data_start;
-extern unsigned int *_data_end;
-extern unsigned int * _bss_start;
-extern unsigned int * _bss_end;
-extern unsigned int * _data_lma;
-
-unsigned int *vectors[] __attribute__((section(".vectors"))) = 
-{
-    (unsigned int *)0x20030000, //Pointer to the top of our stack memory
-    (unsigned int *)start, // Pointer to our reset handler - also our startup code
-    (unsigned int *)NMI, //NMI
-};
-void NMI () 
-{
-    while (1)
-    {
-        /* code */
-    }
-    
-}
-void start()
-{
-    unsigned int *src, *dest;
-
-    src = _data_lma;
-    dest = _data_start;
-    while (dest < _data_end)
-    {
-        *dest++ = *src++;
-    }
-
-    dest = _bss_start;
-    while (dest < _bss_end)
-    {
-        *dest++ = 0;
-    }
-    main();
-}
-
 typedef struct 
 {
     long x;
@@ -55,7 +12,6 @@ typedef struct
 } point;
 
 point p1, p2;
-
 typedef struct
 {
     /* data */
@@ -88,11 +44,9 @@ int main()
     // rm.corners[2].y = 5;
     // rm.corners[3].x = 0;
     // rm.corners[3].y = 5;
-
-
     
     p1.x = 1000000;
-    p1.y = 1000000;
+    p1.y = 2000000;
     p2 = p1;
 
     point *pp;
