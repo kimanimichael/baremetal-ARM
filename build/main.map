@@ -107,11 +107,11 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000060       0x20 build/main.o
 
-.debug_line     0x0000000000000000      0x2b7
+.debug_line     0x0000000000000000      0x2bd
  .debug_line    0x0000000000000000       0xac build/startup.o
- .debug_line    0x00000000000000ac      0x156 build/bsp.o
- .debug_line    0x0000000000000202       0x4f build/delay.o
- .debug_line    0x0000000000000251       0x66 build/main.o
+ .debug_line    0x00000000000000ac      0x15c build/bsp.o
+ .debug_line    0x0000000000000208       0x4f build/delay.o
+ .debug_line    0x0000000000000257       0x66 build/main.o
 
 .debug_str      0x0000000000000000      0x276
  .debug_str     0x0000000000000000      0x19e build/startup.o
