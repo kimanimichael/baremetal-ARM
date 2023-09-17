@@ -26,13 +26,10 @@ int main()
 
     while (1)
     {
-        //bit-wise OR the 8th bit in GPIOx_ODR with 1
-        GPIOx_ODR |= (0b01 << 7);
-        delay(500000);
+        //bit-wise XOR the 8th bit in GPIOx_ODR with 1 - This toggles the bit and hence the led
+        GPIOx_ODR ^= (0b01 << 7);
+        delay(1000000);
 
-        //bit-wise AND the 8th bit in GPIOx_ODR with 0
-        GPIOx_ODR &= (0b0 << 7);
-        delay(500000);
     }
     
 }
