@@ -1,6 +1,6 @@
-#include "defs.h"
-#include "include/stm32f429xx.h"
-#include "include/stm32f4xx_it.h"
+#include "../include/defs.h"
+#include "../include/stm32f429xx.h"
+#include "../include/stm32f4xx_it.h"
 
 extern unsigned int *_data_start;
 extern unsigned int *_data_end;

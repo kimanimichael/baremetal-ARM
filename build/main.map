@@ -1,0 +1,148 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM              0x0000000020000000 0x0000000000030000 rw
+ROM              0x0000000008000000 0x0000000000200000 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000008000000      0x21f
+ *(.vectors)
+ .vectors       0x0000000008000000       0x28 build/startup.o
+                0x0000000008000000                vectors
+ *(.text)
+ .text          0x0000000008000028       0xe4 build/startup.o
+                0x0000000008000028                start
+                0x0000000008000094                NMI_Handler
+                0x00000000080000a8                HardFault_Handler
+                0x00000000080000bc                MemManage_Handler
+                0x00000000080000d0                BusFault_Handler
+                0x00000000080000e4                UsageFault_Handler
+                0x00000000080000f8                DebugMon_Handler
+                0x00000000080000f8                SysTick_Handler
+                0x00000000080000f8                PendSV_Handler
+                0x00000000080000f8                Unused_Handler
+                0x00000000080000f8                SVC_Handler
+ .text          0x000000000800010c       0x3c build/bsp.o
+                0x0000000008000138                assert_failed
+ .text          0x0000000008000148       0x20 build/delay.o
+                0x0000000008000148                delay
+ .text          0x0000000008000168       0x54 build/main.o
+                0x0000000008000168                main
+                0x00000000080001bc                . = ALIGN (0x4)
+ *(.rodata)
+ .rodata        0x00000000080001bc       0x63 build/startup.o
+
+.glue_7         0x0000000008000220        0x0
+ .glue_7        0x0000000008000220        0x0 linker stubs
+
+.glue_7t        0x0000000008000220        0x0
+ .glue_7t       0x0000000008000220        0x0 linker stubs
+
+.vfp11_veneer   0x0000000008000220        0x0
+ .vfp11_veneer  0x0000000008000220        0x0 linker stubs
+
+.v4_bx          0x0000000008000220        0x0
+ .v4_bx         0x0000000008000220        0x0 linker stubs
+
+.iplt           0x0000000008000220        0x0
+ .iplt          0x0000000008000220        0x0 build/startup.o
+
+.rel.dyn        0x0000000008000220        0x0
+ .rel.iplt      0x0000000008000220        0x0 build/startup.o
+
+.data           0x0000000020000000        0x0 load address 0x000000000800021f
+                0x0000000020000000                _data_start = .
+ *(.data)
+ .data          0x0000000020000000        0x0 build/startup.o
+ .data          0x0000000020000000        0x0 build/bsp.o
+ .data          0x0000000020000000        0x0 build/delay.o
+ .data          0x0000000020000000        0x0 build/main.o
+                0x0000000020000000                . = ALIGN (0x4)
+                0x0000000020000000                _data_end = .
+                0x000000000800021f                _data_lma = LOADADDR (.data)
+
+.igot.plt       0x0000000020000000        0x0 load address 0x000000000800021f
+ .igot.plt      0x0000000020000000        0x0 build/startup.o
+
+.bss            0x0000000020000000        0x0 load address 0x000000000800021f
+                0x0000000020000000                _bss_start = .
+ *(.bss)
+ .bss           0x0000000020000000        0x0 build/startup.o
+ .bss           0x0000000020000000        0x0 build/bsp.o
+ .bss           0x0000000020000000        0x0 build/delay.o
+ .bss           0x0000000020000000        0x0 build/main.o
+ *(COMMON)
+                0x0000000020000000                . = ALIGN (0x4)
+                0x0000000020000000                _bss_end = .
+LOAD build/startup.o
+LOAD build/bsp.o
+LOAD build/delay.o
+LOAD build/main.o
+OUTPUT(build/main.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x0000000000000000      0x529
+ .debug_info    0x0000000000000000      0x16d build/startup.o
+ .debug_info    0x000000000000016d      0x2e7 build/bsp.o
+ .debug_info    0x0000000000000454       0x53 build/delay.o
+ .debug_info    0x00000000000004a7       0x82 build/main.o
+
+.debug_abbrev   0x0000000000000000      0x25d
+ .debug_abbrev  0x0000000000000000       0xbf build/startup.o
+ .debug_abbrev  0x00000000000000bf      0x10e build/bsp.o
+ .debug_abbrev  0x00000000000001cd       0x4c build/delay.o
+ .debug_abbrev  0x0000000000000219       0x44 build/main.o
+
+.debug_aranges  0x0000000000000000       0x80
+ .debug_aranges
+                0x0000000000000000       0x20 build/startup.o
+ .debug_aranges
+                0x0000000000000020       0x20 build/bsp.o
+ .debug_aranges
+                0x0000000000000040       0x20 build/delay.o
+ .debug_aranges
+                0x0000000000000060       0x20 build/main.o
+
+.debug_line     0x0000000000000000      0x2b7
+ .debug_line    0x0000000000000000       0xac build/startup.o
+ .debug_line    0x00000000000000ac      0x156 build/bsp.o
+ .debug_line    0x0000000000000202       0x4f build/delay.o
+ .debug_line    0x0000000000000251       0x66 build/main.o
+
+.debug_str      0x0000000000000000      0x276
+ .debug_str     0x0000000000000000      0x19e build/startup.o
+                                        0x1d8 (size before relaxing)
+ .debug_str     0x000000000000019e       0xae build/bsp.o
+                                        0x1e0 (size before relaxing)
+ .debug_str     0x000000000000024c       0x1a build/delay.o
+                                         0xbf (size before relaxing)
+ .debug_str     0x0000000000000266       0x10 build/main.o
+                                        0x12c (size before relaxing)
+
+.comment        0x0000000000000000       0x49
+ .comment       0x0000000000000000       0x49 build/startup.o
+                                         0x4a (size before relaxing)
+ .comment       0x0000000000000049       0x4a build/bsp.o
+ .comment       0x0000000000000049       0x4a build/delay.o
+ .comment       0x0000000000000049       0x4a build/main.o
+
+.ARM.attributes
+                0x0000000000000000       0x2e
+ .ARM.attributes
+                0x0000000000000000       0x2e build/startup.o
+ .ARM.attributes
+                0x000000000000002e       0x2e build/bsp.o
+ .ARM.attributes
+                0x000000000000005c       0x2e build/delay.o
+ .ARM.attributes
+                0x000000000000008a       0x2e build/main.o
+
+.debug_frame    0x0000000000000000      0x188
+ .debug_frame   0x0000000000000000       0xdc build/startup.o
+ .debug_frame   0x00000000000000dc       0x48 build/bsp.o
+ .debug_frame   0x0000000000000124       0x38 build/delay.o
+ .debug_frame   0x000000000000015c       0x2c build/main.o
