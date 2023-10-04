@@ -9,52 +9,53 @@ ROM              0x0000000008000000 0x0000000000200000 xr
 Linker script and memory map
 
 
-.text           0x0000000008000000      0x213
+.text           0x0000000008000000      0x2f7
  *(.vectors)
- .vectors       0x0000000008000000       0x28 build/startup.o
+ .vectors       0x0000000008000000       0x40 build/startup.o
                 0x0000000008000000                vectors
  *(.text)
- .text          0x0000000008000028       0xe4 build/startup.o
-                0x0000000008000028                start
-                0x0000000008000094                NMI_Handler
-                0x00000000080000a8                HardFault_Handler
-                0x00000000080000bc                MemManage_Handler
-                0x00000000080000d0                BusFault_Handler
-                0x00000000080000e4                UsageFault_Handler
-                0x00000000080000f8                DebugMon_Handler
-                0x00000000080000f8                SysTick_Handler
-                0x00000000080000f8                PendSV_Handler
-                0x00000000080000f8                Unused_Handler
-                0x00000000080000f8                SVC_Handler
- .text          0x000000000800010c       0x3c build/bsp.o
-                0x0000000008000138                assert_failed
- .text          0x0000000008000148       0x20 build/delay.o
-                0x0000000008000148                delay
- .text          0x0000000008000168       0x48 build/main.o
-                0x0000000008000168                main
-                0x00000000080001b0                . = ALIGN (0x4)
+ .text          0x0000000008000040       0xe4 build/startup.o
+                0x0000000008000040                start
+                0x00000000080000ac                NMI_Handler
+                0x00000000080000c0                HardFault_Handler
+                0x00000000080000d4                MemManage_Handler
+                0x00000000080000e8                BusFault_Handler
+                0x00000000080000fc                UsageFault_Handler
+                0x0000000008000110                DebugMon_Handler
+                0x0000000008000110                PendSV_Handler
+                0x0000000008000110                Unused_Handler
+                0x0000000008000110                SVC_Handler
+ .text          0x0000000008000124       0x70 build/bsp.o
+                0x0000000008000150                assert_failed
+                0x000000000800015e                SysTick_Handler
+                0x000000000800017c                ledOn
+ .text          0x0000000008000194       0x20 build/delay.o
+                0x0000000008000194                delay
+ .text          0x00000000080001b4       0xe0 build/main.o
+                0x000000000800024c                main
+                0x0000000008000294                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x00000000080001b0       0x63 build/startup.o
+ .rodata        0x0000000008000294       0x63 build/startup.o
 
-.glue_7         0x0000000008000214        0x0
- .glue_7        0x0000000008000214        0x0 linker stubs
+.glue_7         0x00000000080002f8        0x0
+ .glue_7        0x00000000080002f8        0x0 linker stubs
 
-.glue_7t        0x0000000008000214        0x0
- .glue_7t       0x0000000008000214        0x0 linker stubs
+.glue_7t        0x00000000080002f8        0x0
+ .glue_7t       0x00000000080002f8        0x0 linker stubs
 
-.vfp11_veneer   0x0000000008000214        0x0
- .vfp11_veneer  0x0000000008000214        0x0 linker stubs
+.vfp11_veneer   0x00000000080002f8        0x0
+ .vfp11_veneer  0x00000000080002f8        0x0 linker stubs
 
-.v4_bx          0x0000000008000214        0x0
- .v4_bx         0x0000000008000214        0x0 linker stubs
+.v4_bx          0x00000000080002f8        0x0
+ .v4_bx         0x00000000080002f8        0x0 linker stubs
 
-.iplt           0x0000000008000214        0x0
- .iplt          0x0000000008000214        0x0 build/startup.o
+.iplt           0x00000000080002f8        0x0
+ .iplt          0x00000000080002f8        0x0 build/startup.o
 
-.rel.dyn        0x0000000008000214        0x0
- .rel.iplt      0x0000000008000214        0x0 build/startup.o
+.rel.dyn        0x00000000080002f8        0x0
+ .rel.iplt      0x00000000080002f8        0x0 build/startup.o
 
-.data           0x0000000020000000        0x0 load address 0x0000000008000213
+.data           0x0000000020000000        0x0 load address 0x00000000080002f7
                 0x0000000020000000                _data_start = .
  *(.data)
  .data          0x0000000020000000        0x0 build/startup.o
@@ -63,12 +64,12 @@ Linker script and memory map
  .data          0x0000000020000000        0x0 build/main.o
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _data_end = .
-                0x0000000008000213                _data_lma = LOADADDR (.data)
+                0x00000000080002f7                _data_lma = LOADADDR (.data)
 
-.igot.plt       0x0000000020000000        0x0 load address 0x0000000008000213
+.igot.plt       0x0000000020000000        0x0 load address 0x00000000080002f7
  .igot.plt      0x0000000020000000        0x0 build/startup.o
 
-.bss            0x0000000020000000        0x0 load address 0x0000000008000213
+.bss            0x0000000020000000        0x0 load address 0x00000000080002f7
                 0x0000000020000000                _bss_start = .
  *(.bss)
  .bss           0x0000000020000000        0x0 build/startup.o
@@ -85,17 +86,17 @@ LOAD build/main.o
 OUTPUT(build/main.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x0000000000000000      0x529
+.debug_info     0x0000000000000000      0xbc0
  .debug_info    0x0000000000000000      0x16d build/startup.o
- .debug_info    0x000000000000016d      0x2e7 build/bsp.o
- .debug_info    0x0000000000000454       0x53 build/delay.o
- .debug_info    0x00000000000004a7       0x82 build/main.o
+ .debug_info    0x000000000000016d      0x30b build/bsp.o
+ .debug_info    0x0000000000000478       0x53 build/delay.o
+ .debug_info    0x00000000000004cb      0x6f5 build/main.o
 
-.debug_abbrev   0x0000000000000000      0x25d
+.debug_abbrev   0x0000000000000000      0x3c8
  .debug_abbrev  0x0000000000000000       0xbf build/startup.o
- .debug_abbrev  0x00000000000000bf      0x10e build/bsp.o
- .debug_abbrev  0x00000000000001cd       0x4c build/delay.o
- .debug_abbrev  0x0000000000000219       0x44 build/main.o
+ .debug_abbrev  0x00000000000000bf      0x140 build/bsp.o
+ .debug_abbrev  0x00000000000001ff       0x4c build/delay.o
+ .debug_abbrev  0x000000000000024b      0x17d build/main.o
 
 .debug_aranges  0x0000000000000000       0x80
  .debug_aranges
@@ -107,21 +108,21 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000060       0x20 build/main.o
 
-.debug_line     0x0000000000000000      0x2af
+.debug_line     0x0000000000000000      0x418
  .debug_line    0x0000000000000000       0xac build/startup.o
- .debug_line    0x00000000000000ac      0x15c build/bsp.o
- .debug_line    0x0000000000000208       0x4f build/delay.o
- .debug_line    0x0000000000000257       0x58 build/main.o
+ .debug_line    0x00000000000000ac      0x171 build/bsp.o
+ .debug_line    0x000000000000021d       0x4f build/delay.o
+ .debug_line    0x000000000000026c      0x1ac build/main.o
 
-.debug_str      0x0000000000000000      0x276
+.debug_str      0x0000000000000000      0x8a6
  .debug_str     0x0000000000000000      0x19e build/startup.o
                                         0x1d8 (size before relaxing)
- .debug_str     0x000000000000019e       0xae build/bsp.o
-                                        0x1e0 (size before relaxing)
- .debug_str     0x000000000000024c       0x1a build/delay.o
+ .debug_str     0x000000000000019e       0xc4 build/bsp.o
+                                        0x1f6 (size before relaxing)
+ .debug_str     0x0000000000000262       0x1a build/delay.o
                                          0xbf (size before relaxing)
- .debug_str     0x0000000000000266       0x10 build/main.o
-                                        0x12c (size before relaxing)
+ .debug_str     0x000000000000027c      0x62a build/main.o
+                                        0x7d7 (size before relaxing)
 
 .comment        0x0000000000000000       0x49
  .comment       0x0000000000000000       0x49 build/startup.o
@@ -141,8 +142,8 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000000000008a       0x2e build/main.o
 
-.debug_frame    0x0000000000000000      0x188
+.debug_frame    0x0000000000000000      0x214
  .debug_frame   0x0000000000000000       0xdc build/startup.o
- .debug_frame   0x00000000000000dc       0x48 build/bsp.o
- .debug_frame   0x0000000000000124       0x38 build/delay.o
- .debug_frame   0x000000000000015c       0x2c build/main.o
+ .debug_frame   0x00000000000000dc       0x88 build/bsp.o
+ .debug_frame   0x0000000000000164       0x38 build/delay.o
+ .debug_frame   0x000000000000019c       0x78 build/main.o
