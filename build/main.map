@@ -25,14 +25,14 @@ Linker script and memory map
                 0x0000000008000110                PendSV_Handler
                 0x0000000008000110                Unused_Handler
                 0x0000000008000110                SVC_Handler
- .text          0x0000000008000124       0x70 build/bsp.o
+ .text          0x0000000008000124       0x74 build/bsp.o
                 0x0000000008000150                assert_failed
                 0x000000000800015e                SysTick_Handler
                 0x000000000800017c                ledOn
- .text          0x0000000008000194       0x20 build/delay.o
-                0x0000000008000194                delay
- .text          0x00000000080001b4       0xe0 build/main.o
-                0x000000000800024c                main
+ .text          0x0000000008000198       0x20 build/delay.o
+                0x0000000008000198                delay
+ .text          0x00000000080001b8       0xdc build/main.o
+                0x0000000008000250                main
                 0x0000000008000294                . = ALIGN (0x4)
  *(.rodata)
  .rodata        0x0000000008000294       0x63 build/startup.o
@@ -108,11 +108,11 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000060       0x20 build/main.o
 
-.debug_line     0x0000000000000000      0x418
+.debug_line     0x0000000000000000      0x415
  .debug_line    0x0000000000000000       0xac build/startup.o
- .debug_line    0x00000000000000ac      0x171 build/bsp.o
- .debug_line    0x000000000000021d       0x4f build/delay.o
- .debug_line    0x000000000000026c      0x1ac build/main.o
+ .debug_line    0x00000000000000ac      0x16e build/bsp.o
+ .debug_line    0x000000000000021a       0x4f build/delay.o
+ .debug_line    0x0000000000000269      0x1ac build/main.o
 
 .debug_str      0x0000000000000000      0x8a6
  .debug_str     0x0000000000000000      0x19e build/startup.o
