@@ -12,6 +12,9 @@
 //Base GPIOB register 0x4002 0400 + offset 0x14 to find GPIOx_ODR
 #define GPIOx_ODR (*((unsigned int *)(0x40020414)))
 
+/**
+ * Switches on the blue LED
+*/
 void ledOn();
 
 #endif
