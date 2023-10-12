@@ -30,7 +30,7 @@ int main()
     {
         __disable_irq();
         GPIOx_ODR ^= (0b01 << 0);
-        delay(1);
+        // delay(100000);
         __enable_irq();
         
     }
