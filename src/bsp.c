@@ -70,3 +70,14 @@ void BSP_greenLedOff() {
     GPIOx_ODR &= ~(0b01 << 0);
 }
 
+void BSP_blueLedToggle() {
+    GPIOx_ODR ^= (0b01 << 7);
+}
+
+void BSP_blueLedOn() {
+    GPIOx_ODR |= (0b01 << 7);
+}
+
+void BSP_blueLedOff() {
+    GPIOx_ODR &= ~(0b01 << 7);
+}
