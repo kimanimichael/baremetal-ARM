@@ -9,8 +9,12 @@ void OS_init(void) {
     *(uint32_t volatile *) 0xE000ED20 |= (0xFFu << 16);
 }
 
+/* only call this when interrupts are disabled*/
 void OS_sched(void) {
-
+    /* trigger a PendSV exception*/
+    if (OS_next != OS_curr) {
+        *(uint32_t *) 0xE000ED04 = (1 << 28);
+    }
 }
 void OSThread_start(
     OSThread *me,
