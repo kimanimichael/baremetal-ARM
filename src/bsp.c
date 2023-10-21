@@ -47,6 +47,7 @@ void BSP_init() {
 
     //Find out why this isn't necessary
     __enable_irq();
+    NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 void BSP_ledInit() {
