@@ -31,6 +31,7 @@ arm-none-eabi-ld -Map build/main.map -T startup/linker.ld -o main.elf build/star
 # arm-none-eabi-ld -Map build/main.map -T startup/linker.ld -o build/main.elf build/startup.o build/bsp.o build/delay.o build/miros.o build/system_stm32f4xx.o build/main.o
 # arm-none-eabi-ld -Map build/main.map -T startup/linker.ld -o main.elf build/startup.o build/bsp.o build/delay.o build/miros.o build/system_stm32f4xx.o build/main.o
 
+arm-none-eabi-ld -Map build/main.map -T startup/linker.ld -o build/main.elf build/startup.o build/bsp.o build/delay.o build/miros.o build/main.o
 
 # arm-none-eabi-ld -T linker.ld -o main.elf delay.o main.o
 arm-none-eabi-objcopy -O binary build/main.elf build/main.bin
