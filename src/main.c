@@ -1,6 +1,7 @@
 #include "stdint.h"
 
 #include "../include/bsp.h"
+#include "../include/miros.h"
 
 
 /**
@@ -16,7 +17,8 @@ void main_blinky1();
 void main_blinky2();
 
 uint32_t stack_blinky1[40];
-uint32_t *sp_blinky1 = &stack_blinky1[40];
+OSThread blinky1;
+// uint32_t *sp_blinky1 = &stack_blinky1[40];
 
 void main_blinky1() {
     while (1)
@@ -29,6 +31,8 @@ void main_blinky1() {
 uint32_t stack_blinky2[40];
 uint32_t *sp_blinky2 = &stack_blinky2[40];
 
+OSThread blinky2;
+// uint32_t *sp_blinky2 = &stack_blinky2[40];
 void main_blinky2() {
     while (1)
     {
@@ -40,6 +44,7 @@ void main_blinky2() {
 
 int main() {
     BSP_init();
+    OS_init();
     BSP_ledInit();
     BSP_blueLedOn();
 //    main_blinky2();
@@ -83,6 +88,21 @@ int main() {
 //
     while (1) {
 
+    // Set the thumb state
+    OSThread_start(&blinky1,
+                   &main_blinky1,
+                   stack_blinky1,
+                   sizeof(stack_blinky1));
+
+    OSThread_start(&blinky2,
+                   &main_blinky2,
+                   stack_blinky2,
+                   sizeof(stack_blinky2));
+
+    while (1)
+    {
+        /* code */
+        BSP_blueLedOn();
     }
 }
 
