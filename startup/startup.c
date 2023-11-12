@@ -16,8 +16,14 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
     (unsigned int *)HardFault_Handler, //HardFault
     (unsigned int *)MemManage_Handler, //MemManage
     (unsigned int *)BusFault_Handler, //BusFault
+    (unsigned int *)UsageFault_Handler, //MemManage
+    0,
+    0,
+    0,
+    0,
     (unsigned int *)SVC_Handler, //UsageFault
     (unsigned int *)DebugMon_Handler, //DebugMon_Handler
+    0,
     (unsigned int *)PendSV_Handler, //PendSV_Handler
     (unsigned int *)SysTick_Handler, //SysTick_Handler
 };
@@ -104,4 +110,4 @@ void Unused_Handler (void)
 #pragma weak SVC_Handler = Unused_Handler
 #pragma weak DebugMon_Handler = Unused_Handler
 #pragma weak PendSV_Handler = Unused_Handler
-#pragma weak SysTick_Handler = Unused_Handler
+// #pragma weak SysTick_Handler = Unused_Handler
