@@ -24,10 +24,14 @@ int main()
     //Find out why this isn't necessary
     __enable_irq();
 
-    ledOn();
+    // ledOn();
 
     while (1)
     {
+        __disable_irq();
+        GPIOx_ODR ^= (0b01 << 0);
+        // delay(100000);
+        __enable_irq();
         
     }
     
