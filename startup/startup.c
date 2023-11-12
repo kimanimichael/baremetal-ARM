@@ -1,4 +1,5 @@
-#include "../include/defs.h"
+#include "../include/bsp.h"
+#include "../include/main.h"
 #include "../include/cmsis/stm32f429xx.h"
 #include "../include/cmsis/stm32f4xx_it.h"
 
@@ -44,6 +45,7 @@ void start()
     {
         *dest++ = 0;
     }
+    // SystemInit();
     main();
 }
 
