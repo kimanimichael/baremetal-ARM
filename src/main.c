@@ -1,38 +1,34 @@
 #include "../include/defs.h"
 #include "../include/delay.h"
 #include "stdint.h"
+#include "../include/cmsis/stm32f429xx.h"
+#include "../include/bsp.h"
 
-//Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
-#define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
 
-//Base GPIOB register 0x4002 0400 + offset 0x00 to find GPIOB_MODER
-#define GPIOB_MODER (*((unsigned int *)(0x40020400)))
-
-//Base GPIOB register 0x4002 0400 + offset 0x14 to find GPIOx_ODR
-#define GPIOx_ODR (*((unsigned int *)(0x40020414)))
 /**
  * @brief main program function
  * @author @Mike-Kimani
 */
+
 int main()
 {
-    //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN
+    //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
     RCC_AH1BEN |= (0b01 << 1);
-    //Bitwise AND the 16th bit of GPIOB_MODER with 0
-    GPIOB_MODER &= (0b00 << 15);
-    //Bitwise OR the 15th bit of GPIOB_MODER with 1
-    GPIOB_MODER |= (0b01 << 14);
+    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 as output
+    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1));
+    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 as output
+    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0));
     
+    SysTick_Config(SYS_CLCK_HZ/2);
+
+    //Find out why this isn't necessary
+    __enable_irq();
+
+    ledOn();
 
     while (1)
     {
-        //bit-wise OR the 8th bit in GPIOx_ODR with 1
-        GPIOx_ODR |= (0b01 << 7);
-        delay(500000);
-
-        //bit-wise AND the 8th bit in GPIOx_ODR with 0
-        GPIOx_ODR &= (0b0 << 7);
-        delay(500000);
+        
     }
     
 }
