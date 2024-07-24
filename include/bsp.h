@@ -1,9 +1,17 @@
 #ifndef __BSP__H
 #define __BSP__H
 
+/**
+ * @brief Initialize data and call main function
+*/
 void start();
-int *swap(int *x, int *y);
+/**
+ * @brief Unused handler to map to other undefined handlers
+*/
 void Unused_Handler (void);
+/**
+ * @brief Defines action on failure of an assertion
+*/
 void assert_failed(char const* file, int line);
 
 #include "stdint.h"
