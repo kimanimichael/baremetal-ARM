@@ -53,9 +53,9 @@ void BSP_ledInit() {
     //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
     RCC_AH1BEN |= (0b01 << 1);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1));
+    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) |(0b00 << 29));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0));
+    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28));
 }
 
 void BSP_greenLedToggle() {
@@ -80,4 +80,16 @@ void BSP_blueLedOn() {
 
 void BSP_blueLedOff() {
     GPIOx_ODR &= ~(0b01 << 7);
+}
+
+void BSP_redLedOn() {
+    GPIOx_ODR |= (0b01 << 14);
+}
+
+void BSP_redLedOff() {
+    GPIOx_ODR &= ~(0b01 << 14);
+}
+
+void BSP_redLedToggle() {
+    GPIOx_ODR ^= (0b01 << 14);
 }
