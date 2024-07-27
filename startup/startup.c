@@ -32,15 +32,22 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 void start()
 {
     unsigned int *src, *dest;
-
+    // source of initialized data in ROM
     src = _data_lma;
+    // destination of initialized data in RAM
     dest = _data_start;
+    /**
+     * Load initialized data from ROM to RAM
+    */
     while (dest < _data_end)
     {
         *dest++ = *src++;
     }
-
+    // start of
     dest = _bss_start;
+    /**
+     * Initialize uninitialized data to zero in RAM
+    */
     while (dest < _bss_end)
     {
         *dest++ = 0;
