@@ -3,11 +3,11 @@
 #include "../include/cmsis/stm32f429xx.h"
 #include "../include/cmsis/stm32f4xx_it.h"
 
-extern unsigned int *_data_start;
-extern unsigned int *_data_end;
-extern unsigned int * _bss_start;
-extern unsigned int * _bss_end;
-extern unsigned int * _data_lma;
+extern unsigned int _data_start;
+extern unsigned int _data_end;
+extern unsigned int  _bss_start;
+extern unsigned int  _bss_end;
+extern unsigned int  _data_lma;
 
 unsigned int *vectors[] __attribute__((section(".vectors"))) = 
 {
@@ -29,31 +29,42 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
     (unsigned int *)SysTick_Handler, //SysTick_Handler
 };
 
+//void start()
+//{
+//    volatile unsigned int *src, *dest;
+///**
+////     * Load initialized data from ROM to RAM
+////    */
+//    for (src = &_data_lma, dest = &_data_start; dest < &_data_end; src++, dest++)
+//        *dest = *src;
+//// Initialize all uninitialized variables (bss section) to 0
+//    for (dest = &_bss_start; dest < &_bss_end; dest++)
+//        *dest = 0;
+//    // SystemInit();
+//    main();
+//
+//    while (1);
+//}
+
 void start()
 {
     unsigned int *src, *dest;
-    // source of initialized data in ROM
-    src = _data_lma;
-    // destination of initialized data in RAM
-    dest = _data_start;
-    /**
-     * Load initialized data from ROM to RAM
-    */
-    while (dest < _data_end)
+
+    src = &_data_lma;
+    dest = &_data_start;
+    while (dest < &_data_end)
     {
         *dest++ = *src++;
     }
-    // start of
-    dest = _bss_start;
-    /**
-     * Initialize uninitialized data to zero in RAM
-    */
-    while (dest < _bss_end)
+
+    dest = &_bss_start;
+    while (dest < &_bss_end)
     {
         *dest++ = 0;
     }
     // SystemInit();
     main();
+    while (1);
 }
 
 void NMI_Handler (void) 
