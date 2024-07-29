@@ -12,12 +12,11 @@
 
 #ifdef blocking
 
-uint32_t stack_blinky1[40];
-uint32_t *sp_blinky1 = &stack_blinky1[40];
-
 void main_blinky1();
 void main_blinky2();
 
+uint32_t stack_blinky1[40];
+uint32_t *sp_blinky1 = &stack_blinky1[40];
 
 void main_blinky1() {
     while (1)
@@ -46,7 +45,7 @@ int main() {
 //    main_blinky2();
 
     /* fabricate Cortex-M ISR stack frame for blinky 1*/
-    *(--sp_blinky1) = (1U << 24); /* xPSR */
+    *(--sp_blinky1) = (1U << 24); /* xPSR */ // Stack pointer decremented as the arm cpu uses the full-stack i.e. stack pointer points to last used  stack entry
     *(--sp_blinky1) = (uint32_t)&main_blinky1;
     *(--sp_blinky1) = 0x0000000EU; /* LR */
     *(--sp_blinky1) = 0x0000000CU; /* R12 */
@@ -65,7 +64,6 @@ int main() {
     *(--sp_blinky2) = 0x00000001U; /* R1 */
     *(--sp_blinky2) = 0x00000000U; /* R0 */
 //
-    BSP_redLedOn();
     while (1) {
 
     }
