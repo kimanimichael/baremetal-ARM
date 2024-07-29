@@ -8,72 +8,69 @@ ROM              0x0000000008000000 0x0000000000200000 xr
 
 Linker script and memory map
 
-                0x0000000020030000                _estack = 0x20030000
-                0x0000000000000e00                _Min_Heap_Size = 0xe00
-                0x0000000000001a00                _Min_Stack_Size = 0x1a00
 
-.text           0x0000000008000000      0x5af
+.text           0x0000000008000000      0x5a7
  *(.vectors)
  .vectors       0x0000000008000000       0x40 build/startup.o
                 0x0000000008000000                vectors
  *(.text)
- .text          0x0000000008000040       0xe4 build/startup.o
+ .text          0x0000000008000040       0xd4 build/startup.o
                 0x0000000008000040                start
-                0x00000000080000ac                NMI_Handler
-                0x00000000080000c0                HardFault_Handler
-                0x00000000080000d4                MemManage_Handler
-                0x00000000080000e8                BusFault_Handler
-                0x00000000080000fc                UsageFault_Handler
-                0x0000000008000110                DebugMon_Handler
-                0x0000000008000110                PendSV_Handler
-                0x0000000008000110                Unused_Handler
-                0x0000000008000110                SVC_Handler
- .text          0x0000000008000124      0x2a4 build/bsp.o
-                0x00000000080001e8                assert_failed
-                0x00000000080001f6                SysTick_Handler
-                0x0000000008000210                ledOn
-                0x000000000800022c                BSP_Delay
-                0x0000000008000256                BSP_Tickr
-                0x000000000800027c                BSP_init
-                0x0000000008000294                BSP_ledInit
-                0x00000000080002cc                BSP_greenLedToggle
-                0x00000000080002e8                BSP_greenLedOn
-                0x0000000008000304                BSP_greenLedOff
-                0x0000000008000320                BSP_blueLedToggle
-                0x000000000800033c                BSP_blueLedOn
-                0x0000000008000358                BSP_blueLedOff
-                0x0000000008000374                BSP_redLedOn
-                0x0000000008000390                BSP_redLedOff
-                0x00000000080003ac                BSP_redLedToggle
- .text          0x00000000080003c8       0x20 build/delay.o
-                0x00000000080003c8                delay
- .text          0x00000000080003e8      0x164 build/main.o
-                0x00000000080003e8                main_blinky1
-                0x00000000080003f8                main_blinky2
-                0x0000000008000408                main
-                0x000000000800054c                . = ALIGN (0x4)
+                0x000000000800009c                NMI_Handler
+                0x00000000080000b0                HardFault_Handler
+                0x00000000080000c4                MemManage_Handler
+                0x00000000080000d8                BusFault_Handler
+                0x00000000080000ec                UsageFault_Handler
+                0x0000000008000100                DebugMon_Handler
+                0x0000000008000100                PendSV_Handler
+                0x0000000008000100                Unused_Handler
+                0x0000000008000100                SVC_Handler
+ .text          0x0000000008000114      0x2a4 build/bsp.o
+                0x00000000080001d8                assert_failed
+                0x00000000080001e6                SysTick_Handler
+                0x0000000008000200                ledOn
+                0x000000000800021c                BSP_Delay
+                0x0000000008000246                BSP_Tickr
+                0x000000000800026c                BSP_init
+                0x0000000008000284                BSP_ledInit
+                0x00000000080002bc                BSP_greenLedToggle
+                0x00000000080002d8                BSP_greenLedOn
+                0x00000000080002f4                BSP_greenLedOff
+                0x0000000008000310                BSP_blueLedToggle
+                0x000000000800032c                BSP_blueLedOn
+                0x0000000008000348                BSP_blueLedOff
+                0x0000000008000364                BSP_redLedOn
+                0x0000000008000380                BSP_redLedOff
+                0x000000000800039c                BSP_redLedToggle
+ .text          0x00000000080003b8       0x20 build/delay.o
+                0x00000000080003b8                delay
+ .text          0x00000000080003d8      0x16c build/main.o
+                0x00000000080003d8                main_blinky1
+                0x00000000080003e8                main_blinky2
+                0x00000000080003f8                main
+                0x0000000008000544                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x000000000800054c       0x63 build/startup.o
+ .rodata        0x0000000008000544       0x63 build/startup.o
 
-.glue_7         0x00000000080005b0        0x0
- .glue_7        0x00000000080005b0        0x0 linker stubs
+.glue_7         0x00000000080005a8        0x0
+ .glue_7        0x00000000080005a8        0x0 linker stubs
 
-.glue_7t        0x00000000080005b0        0x0
- .glue_7t       0x00000000080005b0        0x0 linker stubs
+.glue_7t        0x00000000080005a8        0x0
+ .glue_7t       0x00000000080005a8        0x0 linker stubs
 
-.vfp11_veneer   0x00000000080005b0        0x0
- .vfp11_veneer  0x00000000080005b0        0x0 linker stubs
+.vfp11_veneer   0x00000000080005a8        0x0
+ .vfp11_veneer  0x00000000080005a8        0x0 linker stubs
 
-.v4_bx          0x00000000080005b0        0x0
- .v4_bx         0x00000000080005b0        0x0 linker stubs
+.v4_bx          0x00000000080005a8        0x0
+ .v4_bx         0x00000000080005a8        0x0 linker stubs
 
-.iplt           0x00000000080005b0        0x0
- .iplt          0x00000000080005b0        0x0 build/startup.o
+.iplt           0x00000000080005a8        0x0
+ .iplt          0x00000000080005a8        0x0 build/startup.o
 
-.rel.dyn        0x00000000080005b0        0x0
- .rel.iplt      0x00000000080005b0        0x0 build/startup.o
+.rel.dyn        0x00000000080005a8        0x0
+ .rel.iplt      0x00000000080005a8        0x0 build/startup.o
 
-.data           0x0000000020000000        0x8 load address 0x00000000080005af
+.data           0x0000000020000000        0x8 load address 0x00000000080005a7
                 0x0000000020000000                _data_start = .
  *(.data)
  .data          0x0000000020000000        0x0 build/startup.o
@@ -84,25 +81,24 @@ Linker script and memory map
                 0x0000000020000004                sp_blinky2
                 0x0000000020000008                . = ALIGN (0x4)
                 0x0000000020000008                _data_end = .
-                0x00000000080005af                _data_lma = LOADADDR (.data)
+                0x00000000080005a7                _data_lma = LOADADDR (.data)
 
-.igot.plt       0x0000000020000008        0x0 load address 0x00000000080005b7
+.igot.plt       0x0000000020000008        0x0 load address 0x00000000080005af
  .igot.plt      0x0000000020000008        0x0 build/startup.o
 
-.bss            0x0000000020000008      0x148 load address 0x00000000080005b7
+.bss            0x0000000020000008      0x144 load address 0x00000000080005af
                 0x0000000020000008                _bss_start = .
  *(.bss)
  .bss           0x0000000020000008        0x0 build/startup.o
  .bss           0x0000000020000008        0x4 build/bsp.o
                 0x0000000020000008                l_tickrCtr
  .bss           0x000000002000000c        0x0 build/delay.o
- *fill*         0x000000002000000c        0x4 
- .bss           0x0000000020000010      0x140 build/main.o
-                0x0000000020000010                stack_blinky1
-                0x00000000200000b0                stack_blinky2
+ .bss           0x000000002000000c      0x140 build/main.o
+                0x000000002000000c                stack_blinky1
+                0x00000000200000ac                stack_blinky2
  *(COMMON)
-                0x0000000020000150                . = ALIGN (0x4)
-                0x0000000020000150                _bss_end = .
+                0x000000002000014c                . = ALIGN (0x4)
+                0x000000002000014c                _bss_end = .
 LOAD build/startup.o
 LOAD build/bsp.o
 LOAD build/delay.o
@@ -110,17 +106,17 @@ LOAD build/main.o
 OUTPUT(main.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x0000000000000000      0xbd1
+.debug_info     0x0000000000000000      0xbcf
  .debug_info    0x0000000000000000      0x16d build/startup.o
  .debug_info    0x000000000000016d      0x8f3 build/bsp.o
  .debug_info    0x0000000000000a60       0x53 build/delay.o
- .debug_info    0x0000000000000ab3      0x11e build/main.o
+ .debug_info    0x0000000000000ab3      0x11c build/main.o
 
-.debug_abbrev   0x0000000000000000      0x41e
+.debug_abbrev   0x0000000000000000      0x408
  .debug_abbrev  0x0000000000000000       0xbf build/startup.o
  .debug_abbrev  0x00000000000000bf      0x264 build/bsp.o
  .debug_abbrev  0x0000000000000323       0x4c build/delay.o
- .debug_abbrev  0x000000000000036f       0xaf build/main.o
+ .debug_abbrev  0x000000000000036f       0x99 build/main.o
 
 .debug_aranges  0x0000000000000000       0x80
  .debug_aranges
@@ -132,11 +128,11 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000060       0x20 build/main.o
 
-.debug_line     0x0000000000000000      0x579
- .debug_line    0x0000000000000000       0xac build/startup.o
- .debug_line    0x00000000000000ac      0x29c build/bsp.o
- .debug_line    0x0000000000000348       0x4f build/delay.o
- .debug_line    0x0000000000000397      0x1e2 build/main.o
+.debug_line     0x0000000000000000      0x581
+ .debug_line    0x0000000000000000       0xb0 build/startup.o
+ .debug_line    0x00000000000000b0      0x29c build/bsp.o
+ .debug_line    0x000000000000034c       0x4f build/delay.o
+ .debug_line    0x000000000000039b      0x1e6 build/main.o
 
 .debug_str      0x0000000000000000      0x9cc
  .debug_str     0x0000000000000000      0x1a9 build/startup.o
@@ -166,8 +162,8 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000000000008a       0x2e build/main.o
 
-.debug_frame    0x0000000000000000      0x3f4
- .debug_frame   0x0000000000000000       0xdc build/startup.o
- .debug_frame   0x00000000000000dc      0x27c build/bsp.o
- .debug_frame   0x0000000000000358       0x38 build/delay.o
- .debug_frame   0x0000000000000390       0x64 build/main.o
+.debug_frame    0x0000000000000000      0x3f0
+ .debug_frame   0x0000000000000000       0xd8 build/startup.o
+ .debug_frame   0x00000000000000d8      0x27c build/bsp.o
+ .debug_frame   0x0000000000000354       0x38 build/delay.o
+ .debug_frame   0x000000000000038c       0x64 build/main.o
