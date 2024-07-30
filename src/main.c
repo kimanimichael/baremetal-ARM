@@ -18,7 +18,7 @@ void main_blinky2();
 
 uint32_t stack_blinky1[40];
 OSThread blinky1;
-// uint32_t *sp_blinky1 = &stack_blinky1[40];
+ uint32_t *sp_blinky1 = &stack_blinky1[40];
 
 void main_blinky1() {
     while (1)
@@ -50,8 +50,9 @@ int main() {
 //    main_blinky2();
 
     /* fabricate Cortex-M ISR stack frame for blinky 1*/
-    *(--sp_blinky1) = (1U << 24); /* xPSR */ // Stack pointer decremented as the arm cpu uses the full-stack i.e. stack pointer points to last used  stack entry
-    *(--sp_blinky1) = (uint32_t)&main_blinky1;
+    *(--sp_blinky1) = (1U
+            << 24); /* xPSR */ // Stack pointer decremented as the arm cpu uses the full-stack i.e. stack pointer points to last used  stack entry
+    *(--sp_blinky1) = (uint32_t) &main_blinky1;
     *(--sp_blinky1) = 0x0000000EU; /* LR */
     *(--sp_blinky1) = 0x0000000CU; /* R12 */
     *(--sp_blinky1) = 0x00000003U; /* R3 */
@@ -69,7 +70,7 @@ int main() {
     *(--sp_blinky1) = 0x00000004U; /* R4 */
     /* fabricate Cortex-M ISR stack frame for blinky 2*/
     *(--sp_blinky2) = (1U << 24); /* xPSR */
-    *(--sp_blinky2) = (uint32_t)&main_blinky2;
+    *(--sp_blinky2) = (uint32_t) &main_blinky2;
     *(--sp_blinky2) = 0x0000000EU; /* LR */
     *(--sp_blinky2) = 0x0000000CU; /* R12 */
     *(--sp_blinky2) = 0x00000003U; /* R3 */
@@ -88,24 +89,23 @@ int main() {
 //
     while (1) {
 
-    // Set the thumb state
-    OSThread_start(&blinky1,
-                   &main_blinky1,
-                   stack_blinky1,
-                   sizeof(stack_blinky1));
+        // Set the thumb state
+        OSThread_start(&blinky1,
+                       &main_blinky1,
+                       stack_blinky1,
+                       sizeof(stack_blinky1));
 
-    OSThread_start(&blinky2,
-                   &main_blinky2,
-                   stack_blinky2,
-                   sizeof(stack_blinky2));
+        OSThread_start(&blinky2,
+                       &main_blinky2,
+                       stack_blinky2,
+                       sizeof(stack_blinky2));
 
-    while (1)
-    {
-        /* code */
-        BSP_blueLedOn();
+        while (1) {
+            /* code */
+            BSP_blueLedOn();
+        }
     }
 }
-
 
 
 #else
