@@ -18,5 +18,6 @@ target_sources(${APP_TARGET}
         src/delay.c
         src/bsp.c
         core/system_stm32f4xx.c
+        core/miros/miros.c
         startup/startup.c
 )
