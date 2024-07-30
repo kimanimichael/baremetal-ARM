@@ -1,2 +1,5 @@
 .vscode/settings.json
-CMakeLists.txt
+cmake_build_clion/
+main.elf
+.idea/
+build/
