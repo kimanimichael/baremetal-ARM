@@ -1,9 +1,7 @@
 #include "stdint.h"
-
 #include "../include/bsp.h"
 #include "../include/miros.h"
-
-
+#include "../include/main.h"
 /**
  * @brief main program function
  * @author @Mike-Kimani
@@ -13,12 +11,8 @@
 
 #ifdef blocking
 
-void main_blinky1();
-void main_blinky2();
-
 uint32_t stack_blinky1[40];
 OSThread blinky1;
-// uint32_t *sp_blinky1 = &stack_blinky1[40];
 
 void main_blinky1() {
     while (1)
@@ -28,11 +22,9 @@ void main_blinky1() {
     }
 
 }
-uint32_t stack_blinky2[40];
-//uint32_t *sp_blinky2 = &stack_blinky2[40];
 
+uint32_t stack_blinky2[40];
 OSThread blinky2;
-// uint32_t *sp_blinky2 = &stack_blinky2[40];
 void main_blinky2() {
     while (1)
     {
