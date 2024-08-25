@@ -1,5 +1,6 @@
 #include "../include/cmsis/stm32f429xx.h"
 #include "../include/bsp.h"
+#include "../include/miros.h"
 
 void assert_failed(char const* file, int line) {
     /**
@@ -13,6 +14,10 @@ unsigned int volatile l_tickrCtr;
 void SysTick_Handler (void) 
 {
     ++l_tickrCtr;
+    
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
 } 
 
 void ledOn() {
@@ -47,6 +52,7 @@ void BSP_init() {
 
     //Find out why this isn't necessary
     __enable_irq();
+    NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 void BSP_ledInit() {
