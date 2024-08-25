@@ -2,10 +2,6 @@
 #include "../include/bsp.h"
 #include "../include/miros.h"
 #include "../include/main.h"
-/**
- * @brief main program function
- * @author @Mike-Kimani
-*/
 
 #define blocking
 
@@ -33,19 +29,22 @@ void main_blinky2() {
     }
 
 }
-
+/**
+ * @brief main program function
+ * @author @Mike-Kimani
+*/
 int main() {
     BSP_init();
     OS_init();
     BSP_ledInit();
 
     while (1) {
-
+        /* fabricate Cortex-M ISR stack for blinky1 */
         OSThread_start(&blinky1,
                        &main_blinky1,
                        stack_blinky1,
                        sizeof(stack_blinky1));
-
+        /* fabricate Cortex-M ISR stack for blinky2 */
         OSThread_start(&blinky2,
                        &main_blinky2,
                        stack_blinky2,
