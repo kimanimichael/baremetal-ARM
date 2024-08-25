@@ -3,7 +3,7 @@
 #include "../../include/miros.h"
 
 /****************************************************************************
-* MInimal Real-time Operating System (MIROS)
+* Minimal Real-time Operating System (MIROS)
 * version 0.23 (matching lesson 23)
 *
 * This software is a teaching aid to illustrate the concepts underlying
@@ -79,7 +79,7 @@ void OSThread_start(
     *(--sp) = 0x00000005U; /* R5 */
     *(--sp) = 0x00000004U; /* R4 */
 
-    /* save the top of the stack in the thread's attibute */
+    /* save the top of the stack in the thread's attribute */
     me->sp = sp;
 
     /* round up the bottom of the stack to the 8-byte boundary */
