@@ -46,13 +46,9 @@ int main() {
     BSP_init();
     OS_init();
     BSP_ledInit();
-    BSP_blueLedOn();
-    BSP_blueLedOff();
-//    main_blinky2();
-//
+
     while (1) {
 
-        // Set the thumb state
         OSThread_start(&blinky1,
                        &main_blinky1,
                        stack_blinky1,
@@ -65,7 +61,7 @@ int main() {
 
         while (1) {
             /* code */
-            BSP_blueLedOff();
+            // BSP_blueLedOff();
         }
     }
 }
