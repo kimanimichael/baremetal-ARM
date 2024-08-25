@@ -43,6 +43,16 @@ void OS_init(void) {
 }
 
 void OS_sched(void) {
+    extern OSThread blinky1;
+    extern OSThread blinky2;
+
+    if (OS_curr == &blinky1) {
+        OS_next = &blinky2;
+    }
+    else {
+        OS_next = &blinky1;
+    }
+
     /* OS_next = ... */
     OSThread const *next = OS_next; /* volatile to temporary */
     if (next != OS_curr) {
