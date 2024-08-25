@@ -29,10 +29,7 @@ void main_blinky2() {
     }
 
 }
-/**
- * @brief main program function
- * @author @Mike-Kimani
-*/
+
 int main() {
     BSP_init();
     OS_init();
