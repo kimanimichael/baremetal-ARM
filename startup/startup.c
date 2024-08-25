@@ -11,7 +11,7 @@ extern unsigned int  _data_lma;
 
 unsigned int *vectors[] __attribute__((section(".vectors"))) = 
 {
-    (unsigned int *)0x20032000, //Pointer to the top of our stack memory
+    (unsigned int *)0x20030000, //Pointer to the top of our stack memory
     (unsigned int *)start, // Pointer to our reset handler - also our startup code
     (unsigned int *)NMI_Handler, //NMI
     (unsigned int *)HardFault_Handler, //HardFault
