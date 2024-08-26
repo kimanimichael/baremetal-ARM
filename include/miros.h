@@ -26,7 +26,10 @@ void OS_sched(void);
  * @brief Callback to configure  and start interrupts
  */
 void OS_onStartup(void);
-
+/**
+ * @brief Transfer control to the RTOS to run threads
+ */
+void OS_run(void);
 
 /**
  * @brief Fabricate Cortex-M ISR stack
