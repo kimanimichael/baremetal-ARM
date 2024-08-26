@@ -43,7 +43,6 @@ int main() {
     OS_init();
     BSP_ledInit();
 
-    while (1) {
         /* fabricate Cortex-M ISR stack for blinky1 */
         OSThread_start(&blinky1,
                        &main_blinky1,
@@ -61,7 +60,6 @@ int main() {
             sizeof(stack_blinky3));
 
         OS_run();
-    }
 }
 
 
