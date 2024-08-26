@@ -60,10 +60,7 @@ int main() {
             stack_blinky3,
             sizeof(stack_blinky3));
 
-        while (1) {
-            /* code */
-            // BSP_blueLedOff();
-        }
+        OS_run();
     }
 }
 
