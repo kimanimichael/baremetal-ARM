@@ -15,5 +15,10 @@ void main_blinky1();
  * @author @kimanimichael
 */
 void main_blinky2();
+/**
+ * @brief Blink red led
+ * @author @kimanimichael
+*/
+void main_blinky3();
 
 #endif
