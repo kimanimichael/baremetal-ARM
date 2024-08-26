@@ -34,7 +34,7 @@ OSThread blinky3;
 void main_blinky3() {
     while (1) {
         BSP_redLedToggle();
-        BSP_Delay(100);
+        BSP_Delay(50);
     }
 }
 
