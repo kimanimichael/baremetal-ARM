@@ -37,21 +37,21 @@ Q_DEFINE_THIS_FILE
 OSThread * volatile OS_curr; /* pointer to the current thread */
 OSThread * volatile OS_next; /* pointer to the next thread to run */
 
+OSThread *OS_thread[32 + 1]; /* array of threads */
+uint8_t OS_threadNum; /* number of threads started so far */
+uint8_t OS_currIndex; /* current thread index for round-robin */
+
 void OS_init(void) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
 }
 
 void OS_sched(void) {
-    extern OSThread blinky1;
-    extern OSThread blinky2;
-
-    if (OS_curr == &blinky1) {
-        OS_next = &blinky2;
+    OS_currIndex++;
+    if (OS_currIndex > OS_threadNum) {
+        OS_currIndex = 0;
     }
-    else {
-        OS_next = &blinky1;
-    }
+    OS_next = OS_thread[OS_currIndex];
 
     /* OS_next = ... */
     OSThread const *next = OS_next; /* volatile to temporary */
@@ -99,6 +99,11 @@ void OSThread_start(
     for (sp = sp - 1U; sp >= stk_limit; --sp) {
         *sp = 0xDEADBEEFU;
     }
+
+    Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
+
+    OS_thread[OS_threadNum] = me;
+    ++OS_threadNum;
 }
 
 /* inline assembly syntax for Compiler 6 (ARMCLANG) */
