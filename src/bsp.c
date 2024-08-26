@@ -2,10 +2,14 @@
 #include "../include/bsp.h"
 #include "../include/miros.h"
 
-void assert_failed(char const* file, int line) {
-    /**
-     * @brief Resets the system,
-    */
+void assert_failed(char const* module, int id) {
+    Q_onError(module, id);
+}
+
+void Q_onError(char const* module, int id) {
+    /* TBD Damage control */
+    (void)module;
+    (void)id;
     NVIC_SystemReset();
 }
 

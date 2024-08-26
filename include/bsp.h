@@ -12,7 +12,9 @@ void Unused_Handler (void);
 /**
  * @brief Defines action on failure of an assertion
 */
-void assert_failed(char const* file, int line);
+void assert_failed(char const* module, int id);
+
+void Q_onError(char const* module, int id);
 
 #include "stdint.h"
 
