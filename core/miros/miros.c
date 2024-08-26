@@ -60,6 +60,17 @@ void OS_sched(void) {
     }
 }
 
+void OS_run(void) {
+    OS_onStartup();
+
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
+    /* code should never get here as the PendSV exception occurs immediately after enabling interrupts*/
+    Q_ERROR();
+}
+
+
 void OSThread_start(
         OSThread *me,
         OSThreadHandler threadHandler,
