@@ -1,19 +1,13 @@
-#include <stdint.h>
-#include "../../include/cmsis/stm32f429xx.h"
-#include "../../include/miros.h"
-
 /****************************************************************************
 * Minimal Real-time Operating System (MIROS)
-* version 0.23 (matching lesson 23)
 *
-* This software is a teaching aid to illustrate the concepts underlying
-* a Real-Time Operating System (RTOS). The main goal of the software is
+* The main goal of the software is
 * simplicity and clear presentation of the concepts, but without dealing
 * with various corner cases, portability, or error handling. For these
 * reasons, the software is generally NOT intended or recommended for use
 * in commercial applications.
 *
-* Copyright (C) 2018 Miro Samek. All Rights Reserved.
+* Copyright (C) 2024 Michael Kimani. All Rights Reserved.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,11 +22,17 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 *
-* Contact Information:
-* https://www.state-machine.com
 ****************************************************************************/
+
 #include <stdint.h>
-//#include "miros.h"
+#include "../../include/cmsis/stm32f429xx.h"
+#include "../../include/miros.h"
+
+#include <stdbool.h>
+
+#include "../../qpc/include/qsafe.h"
+
+Q_DEFINE_THIS_FILE
 
 OSThread * volatile OS_curr; /* pointer to the current thread */
 OSThread * volatile OS_next; /* pointer to the next thread to run */
