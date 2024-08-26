@@ -48,7 +48,7 @@ void OS_init(void) {
 
 void OS_sched(void) {
     OS_currIndex++;
-    if (OS_currIndex > OS_threadNum) {
+    if (OS_currIndex == OS_threadNum) {
         OS_currIndex = 0;
     }
     OS_next = OS_thread[OS_currIndex];
