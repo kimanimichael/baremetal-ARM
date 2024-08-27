@@ -1,19 +1,13 @@
-#include <stdint.h>
-#include "../../include/cmsis/stm32f429xx.h"
-#include "../../include/miros.h"
-
 /****************************************************************************
 * Minimal Real-time Operating System (MIROS)
-* version 0.23 (matching lesson 23)
 *
-* This software is a teaching aid to illustrate the concepts underlying
-* a Real-Time Operating System (RTOS). The main goal of the software is
+* The main goal of the software is
 * simplicity and clear presentation of the concepts, but without dealing
 * with various corner cases, portability, or error handling. For these
 * reasons, the software is generally NOT intended or recommended for use
 * in commercial applications.
 *
-* Copyright (C) 2018 Miro Samek. All Rights Reserved.
+* Copyright (C) 2024 Michael Kimani. All Rights Reserved.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,14 +22,24 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 *
-* Contact Information:
-* https://www.state-machine.com
 ****************************************************************************/
+
 #include <stdint.h>
-//#include "miros.h"
+#include "../../include/cmsis/stm32f429xx.h"
+#include "../../include/miros.h"
+
+#include <stdbool.h>
+
+#include "../../qpc/include/qsafe.h"
+
+Q_DEFINE_THIS_FILE
 
 OSThread * volatile OS_curr; /* pointer to the current thread */
 OSThread * volatile OS_next; /* pointer to the next thread to run */
+
+OSThread *OS_thread[32 + 1]; /* array of threads */
+uint8_t OS_threadNum; /* number of threads started so far */
+uint8_t OS_currIndex; /* current thread index for round-robin */
 
 void OS_init(void) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
@@ -43,12 +47,29 @@ void OS_init(void) {
 }
 
 void OS_sched(void) {
+    OS_currIndex++;
+    if (OS_currIndex == OS_threadNum) {
+        OS_currIndex = 0;
+    }
+    OS_next = OS_thread[OS_currIndex];
+
     /* OS_next = ... */
     OSThread const *next = OS_next; /* volatile to temporary */
     if (next != OS_curr) {
         *(uint32_t volatile *)0xE000ED04 = (1U << 28);
     }
 }
+
+void OS_run(void) {
+    OS_onStartup();
+
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
+    /* code should never get here as the PendSV exception occurs immediately after enabling interrupts*/
+    Q_ERROR();
+}
+
 
 void OSThread_start(
         OSThread *me,
@@ -89,6 +110,11 @@ void OSThread_start(
     for (sp = sp - 1U; sp >= stk_limit; --sp) {
         *sp = 0xDEADBEEFU;
     }
+
+    Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
+
+    OS_thread[OS_threadNum] = me;
+    ++OS_threadNum;
 }
 
 /* inline assembly syntax for Compiler 6 (ARMCLANG) */
