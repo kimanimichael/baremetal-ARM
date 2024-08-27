@@ -2,11 +2,22 @@
 #include "../include/bsp.h"
 #include "../include/miros.h"
 
-void assert_failed(char const* file, int line) {
-    /**
-     * @brief Resets the system,
-    */
+void assert_failed(char const* module, int id) {
+    Q_onError(module, id);
+}
+
+void Q_onError(char const* module, int id) {
+    /* TBD Damage control */
+    (void)module;
+    (void)id;
     NVIC_SystemReset();
+}
+
+void OS_onStartup(void) {
+    SystemCoreClockUpdate();
+    SysTick_Config(16000000/BSP_TICKS_PER_SEC);
+
+    NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 unsigned int volatile l_tickrCtr;
@@ -47,12 +58,7 @@ uint32_t BSP_Tickr(void) {
 }
 
 void BSP_init() {
-    // SystemCoreClockUpdate();
-    SysTick_Config(16000000/BSP_TICKS_PER_SEC);
 
-    //Find out why this isn't necessary
-    __enable_irq();
-    NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 void BSP_ledInit() {
@@ -99,3 +105,4 @@ void BSP_redLedOff() {
 void BSP_redLedToggle() {
     GPIOx_ODR ^= (0b01 << 14);
 }
+
