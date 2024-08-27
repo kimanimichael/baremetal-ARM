@@ -41,9 +41,25 @@ OSThread *OS_thread[32 + 1]; /* array of threads */
 uint8_t OS_threadNum; /* number of threads started so far */
 uint8_t OS_currIndex; /* current thread index for round-robin */
 
-void OS_init(void) {
+OSThread idle_thread;
+
+void main_idle() {
+    while(1) {
+        OS_on_idle();
+    }
+}
+
+
+
+void OS_init(void *stkSto, uint32_t stkSize) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
+
+    OSThread_start(&idle_thread,
+    &main_idle,
+    stkSto,
+    stkSize
+    );
 }
 
 void OS_sched(void) {

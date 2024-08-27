@@ -8,6 +8,7 @@ typedef struct
 {
     void *sp; /*Stack pointer*/
     /*... Other thread attributes*/
+
 } OSThread;
 
 /* Function pointer to function run in thread */
@@ -16,7 +17,12 @@ typedef void (*OSThreadHandler)();
 /**
  * @brief Initialize thread handling setting
  */
-void OS_init(void);
+void OS_init(void *stkSto, uint32_t stkSize);
+/**
+ * @brief Callback to run idle thread
+ */
+void OS_on_idle();
+
 /**
  * @brief Set the bit for PendSV to be triggered if next thread is different with current thread
  * @attention Function must be called with interrupts disabled
