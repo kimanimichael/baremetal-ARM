@@ -38,9 +38,10 @@ void main_blinky3() {
     }
 }
 
+uint32_t stack_idle_thread[40];
 int main() {
     BSP_init();
-    OS_init();
+    OS_init(stack_idle_thread, sizeof(stack_idle_thread));
     BSP_ledInit();
 
     /* fabricate Cortex-M ISR stack for blinky1 */
