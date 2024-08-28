@@ -8,7 +8,7 @@ typedef struct
 {
     void *sp; /*Stack pointer*/
     /*... Other thread attributes*/
-
+    uint32_t timeout;
 } OSThread;
 
 /* Function pointer to function run in thread */
