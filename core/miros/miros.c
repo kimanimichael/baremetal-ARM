@@ -40,6 +40,7 @@ OSThread * volatile OS_next; /* pointer to the next thread to run */
 OSThread *OS_thread[32 + 1]; /* array of threads */
 uint8_t OS_threadNum; /* number of threads started so far */
 uint8_t OS_currIndex; /* current thread index for round-robin */
+uint32_t OS_ready_set; /* bit mask of threads that are ready to run*/
 
 OSThread idle_thread;
 
@@ -63,17 +64,24 @@ void OS_init(void *stkSto, uint32_t stkSize) {
 }
 
 void OS_sched(void) {
-    OS_currIndex++;
-    if (OS_currIndex == OS_threadNum) {
+    if (OS_ready_set == 0U) {
         OS_currIndex = 0;
     }
-    OS_next = OS_thread[OS_currIndex];
-
-    /* OS_next = ... */
-    OSThread const *next = OS_next; /* volatile to temporary */
-    if (next != OS_curr) {
-        *(uint32_t volatile *)0xE000ED04 = (1U << 28);
+    else {
+        do {
+            OS_currIndex++;
+            if (OS_currIndex == OS_threadNum) {
+                OS_currIndex = 1;
+            }
+        } while ((OS_ready_set & (1 << (OS_currIndex - 1))) == 0);
     }
+        OS_next = OS_thread[OS_currIndex];
+
+        /* OS_next = ... */
+        OSThread const *next = OS_next; /* volatile to temporary */
+        if (next != OS_curr) {
+            *(uint32_t volatile *)0xE000ED04 = (1U << 28);
+        }
 }
 
 void OS_run(void) {
