@@ -14,7 +14,7 @@ void main_blinky1() {
     while (1)
     {
         BSP_greenLedToggle();
-        BSP_Delay(50);
+        OS_delay(50);
     }
 
 }
@@ -25,7 +25,7 @@ void main_blinky2() {
     while (1)
     {
         BSP_blueLedToggle();
-        BSP_Delay(50);
+        OS_delay(50);
     }
 
 }
@@ -34,7 +34,7 @@ OSThread blinky3;
 void main_blinky3() {
     while (1) {
         BSP_redLedToggle();
-        BSP_Delay(50);
+        OS_delay(50);
     }
 }
 

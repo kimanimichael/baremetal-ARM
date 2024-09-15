@@ -94,6 +94,28 @@ void OS_run(void) {
     Q_ERROR();
 }
 
+void OS_tick(void) {
+    for (uint8_t n = 1; n < OS_threadNum; n++) {
+        if (OS_thread[n]->timeout != 0) {
+            --OS_thread[n]->timeout;
+            if (OS_thread[n]->timeout == 0) {
+                OS_ready_set |= (1 << (n - 1));
+            }
+        }
+    }
+}
+
+void OS_delay(uint32_t ticks) {
+    __disable_irq();
+    /* OS_delay should never be called from the idle thread */
+    Q_REQUIRE(OS_curr != OS_thread[0]);
+
+    OS_curr->timeout = ticks;
+    OS_ready_set &= ~(1 << (OS_currIndex - 1));
+    OS_sched();
+    /* This switches the context immediately away from this thread as PendSV exception occurs immediately after enabling interrupts */
+    __enable_irq();
+}
 
 void OSThread_start(
         OSThread *me,
