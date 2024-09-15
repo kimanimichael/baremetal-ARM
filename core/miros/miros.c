@@ -160,6 +160,11 @@ void OSThread_start(
     Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
 
     OS_thread[OS_threadNum] = me;
+    /* Make thread ready to run. Except for the idle thread of course */
+    if (OS_threadNum > 0) {
+        OS_ready_set |= (1 << (OS_threadNum - 1));
+    }
+
     ++OS_threadNum;
 }
 
