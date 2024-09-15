@@ -32,6 +32,11 @@ void OS_sched(void);
  * @brief Callback to configure  and start interrupts
  */
 void OS_onStartup(void);
+/* blocking delay */
+void OS_delay(uint32_t ticks);
+/* processing all thread timeouts */
+void OS_tick(void);
+
 /**
  * @brief Transfer control to the RTOS to run threads
  */
