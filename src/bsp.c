@@ -67,9 +67,9 @@ void BSP_init() {
 void BSP_ledInit() {
     //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
     RCC_AH1BEN |= (0b01 << 1);
-    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 as output
+    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 as output
     GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) |(0b00 << 29));
-    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 as output
+    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 as output
     GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28));
 }
 
