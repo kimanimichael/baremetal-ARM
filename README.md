@@ -1,20 +1,39 @@
-# INSTRUCTIONS
+# BAREMETAL ARM
+This is an exploration building of embedded systems on arm microcontrollers without using any framework
 
-## BUILD
+It covers:
 
+<li>Blocking Design</li>
+<li>State Machine Deign</li>
+<li>RTOS design</li>
+<li>Event Driven Systems Design </li>
+
+## Hardware Requirements
+
+1. [NUCLEO-F429ZI board](https://www.st.com/en/evaluation-tools/nucleo-f429zi.html#samplebuy-scroll)
+2. USB-X to USB 2.0 Micro B cable
+
+
+Although this project is built for the NUCLEO-F429ZI development board, users can modify it, if they can, to fit other development boards
+
+
+## Installation
+### Prerequisites
+The following are required to build this program:
+1. [GNU Arm Embedded Toolchain](https://developer.arm.com/downloads/-/gnu-rm)
+
+The following are required to flash this program onto a microcontroller
+1. [stlink](https://github.com/stlink-org/stlink)
+
+## Build
+Ensure all prerequisites are met.
 ```console
-rm -rf build/
-mkdir build/
-arm-none-eabi-gcc -O0 -g -Wall -mcpu=cortex-m4 -mthumb -c -o build/startup.o startup/startup.c 
-arm-none-eabi-gcc -O0 -g -Wall -mcpu=cortex-m4 -mthumb -c -o build/bsp.o src/bsp.c 
-arm-none-eabi-gcc -O0 -g -Wall -mcpu=cortex-m4 -mthumb -c -o build/delay.o src/delay.c 
-arm-none-eabi-gcc -O0 -g -Wall -mcpu=cortex-m4 -mthumb -c -o build/main.o src/main.c 
-arm-none-eabi-ld -Map build/main.map -T startup/linker.ld -o build/main.elf build/startup.o build/bsp.o build/delay.o build/main.o
+./build.sh
 ```
-## FLASH
+## Flash
 
+Connect the board to your PC and run this in the terminal
 ```console
-arm-none-eabi-objcopy -O binary build/main.elf build/main.bin
-st-flash write build/main.bin 0x08000000
+./build_flash.sh
 ```
 
