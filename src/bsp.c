@@ -15,6 +15,7 @@ void Q_onError(char const* module, int id) {
 
 void OS_onStartup(void) {
     SystemCoreClockUpdate();
+    /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
 
     NVIC_SetPriority(SysTick_IRQn, 0U);
