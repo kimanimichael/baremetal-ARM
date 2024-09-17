@@ -15,6 +15,8 @@ void main_blinky1() {
     {
         BSP_greenLedToggle();
         BSP_Delay(50);
+        // BSP_greenLedOn();
+        // BSP_greenLedOff();
     }
 
 }
@@ -26,6 +28,8 @@ void main_blinky2() {
     {
         BSP_blueLedToggle();
         BSP_Delay(50);
+        // BSP_blueLedOn();
+        // BSP_blueLedOff();
     }
 
 }
@@ -35,6 +39,8 @@ void main_blinky3() {
     while (1) {
         BSP_redLedToggle();
         BSP_Delay(50);
+        // BSP_redLedOn();
+        // BSP_redLedOff();
     }
 }
 

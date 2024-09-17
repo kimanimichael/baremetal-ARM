@@ -24,11 +24,13 @@ unsigned int volatile l_tickrCtr;
 
 void SysTick_Handler (void) 
 {
+    GPIOx_ODR |= (0b01 << 1);
     ++l_tickrCtr;
     
     __disable_irq();
     OS_sched();
     __enable_irq();
+    GPIOx_ODR &= ~(0b01 << 1);
 } 
 
 void ledOn() {
@@ -64,10 +66,10 @@ void BSP_init() {
 void BSP_ledInit() {
     //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
     RCC_AH1BEN |= (0b01 << 1);
-    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) |(0b00 << 29));
-    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28));
+    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
+    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) |(0b00 << 29) |(0b00 << 3));
+    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
+    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) |(0b01 << 2));
 }
 
 void BSP_greenLedToggle() {
