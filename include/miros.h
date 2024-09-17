@@ -32,9 +32,14 @@ void OS_sched(void);
  * @brief Callback to configure  and start interrupts
  */
 void OS_onStartup(void);
-/* blocking delay */
+/**
+ * @brief Set number of clock ticks needed to unblock the calling thread
+ * @param ticks
+ */
 void OS_delay(uint32_t ticks);
-/* processing all thread timeouts */
+/**
+ * @brief Process timout for all threads
+ */
 void OS_tick(void);
 
 /**
