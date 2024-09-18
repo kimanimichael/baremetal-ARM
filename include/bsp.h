@@ -31,6 +31,12 @@ void Q_onError(char const* module, int id);
 //Base GPIOB register 0x4002 0400 + offset 0x14 to find GPIOx_ODR
 #define GPIOx_ODR (*((unsigned int *)(0x40020414)))
 
+//Base GPIOA register 0x4002 0000 + offset 0x00 to find GPIOA_MODER
+#define GPIOA_MODER (*((unsigned int *)(0x40020000)))
+
+//Base GPIOA register 0x4002 0000 + offset 0x14 to find GPIOx_ODR
+#define GPIOA_ODR (*((unsigned int *)(0x40020014)))
+
 /**
  * @brief Implements a delay
  * @author @Mike-Kimani
