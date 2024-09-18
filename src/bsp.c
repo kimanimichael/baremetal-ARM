@@ -22,8 +22,10 @@ void OS_onStartup(void) {
 }
 
 void OS_on_idle(void) {
-    GPIOx_ODR |= (0b01 << 14);
-    GPIOx_ODR &= ~(0b01 << 14);
+    // GPIOx_ODR |= (0b01 << 14);
+    // GPIOx_ODR &= ~(0b01 << 14);
+    // GPIOA_ODR |= (0b01 << 12);
+    // GPIOA_ODR &= ~(0b01 << 12);
 
 }
 
@@ -72,11 +74,15 @@ void BSP_init() {
 
 void BSP_ledInit() {
     //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 1);
+    RCC_AH1BEN |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) | (0b01 << 2));
+    /* Bitwise AND the second bit of GPIOA_MODER with 0 */
+    GPIOA_MODER &= (0b00 << 13);
+    /* Bite wise OR the 1st bit of GPIOA_MODER with 1*/
+    GPIOA_MODER |= (0b01 << 12);
 }
 
 void BSP_greenLedToggle() {
