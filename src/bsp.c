@@ -22,8 +22,10 @@ void OS_onStartup(void) {
 }
 
 void OS_on_idle(void) {
+    /* @TODO Investigate why this causes irregular thread switching */
     // GPIOx_ODR |= (0b01 << 14);
     // GPIOx_ODR &= ~(0b01 << 14);
+
     GPIOA_ODR |= (0b01 << 12);
     GPIOA_ODR &= ~(0b01 << 12);
 
@@ -80,7 +82,8 @@ void BSP_ledInit() {
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) | (0b01 << 2));
     /* Bitwise AND the 15th of GPIOA_MODER with 0 */
-    // GPIOA_MODER &= (0b00 << 15);
+    /* @TODO Investigate why this bricks flashing with stlink */
+    // GPIOA_MODER &= (0b00 << 25);
     /* Bite wise OR the 14th bit of GPIOA_MODER with 1*/
     GPIOA_MODER |= (0b01 << 24);
 }
