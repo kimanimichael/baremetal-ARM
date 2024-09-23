@@ -13,8 +13,10 @@ OSThread blinky1;
 void main_blinky1() {
     while (1)
     {
-        BSP_greenLedToggle();
-        OS_delay(50);
+        // BSP_greenLedToggle();
+        // OS_delay(50);
+        BSP_greenLedOn();
+        BSP_greenLedOff();
     }
 
 }
@@ -24,8 +26,10 @@ OSThread blinky2;
 void main_blinky2() {
     while (1)
     {
-        BSP_blueLedToggle();
-        OS_delay(50);
+        // BSP_blueLedToggle();
+        // OS_delay(50);
+        BSP_blueLedOn();
+        BSP_blueLedOff();
     }
 
 }
@@ -33,8 +37,10 @@ uint32_t stack_blinky3[40];
 OSThread blinky3;
 void main_blinky3() {
     while (1) {
-        BSP_redLedToggle();
-        OS_delay(50);
+        // BSP_redLedToggle();
+        // OS_delay(50);
+        BSP_redLedOn();
+        BSP_redLedOff();
     }
 }
 
