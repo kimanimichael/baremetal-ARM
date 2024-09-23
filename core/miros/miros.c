@@ -40,24 +40,48 @@ OSThread * volatile OS_next; /* pointer to the next thread to run */
 OSThread *OS_thread[32 + 1]; /* array of threads */
 uint8_t OS_threadNum; /* number of threads started so far */
 uint8_t OS_currIndex; /* current thread index for round-robin */
+uint32_t OS_ready_set; /* bit mask of threads that are ready to run*/
 
-void OS_init(void) {
+OSThread idle_thread;
+
+void main_idle() {
+    while(1) {
+        OS_on_idle();
+    }
+}
+
+
+
+void OS_init(void *stkSto, uint32_t stkSize) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
+
+    OSThread_start(&idle_thread,
+    &main_idle,
+    stkSto,
+    stkSize
+    );
 }
 
 void OS_sched(void) {
-    OS_currIndex++;
-    if (OS_currIndex == OS_threadNum) {
+    if (OS_ready_set == 0U) {
         OS_currIndex = 0;
     }
-    OS_next = OS_thread[OS_currIndex];
-
-    /* OS_next = ... */
-    OSThread const *next = OS_next; /* volatile to temporary */
-    if (next != OS_curr) {
-        *(uint32_t volatile *)0xE000ED04 = (1U << 28);
+    else {
+        do {
+            OS_currIndex++;
+            if (OS_currIndex == OS_threadNum) {
+                OS_currIndex = 1;
+            }
+        } while ((OS_ready_set & (1 << (OS_currIndex - 1))) == 0);
     }
+        OS_next = OS_thread[OS_currIndex];
+
+        /* OS_next = ... */
+        OSThread const *next = OS_next; /* volatile to temporary */
+        if (next != OS_curr) {
+            *(uint32_t volatile *)0xE000ED04 = (1U << 28);
+        }
 }
 
 void OS_run(void) {
@@ -70,6 +94,28 @@ void OS_run(void) {
     Q_ERROR();
 }
 
+void OS_tick(void) {
+    for (uint8_t n = 1; n < OS_threadNum; n++) {
+        if (OS_thread[n]->timeout != 0) {
+            --OS_thread[n]->timeout;
+            if (OS_thread[n]->timeout == 0) {
+                OS_ready_set |= (1 << (n - 1));
+            }
+        }
+    }
+}
+
+void OS_delay(uint32_t ticks) {
+    __disable_irq();
+    /* OS_delay should never be called from the idle thread */
+    Q_REQUIRE(OS_curr != OS_thread[0]);
+
+    OS_curr->timeout = ticks;
+    OS_ready_set &= ~(1 << (OS_currIndex - 1));
+    OS_sched();
+    /* This switches the context immediately away from this thread as PendSV exception occurs immediately after enabling interrupts */
+    __enable_irq();
+}
 
 void OSThread_start(
         OSThread *me,
@@ -114,6 +160,11 @@ void OSThread_start(
     Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
 
     OS_thread[OS_threadNum] = me;
+    /* Make thread ready to run. Except for the idle thread of course */
+    if (OS_threadNum > 0) {
+        OS_ready_set |= (1 << (OS_threadNum - 1));
+    }
+
     ++OS_threadNum;
 }
 

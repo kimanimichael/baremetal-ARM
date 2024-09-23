@@ -15,19 +15,32 @@ void Q_onError(char const* module, int id) {
 
 void OS_onStartup(void) {
     SystemCoreClockUpdate();
+    /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
 
     NVIC_SetPriority(SysTick_IRQn, 0U);
+}
+
+void OS_on_idle(void) {
+    /* @TODO Investigate why this causes irregular thread switching */
+    // GPIOx_ODR |= (0b01 << 14);
+    // GPIOx_ODR &= ~(0b01 << 14);
+
+    GPIOA_ODR |= (0b01 << 12);
+    GPIOA_ODR &= ~(0b01 << 12);
+
 }
 
 unsigned int volatile l_tickrCtr;
 
 void SysTick_Handler (void) 
 {
-    ++l_tickrCtr;
-    
+    GPIOx_ODR |= (0b01 << 1);
+    OS_tick();
+
     __disable_irq();
     OS_sched();
+    GPIOx_ODR &= ~(0b01 << 1);
     __enable_irq();
 } 
 
@@ -63,11 +76,16 @@ void BSP_init() {
 
 void BSP_ledInit() {
     //Bitwise OR the second bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 1);
-    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) |(0b00 << 29));
-    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 as output
-    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28));
+    RCC_AH1BEN |= (0b01 << 1) | (0b01 << 0);
+    //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
+    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
+    //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
+    GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) | (0b01 << 2));
+    /* Bitwise AND the 15th of GPIOA_MODER with 0 */
+    /* @TODO Investigate why this bricks flashing with stlink */
+    // GPIOA_MODER &= (0b00 << 25);
+    /* Bite wise OR the 14th bit of GPIOA_MODER with 1*/
+    GPIOA_MODER |= (0b01 << 24);
 }
 
 void BSP_greenLedToggle() {
