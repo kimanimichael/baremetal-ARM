@@ -1,13 +1,17 @@
 /****************************************************************************
-* Minimal Real-time Operating System (MIROS)
+* MInimal Real-time Operating System (MiROS), ARM-CLANG port.
+* version 1.26 (matching lesson 26, see https://youtu.be/kLxxXNCrY60)
 *
-* The main goal of the software is
+* This software is a teaching aid to illustrate the concepts underlying
+* a Real-Time Operating System (RTOS). The main goal of the software is
 * simplicity and clear presentation of the concepts, but without dealing
 * with various corner cases, portability, or error handling. For these
 * reasons, the software is generally NOT intended or recommended for use
 * in commercial applications.
 *
-* Copyright (C) 2024 Michael Kimani. All Rights Reserved.
+* Copyright (C) 2018 Miro Samek. All Rights Reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,8 +26,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 *
+* Git repo:
+* https://github.com/QuantumLeaps/MiROS
 ****************************************************************************/
-
 #include <stdint.h>
 #include "../../include/cmsis/stm32f429xx.h"
 #include "../../include/miros.h"
