@@ -41,6 +41,7 @@ typedef struct
     void *sp; /*Stack pointer*/
     /*... Other thread attributes*/
     uint32_t timeout;
+    uint8_t priority; /* thread priority */
 } OSThread;
 
 /* Function pointer to function run in thread */
@@ -82,11 +83,13 @@ void OS_run(void);
 /**
  * @brief Fabricate Cortex-M ISR stack
  * @param me thread whose stack frame is to be created
+ * @param priority priority of the thread
  * @param threadHandler function handled by the thread
  * @param stkSto allocated stack
  * @param stkSize size of allocated stack
  */
 void OSThread_start(
     OSThread *me,
+    uint8_t priority,
     OSThreadHandler threadHandler,
     void* stkSto, uint32_t stkSize);
