@@ -20,7 +20,7 @@ void Q_onError(char const* module, int id);
 
 #define SYS_CLCK_HZ 16000000U
 
-#define BSP_TICKS_PER_SEC 100
+#define BSP_TICKS_PER_SEC 1000
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
