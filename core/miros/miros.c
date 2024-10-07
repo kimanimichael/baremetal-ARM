@@ -1,13 +1,17 @@
 /****************************************************************************
-* Minimal Real-time Operating System (MIROS)
+* MInimal Real-time Operating System (MiROS), ARM-CLANG port.
+* version 1.26 (matching lesson 26, see https://youtu.be/kLxxXNCrY60)
 *
-* The main goal of the software is
+* This software is a teaching aid to illustrate the concepts underlying
+* a Real-Time Operating System (RTOS). The main goal of the software is
 * simplicity and clear presentation of the concepts, but without dealing
 * with various corner cases, portability, or error handling. For these
 * reasons, the software is generally NOT intended or recommended for use
 * in commercial applications.
 *
-* Copyright (C) 2024 Michael Kimani. All Rights Reserved.
+* Copyright (C) 2018 Miro Samek. All Rights Reserved.
+*
+* SPDX-License-Identifier: GPL-3.0-or-later
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,8 +26,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 *
+* Git repo:
+* https://github.com/QuantumLeaps/MiROS
 ****************************************************************************/
-
 #include <stdint.h>
 #include "../../include/cmsis/stm32f429xx.h"
 #include "../../include/miros.h"
@@ -38,9 +43,10 @@ OSThread * volatile OS_curr; /* pointer to the current thread */
 OSThread * volatile OS_next; /* pointer to the next thread to run */
 
 OSThread *OS_thread[32 + 1]; /* array of threads */
-uint8_t OS_threadNum; /* number of threads started so far */
-uint8_t OS_currIndex; /* current thread index for round-robin */
 uint32_t OS_ready_set; /* bit mask of threads that are ready to run*/
+uint32_t OS_delayed_set; /* bitmask of threads that are delayed */
+
+#define LOG2(x) (32 - __CLZ(x))
 
 OSThread idle_thread;
 
@@ -57,6 +63,7 @@ void OS_init(void *stkSto, uint32_t stkSize) {
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
 
     OSThread_start(&idle_thread,
+        0,
     &main_idle,
     stkSto,
     stkSize
@@ -65,17 +72,12 @@ void OS_init(void *stkSto, uint32_t stkSize) {
 
 void OS_sched(void) {
     if (OS_ready_set == 0U) {
-        OS_currIndex = 0;
+        OS_next = OS_thread[0];
     }
     else {
-        do {
-            OS_currIndex++;
-            if (OS_currIndex == OS_threadNum) {
-                OS_currIndex = 1;
-            }
-        } while ((OS_ready_set & (1 << (OS_currIndex - 1))) == 0);
+            OS_next = OS_thread[LOG2(OS_ready_set)];
+            Q_ASSERT(OS_next != (OSThread*)0);
     }
-        OS_next = OS_thread[OS_currIndex];
 
         /* OS_next = ... */
         OSThread const *next = OS_next; /* volatile to temporary */
@@ -95,13 +97,18 @@ void OS_run(void) {
 }
 
 void OS_tick(void) {
-    for (uint8_t n = 1; n < OS_threadNum; n++) {
-        if (OS_thread[n]->timeout != 0) {
-            --OS_thread[n]->timeout;
-            if (OS_thread[n]->timeout == 0) {
-                OS_ready_set |= (1 << (n - 1));
-            }
+    uint32_t working_set = OS_delayed_set;
+    while (working_set != 0U) {
+        OSThread *t = OS_thread[LOG2(working_set)];
+        Q_ASSERT(t != (OSThread*)0 && t->timeout != 0);
+
+        uint32_t bit = (1U << (t->priority - 1U));
+        --t->timeout;
+        if (t->timeout == 0U) {
+            OS_ready_set |= bit; /* insert thread into ready set*/
+            OS_delayed_set &= ~bit; /* remove thread from delayed set*/
         }
+        working_set &= ~bit; /* remove from working set as it's already processed */
     }
 }
 
@@ -111,7 +118,10 @@ void OS_delay(uint32_t ticks) {
     Q_REQUIRE(OS_curr != OS_thread[0]);
 
     OS_curr->timeout = ticks;
-    OS_ready_set &= ~(1 << (OS_currIndex - 1));
+
+    uint32_t bit = (1U << (OS_curr->priority - 1U));
+    OS_ready_set &= ~bit;
+    OS_delayed_set |= bit;
     OS_sched();
     /* This switches the context immediately away from this thread as PendSV exception occurs immediately after enabling interrupts */
     __enable_irq();
@@ -119,6 +129,7 @@ void OS_delay(uint32_t ticks) {
 
 void OSThread_start(
         OSThread *me,
+        uint8_t priority,
         OSThreadHandler threadHandler,
         void *stkSto, uint32_t stkSize)
 {
@@ -127,6 +138,12 @@ void OSThread_start(
     */
     uint32_t *sp = (uint32_t *)((((uint32_t)stkSto + stkSize) / 8) * 8);
     uint32_t *stk_limit;
+
+    /*
+    * priority must be in range && must not have been used before
+    */
+    Q_REQUIRE((priority < Q_DIM(OS_thread))
+        && (OS_thread[priority] == (OSThread *)0));
 
     *(--sp) = (1U << 24);  /* xPSR */
     *(--sp) = (uint32_t)threadHandler; /* PC */
@@ -157,15 +174,13 @@ void OSThread_start(
         *sp = 0xDEADBEEFU;
     }
 
-    Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
-
-    OS_thread[OS_threadNum] = me;
+    OS_thread[priority] = me;
+    me->priority = priority;
     /* Make thread ready to run. Except for the idle thread of course */
-    if (OS_threadNum > 0) {
-        OS_ready_set |= (1 << (OS_threadNum - 1));
+    if (priority > 0) {
+        OS_ready_set |= (1 << (priority - 1));
     }
 
-    ++OS_threadNum;
 }
 
 /* inline assembly syntax for Compiler 6 (ARMCLANG) */

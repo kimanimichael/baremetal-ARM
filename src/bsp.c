@@ -28,6 +28,7 @@ void OS_on_idle(void) {
 
     GPIOA_ODR |= (0b01 << 12);
     GPIOA_ODR &= ~(0b01 << 12);
+    // __WFI();
 
 }
 
