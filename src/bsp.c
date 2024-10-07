@@ -1,6 +1,6 @@
 #include "../include/cmsis/stm32f429xx.h"
 #include "../include/bsp.h"
-#include "../include/miros.h"
+#include "../qpc/include/qpc.h"
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
