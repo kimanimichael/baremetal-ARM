@@ -40,7 +40,7 @@ void start()
 // Initialize all uninitialized variables (bss section) to 0
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
-   // SystemInit();
+   SystemInit();
    main();
 
    while (1);

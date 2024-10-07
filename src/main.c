@@ -13,8 +13,11 @@ OSThread blinky1;
 void main_blinky1() {
     while (1)
     {
-        BSP_greenLedToggle();
-        OS_delay(50);
+        for (uint32_t volatile i = 320U;i != 0U;i--) {
+            BSP_greenLedOn();
+            BSP_greenLedOff();
+        }
+        OS_delay(1U);
     }
 
 }
@@ -24,8 +27,11 @@ OSThread blinky2;
 void main_blinky2() {
     while (1)
     {
-        BSP_blueLedToggle();
-        OS_delay(50);
+        for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
+            BSP_blueLedOn();
+            BSP_blueLedOff();
+        }
+        OS_delay(50U);
     }
 
 }
@@ -46,19 +52,21 @@ int main() {
 
     /* fabricate Cortex-M ISR stack for blinky1 */
     OSThread_start(&blinky1,
+                    5U,
                    &main_blinky1,
                    stack_blinky1,
                    sizeof(stack_blinky1));
     /* fabricate Cortex-M ISR stack for blinky2 */
     OSThread_start(&blinky2,
+                    2U,
                    &main_blinky2,
                    stack_blinky2,
                    sizeof(stack_blinky2));
-    /* fabricate Cortex-M ISR stack for blinky3 */
-    OSThread_start(&blinky3,
-        &main_blinky3,
-        stack_blinky3,
-        sizeof(stack_blinky3));
+    // /* fabricate Cortex-M ISR stack for blinky3 */
+    // OSThread_start(&blinky3,
+    //     &main_blinky3,
+    //     stack_blinky3,
+    //     sizeof(stack_blinky3));
 
     OS_run();
 }
