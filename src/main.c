@@ -1,7 +1,6 @@
 #include "stdint.h"
 #include "../include/bsp.h"
-#include "../include/miros.h"
-#include "../include/main.h"
+#include "../qpc/include/qpc.h"
 
 #define blocking
 
