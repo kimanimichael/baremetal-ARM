@@ -21,19 +21,28 @@ Although this project is built for the NUCLEO-F429ZI development board, users ca
 ### Prerequisites
 The following are required to build this program:
 1. [GNU Arm Embedded Toolchain](https://developer.arm.com/downloads/-/gnu-rm)
+2. [Python](https://www.python.org/downloads/)
 
 The following are required to flash this program onto a microcontroller
 1. [stlink](https://github.com/stlink-org/stlink)
 
 ## Build
 Ensure all prerequisites are met.
+
+Run the following commands:
 ```console
-./build.sh
+pip install -r requirements.txt
+```
+```console
+python3 build.py build-application --compile
 ```
 ## Flash
 
 Connect the board to your PC and run this in the terminal
 ```console
-./build_flash.sh
+python3 build.py build-application --flash
 ```
-
+# Compile and Flash
+```console
+python3 build.py build-application --compile --flash
+```
