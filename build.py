@@ -22,6 +22,7 @@ FLASH_APPLICATION_CMD = '''st-flash write
 {image} 0x8040000 && st-info --reset
 '''
 
+
 def build_image():
     print(colorama.Fore.CYAN, "Building Image .." + colorama.Style.RESET_ALL)
 
@@ -41,6 +42,7 @@ def build_image():
 
     print(colorama.Fore.GREEN + "Compiled firmware successfully" + colorama.Style.RESET_ALL)
 
+
 def _flash_application(image=APPLICATION):
     cmd = FLASH_APPLICATION_CMD.format(image=image)
     print(cmd)
@@ -48,13 +50,13 @@ def _flash_application(image=APPLICATION):
     if not os.path.exists(image):
         raise FileNotFoundError(image)
 
-
     ret = os.system(" ".join(cmd.split("\n")))
     if ret != 0:
         msg = "Unable to flash application"
         print(colorama.Fore.RED + msg + colorama.Style.RESET_ALL)
         raise Exception(msg)
     print(colorama.Fore.GREEN + "Application flashed" + colorama.Style.RESET_ALL)
+
 
 @click.group()
 def cli():
@@ -65,6 +67,7 @@ def cli():
     print(colorama.Fore.GREEN + "[CLI]\n" + colorama.Style.RESET_ALL)
     pass
 
+
 @cli.command()
 def compile_image():
     """
@@ -72,12 +75,14 @@ def compile_image():
     """
     build_image()
 
+
 @cli.command()
 def flash_application():
     """
     flashes application
     """
     _flash_application()
+
 
 @cli.command()
 @click.option("--compile", is_flag=True, help="compile image, default False")
@@ -88,6 +93,6 @@ def build_application(compile, flash):
     if flash:
         _flash_application("cmake_build/baremetal_arm.bin")
 
+
 if __name__ == "__main__":
     cli()
-
