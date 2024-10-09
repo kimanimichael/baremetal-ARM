@@ -1,73 +1,77 @@
 #include "stdint.h"
 #include "../include/bsp.h"
-#include "../qpc/include/qpc.h"
+#include "qpc.h"
 
 #define blocking
 
 #ifdef blocking
 
 uint32_t stack_blinky1[40];
-OSThread blinky1;
+QXThread blinky1;
 
-void main_blinky1() {
+void main_blinky1(QXThread * const me) {
     while (1)
     {
         for (uint32_t volatile i = 320U;i != 0U;i--) {
             BSP_greenLedOn();
             BSP_greenLedOff();
         }
-        OS_delay(1U);
+        QXThread_delay(1U);
     }
 
 }
 
 uint32_t stack_blinky2[40];
-OSThread blinky2;
-void main_blinky2() {
+QXThread blinky2;
+void main_blinky2(QXThread * const me) {
     while (1)
     {
         for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
             BSP_blueLedOn();
             BSP_blueLedOff();
         }
-        OS_delay(50U);
+        QXThread_delay(50U);
     }
 
 }
 uint32_t stack_blinky3[40];
-OSThread blinky3;
-void main_blinky3() {
+QXThread blinky3;
+void main_blinky3(QXThread * const me) {
     while (1) {
         BSP_redLedToggle();
-        OS_delay(50);
+        QXThread_delay(50);
     }
 }
 
-uint32_t stack_idle_thread[40];
 int main() {
     BSP_init();
-    OS_init(stack_idle_thread, sizeof(stack_idle_thread));
+    QF_init();
     BSP_ledInit();
 
-    /* fabricate Cortex-M ISR stack for blinky1 */
-    OSThread_start(&blinky1,
-                    5U,
-                   &main_blinky1,
-                   stack_blinky1,
-                   sizeof(stack_blinky1));
-    /* fabricate Cortex-M ISR stack for blinky2 */
-    OSThread_start(&blinky2,
-                    2U,
-                   &main_blinky2,
-                   stack_blinky2,
-                   sizeof(stack_blinky2));
-    // /* fabricate Cortex-M ISR stack for blinky3 */
-    // OSThread_start(&blinky3,
-    //     &main_blinky3,
-    //     stack_blinky3,
-    //     sizeof(stack_blinky3));
+    /* initialize and start blinky1 thread */
+    QXThread_ctor(&blinky1, &main_blinky1, 0);
+    QXTHREAD_START(&blinky1,
+                    5U, /* priority */
+                   (void *)0, 0, /* message queue and size of queue */
+                   stack_blinky1, sizeof(stack_blinky1), /* stack */
+                   (void *)0); /* extra unused parameter */
 
-    OS_run();
+    /* initialize and start blinky2 thread */
+    QXThread_ctor(&blinky2, &main_blinky2, 0);
+    QXTHREAD_START(&blinky2,
+                    2U, /* priority */
+                   (void *)0, 0, /* message queue and size of queue */
+                   stack_blinky2, sizeof(stack_blinky2), /* stack */
+                   (void *)0); /* extra unused parameter */
+    // /* initialize and start blinky3 thread */
+    // QXThread_ctor(&blinky3, &main_blinky3, 0);
+    // QXTHREAD_START(&blinky3,
+    //                 1U, /* priority */
+    //                (void *)0, 0, /* message queue and size of queue */
+    //                stack_blinky1, sizeof(stack_blinky1), /* stack */
+    //                (void *)0); /* extra unused parameter */
+
+    QF_run();
 }
 
 
