@@ -13,15 +13,18 @@ void Q_onError(char const* module, int id) {
     NVIC_SystemReset();
 }
 
-void OS_onStartup(void) {
+void QF_onStartup(void) {
     SystemCoreClockUpdate();
     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
-
-    NVIC_SetPriority(SysTick_IRQn, 0U);
+    /* set systick priority to be "kernel aware */
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
 }
 
-void OS_on_idle(void) {
+void QF_onCleanup(void) {
+}
+
+void QXK_onIdle(void) {
     /* @TODO Investigate why this causes irregular thread switching */
     // GPIOx_ODR |= (0b01 << 14);
     // GPIOx_ODR &= ~(0b01 << 14);
@@ -37,13 +40,12 @@ unsigned int volatile l_tickrCtr;
 void SysTick_Handler (void) 
 {
     GPIOx_ODR |= (0b01 << 1);
-    OS_tick();
+    QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+    QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
 
-    __disable_irq();
-    OS_sched();
+    QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
     GPIOx_ODR &= ~(0b01 << 1);
-    __enable_irq();
-} 
+}
 
 void ledOn() {
     //Bitwise OR the 8th bit of GPIOx_ODR with 1

@@ -67,15 +67,15 @@ void start()
 //     while (1);
 // }
 
-void NMI_Handler (void) 
-{
-    while (1)
-    {
-        /* code */
-        assert_failed("NMI_Handler", __LINE__);
-    }
-    
-}
+// void NMI_Handler (void)
+// {
+//     while (1)
+//     {
+//         /* code */
+//         assert_failed("NMI_Handler", __LINE__);
+//     }
+//
+// }
 
 void HardFault_Handler (void) 
 {

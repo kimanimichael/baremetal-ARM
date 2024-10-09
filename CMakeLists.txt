@@ -23,9 +23,19 @@ set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 
+set(QPC_CFG_KERNEL qxk)
+set(QPC_CFG_PORT arm-cm)
+set(QPC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/qpc CACHE INTERNAL "")
+add_subdirectory(${QPC_PATH})
+
 project(${APP_TARGET})
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+
+target_link_libraries(${APP_TARGET}
+    PRIVATE
+        qpc
+)
 
 target_include_directories(${APP_TARGET}
         PRIVATE
@@ -39,7 +49,6 @@ target_sources(${APP_TARGET}
         src/delay.c
         src/bsp.c
         core/system_stm32f4xx.c
-        core/miros/miros.c
         startup/startup.c
 )
 
