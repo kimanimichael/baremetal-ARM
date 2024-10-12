@@ -28,6 +28,8 @@ void EXTI15_10IRQHandler(void);
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
 //Base SYSCFG register 0x4001 3800 + offset 0x14 to find SYSCFG_EXTICR4
 #define SYSCFG_EXTICR4 (*((unsigned int *)(0x40013814)))
+// Base EXTI register 0x4001 3C00 + offset 0x08 to find EXTI_RTSR(Rising trigger selection register)
+#define EXTI_RTSR ((*(unsigned int *)(0x40013c08)))
 // Base EXTI register 0x4001 3C00 + offset 0x0C to find EXTI_FTSR(Falling trigger selection register)
 #define EXTI_FTSR ((*(unsigned int *)(0x40013c0c)))
 // Base EXTI register 0x4001 3C00 + offset 0x00 to find EXTI_IMR(Interrupt mask register)
