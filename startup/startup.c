@@ -1,3 +1,4 @@
+#include "qpc.h"
 #include "../include/bsp.h"
 #include "../include/main.h"
 #include "../include/cmsis/stm32f429xx.h"
@@ -27,6 +28,48 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
     0,
     (unsigned int *)PendSV_Handler, //PendSV_Handler
     (unsigned int *)SysTick_Handler, //SysTick_Handler
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    (unsigned int *)EXTI15_10IRQHandler,//
+
 };
 
 void start()
