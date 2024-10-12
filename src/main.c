@@ -1,10 +1,11 @@
-#include "stdint.h"
-#include "../include/bsp.h"
 #include "qpc.h"
+#include "bsp.h"
 
 #define blocking
 
 #ifdef blocking
+
+QXSemaphore SW1_sema;
 
 uint32_t stack_blinky1[40];
 QXThread blinky1;
@@ -26,11 +27,13 @@ QXThread blinky2;
 void main_blinky2(QXThread * const me) {
     while (1)
     {
+        QXSemaphore_wait(&SW1_sema,
+            QXTHREAD_NO_TIMEOUT);
         for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
             BSP_blueLedOn();
             BSP_blueLedOff();
         }
-        QXThread_delay(50U);
+        // QXThread_delay(50U);
     }
 
 }
@@ -47,6 +50,11 @@ int main() {
     BSP_init();
     QF_init();
     BSP_ledInit();
+    BSP_user_button_init();
+    /* Initialize SW1_sema semaphore as a binary, signalling semaphore */
+    QXSemaphore_init(&SW1_sema, /* pointer to the semaphore you wish to initialize */
+        0U,
+        1U);
 
     /* initialize and start blinky1 thread */
     QXThread_ctor(&blinky1, &main_blinky1, 0);
