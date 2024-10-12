@@ -116,17 +116,17 @@ void BSP_user_button_init() {
     GPIOC_MODER &= (0b00 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
     GPIOC_MODER &= (0b00 << 26);
-    //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-up
+    //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 27);
-    //Bitwise AND the 26th bit of GPIOC_MODER with 1 - CONFIG PC13 as input pull-up
-    GPIOC_PUPDR |= (0b01 << 26);
+    //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
+    GPIOC_PUPDR &= (0b00 << 26);
 
     //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
     RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
     //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
     SYSCFG_EXTICR4 |= (0b0010 << 4);
-    // Bitwise OR the 13th bit of EXTI_FTSR with 1 to enable the falling edge trigger for EXTI13
-    EXTI_FTSR |= (1 << 13);
+    // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
+    EXTI_RTSR |= (1 << 13);
     // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
     EXTI_IMR |= (1 << 13);
     // Enable IRQ for EXTI lines 10-15
