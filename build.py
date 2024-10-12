@@ -19,7 +19,7 @@ CMAKE_GEN_CMD = '''cmake -S . -B cmake_build/ -G Ninja'''
 CMAKE_BUILD_CMD = '''cmake --build cmake_build/'''
 
 FLASH_APPLICATION_CMD = '''st-flash write 
-{image} 0x8040000 && st-info --reset
+{image} 0x8000000 && st-info --reset
 '''
 
 
