@@ -13,7 +13,7 @@ QXThread blinky1;
 void main_blinky1(QXThread * const me) {
     while (1)
     {
-        for (uint32_t volatile i = 320U;i != 0U;i--) {
+        for (uint32_t volatile i = 404U + 1U;i != 0U;i--) {
             // BSP_greenLedOn();
             // BSP_greenLedOff();
             BSP_greenLedToggle();
