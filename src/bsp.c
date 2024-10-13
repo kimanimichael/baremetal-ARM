@@ -134,7 +134,11 @@ void BSP_user_button_init() {
 }
 
 void BSP_greenLedToggle() {
+    unsigned int istat;
+
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 0);
+    QF_CRIT_EXIT();
 }
 
 void BSP_greenLedOn() {
@@ -146,7 +150,9 @@ void BSP_greenLedOff() {
 }
 
 void BSP_blueLedToggle() {
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 7);
+    QF_CRIT_EXIT();
 }
 
 void BSP_blueLedOn() {
@@ -166,6 +172,8 @@ void BSP_redLedOff() {
 }
 
 void BSP_redLedToggle() {
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 14);
+    QF_CRIT_EXIT();
 }
 
