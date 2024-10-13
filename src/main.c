@@ -14,8 +14,9 @@ void main_blinky1(QXThread * const me) {
     while (1)
     {
         for (uint32_t volatile i = 320U;i != 0U;i--) {
-            BSP_greenLedOn();
-            BSP_greenLedOff();
+            // BSP_greenLedOn();
+            // BSP_greenLedOff();
+            BSP_greenLedToggle();
         }
         QXThread_delay(1U);
     }
@@ -30,8 +31,9 @@ void main_blinky2(QXThread * const me) {
         QXSemaphore_wait(&SW1_sema,
             QXTHREAD_NO_TIMEOUT);
         for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
-            BSP_blueLedOn();
-            BSP_blueLedOff();
+            // BSP_blueLedOn();
+            // BSP_blueLedOff();
+            BSP_blueLedToggle();
         }
         // QXThread_delay(50U);
     }
