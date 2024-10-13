@@ -13,10 +13,9 @@ OSThread blinky1;
 void main_blinky1() {
     while (1)
     {
-        for (uint32_t volatile i = 404U + 1U;i != 0U;i--) {
-            // BSP_greenLedOn();
-            // BSP_greenLedOff();
-            BSP_greenLedToggle();
+        for (uint32_t volatile i = 320U;i != 0U;i--) {
+            BSP_greenLedOn();
+            BSP_greenLedOff();
         }
         OS_delay(1U);
     }
@@ -29,9 +28,8 @@ void main_blinky2() {
     while (1)
     {
         for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
-            // BSP_blueLedOn();
-            // BSP_blueLedOff();
-            BSP_blueLedToggle();
+            BSP_blueLedOn();
+            BSP_blueLedOff();
         }
         OS_delay(50U);
     }
