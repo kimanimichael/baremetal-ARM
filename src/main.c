@@ -13,11 +13,7 @@ QXThread blinky1;
 void main_blinky1(QXThread * const me) {
     while (1)
     {
-        for (uint32_t volatile i = 404U + 1U;i != 0U;i--) {
-            // BSP_greenLedOn();
-            // BSP_greenLedOff();
-            BSP_greenLedToggle();
-        }
+        BSP_send_morse_code(0xA8EEE2A0U); /* SOS */
         QXThread_delay(1U);
     }
 
@@ -43,8 +39,9 @@ uint32_t stack_blinky3[40];
 QXThread blinky3;
 void main_blinky3(QXThread * const me) {
     while (1) {
-        BSP_redLedToggle();
-        QXThread_delay(50);
+        BSP_send_morse_code(0xE22A3800U); /* TEST */
+        BSP_send_morse_code(0xE22A3800U); /* TEST */
+        QXThread_delay(5U);
     }
 }
 
@@ -73,13 +70,13 @@ int main() {
                    (void *)0, 0, /* message queue and size of queue */
                    stack_blinky2, sizeof(stack_blinky2), /* stack */
                    (void *)0); /* extra unused parameter */
-    // /* initialize and start blinky3 thread */
-    // QXThread_ctor(&blinky3, &main_blinky3, 0);
-    // QXTHREAD_START(&blinky3,
-    //                 1U, /* priority */
-    //                (void *)0, 0, /* message queue and size of queue */
-    //                stack_blinky1, sizeof(stack_blinky1), /* stack */
-    //                (void *)0); /* extra unused parameter */
+    /* initialize and start blinky3 thread */
+    QXThread_ctor(&blinky3, &main_blinky3, 0);
+    QXTHREAD_START(&blinky3,
+                    1U, /* priority */
+                   (void *)0, 0, /* message queue and size of queue */
+                   stack_blinky1, sizeof(stack_blinky1), /* stack */
+                   (void *)0); /* extra unused parameter */
 
     QF_run();
 }
