@@ -75,7 +75,7 @@ int main() {
     QXTHREAD_START(&blinky3,
                     1U, /* priority */
                    (void *)0, 0, /* message queue and size of queue */
-                   stack_blinky1, sizeof(stack_blinky1), /* stack */
+                   stack_blinky3, sizeof(stack_blinky3), /* stack */
                    (void *)0); /* extra unused parameter */
 
     QF_run();
