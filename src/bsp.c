@@ -177,3 +177,23 @@ void BSP_redLedToggle() {
     QF_CRIT_EXIT();
 }
 
+void BSP_send_morse_code(uint32_t bitmask) {
+    uint32_t volatile delay_ctr;
+    enum {DOT_DELAY = 75 };
+
+    for (; bitmask != 0U; bitmask <<= 1U) {
+        if ((bitmask & (1U << 31U)) != 0U) {
+            BSP_greenLedOn();
+        } else {
+            BSP_greenLedOff();
+        }
+        for (delay_ctr = DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
+
+        }
+    }
+    BSP_greenLedOff();
+    for(delay_ctr = 7 * DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
+
+    }
+}
+

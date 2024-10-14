@@ -142,6 +142,11 @@ void BSP_redLedOff();
  * @author @Mike-Kimani
 */
 void BSP_redLedToggle();
+/**
+* @brief blink green led to send morse code
+* @param bitmask message to be sent in bits
+*/
+void BSP_send_morse_code(uint32_t bitmask);
 
 void ledOn();
 
