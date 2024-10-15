@@ -1,4 +1,4 @@
-#include "../include/delay.h"
+#include "delay.h"
 
 void delay(unsigned int counter)
 {

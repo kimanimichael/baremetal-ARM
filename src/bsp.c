@@ -1,4 +1,4 @@
-#include "../include/cmsis/stm32f429xx.h"
+#include "stm32f429xx.h"
 
 #include "qpc.h"
 #include "bsp.h"
@@ -83,10 +83,8 @@ void BSP_Delay(uint32_t ticks) {
 }
 
 uint32_t BSP_Tickr(void) {
-    uint32_t tickrCtr;
-
     __disable_irq();
-    tickrCtr = l_tickrCtr;
+    uint32_t tickrCtr = l_tickrCtr;
     __enable_irq();
 
     return tickrCtr;
@@ -138,8 +136,6 @@ void BSP_user_button_init() {
 }
 
 void BSP_greenLedToggle() {
-    unsigned int istat;
-
     QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 0);
     QF_CRIT_EXIT();
