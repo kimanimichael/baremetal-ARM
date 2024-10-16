@@ -3,7 +3,7 @@
 #include "qpc.h"
 #include "bsp.h"
 
-static QXSemaphore morse_sema;
+// static QXSemaphore morse_sema;
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -91,9 +91,9 @@ uint32_t BSP_Tickr(void) {
 }
 
 void BSP_init() {
-    QXSemaphore_init(&morse_sema,
-        1U,
-        1U);
+    // QXSemaphore_init(&morse_sema,
+    //     1U,
+    //     1U);
 }
 
 void BSP_ledInit() {
@@ -180,9 +180,11 @@ void BSP_redLedToggle() {
 void BSP_send_morse_code(uint32_t bitmask) {
     uint32_t volatile delay_ctr;
     enum {DOT_DELAY = 75 };
+    // SEMA
+    // QXSemaphore_wait(&morse_sema,
+    //     QXTHREAD_NO_TIMEOUT);
 
-    QXSemaphore_wait(&morse_sema,
-        QXTHREAD_NO_TIMEOUT);
+    const QSchedStatus lock_status = QXK_schedLock(5U);
     for (; bitmask != 0U; bitmask <<= 1U) {
         if ((bitmask & (1U << 31U)) != 0U) {
             BSP_greenLedOn();
@@ -197,6 +199,9 @@ void BSP_send_morse_code(uint32_t bitmask) {
     for(delay_ctr = 7 * DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
 
     }
-    QXSemaphore_signal(&morse_sema);
+    // SEMA
+    // QXSemaphore_signal(&morse_sema);
+
+    QXK_schedUnlock(lock_status);
 }
 
