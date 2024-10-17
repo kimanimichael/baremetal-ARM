@@ -46,8 +46,9 @@ void main_blinky3(QXThread * const me) {
 }
 
 int main() {
-    BSP_init();
+    // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     QF_init();
+    BSP_init();
     BSP_ledInit();
     BSP_user_button_init();
     /* Initialize SW1_sema semaphore as a binary, signalling semaphore */
