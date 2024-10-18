@@ -1,7 +1,12 @@
-#include "../include/cmsis/stm32f429xx.h"
+#include "stm32f429xx.h"
 
 #include "qpc.h"
 #include "bsp.h"
+
+// static QXSemaphore morse_sema;
+
+// Mutex
+static QXMutex morse_mutex;
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -81,17 +86,19 @@ void BSP_Delay(uint32_t ticks) {
 }
 
 uint32_t BSP_Tickr(void) {
-    uint32_t tickrCtr;
-
     __disable_irq();
-    tickrCtr = l_tickrCtr;
+    uint32_t tickrCtr = l_tickrCtr;
     __enable_irq();
 
     return tickrCtr;
 }
 
 void BSP_init() {
+    // QXSemaphore_init(&morse_sema,
+    //     1U,
+    //     1U);
 
+    QXMutex_init(&morse_mutex, 6U);
 }
 
 void BSP_ledInit() {
@@ -134,7 +141,9 @@ void BSP_user_button_init() {
 }
 
 void BSP_greenLedToggle() {
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 0);
+    QF_CRIT_EXIT();
 }
 
 void BSP_greenLedOn() {
@@ -146,7 +155,9 @@ void BSP_greenLedOff() {
 }
 
 void BSP_blueLedToggle() {
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 7);
+    QF_CRIT_EXIT();
 }
 
 void BSP_blueLedOn() {
@@ -166,6 +177,45 @@ void BSP_redLedOff() {
 }
 
 void BSP_redLedToggle() {
+    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 14);
+    QF_CRIT_EXIT();
+}
+
+void BSP_send_morse_code(uint32_t bitmask) {
+    uint32_t volatile delay_ctr;
+    enum {DOT_DELAY = 75 };
+    // SEMA
+    // QXSemaphore_wait(&morse_sema,
+    //     QXTHREAD_NO_TIMEOUT);
+
+    // Scheduler lock
+    // const QSchedStatus lock_status = QXK_schedLock(5U);
+
+    // Mutex
+    QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
+
+    for (; bitmask != 0U; bitmask <<= 1U) {
+        if ((bitmask & (1U << 31U)) != 0U) {
+            BSP_greenLedOn();
+        } else {
+            BSP_greenLedOff();
+        }
+        for (delay_ctr = DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
+
+        }
+    }
+    BSP_greenLedOff();
+    for(delay_ctr = 7 * DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
+
+    }
+    // SEMA
+    // QXSemaphore_signal(&morse_sema);
+
+    // Scheduler lock
+    // QXK_schedUnlock(lock_status);
+
+    // Mutex
+    QXMutex_unlock(&morse_mutex);
 }
 

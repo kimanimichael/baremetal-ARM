@@ -120,7 +120,7 @@
   * @{
   */
 
-#include "../include/cmsis/stm32f4xx.h"
+#include "stm32f4xx.h"
 
 /**
   * @}

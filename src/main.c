@@ -13,10 +13,7 @@ QXThread blinky1;
 void main_blinky1(QXThread * const me) {
     while (1)
     {
-        for (uint32_t volatile i = 320U;i != 0U;i--) {
-            BSP_greenLedOn();
-            BSP_greenLedOff();
-        }
+        BSP_send_morse_code(0xA8EEE2A0U); /* SOS */
         QXThread_delay(1U);
     }
 
@@ -30,8 +27,9 @@ void main_blinky2(QXThread * const me) {
         QXSemaphore_wait(&SW1_sema,
             QXTHREAD_NO_TIMEOUT);
         for (uint32_t volatile i = 3 * 320U;i != 0U;i--) {
-            BSP_blueLedOn();
-            BSP_blueLedOff();
+            // BSP_blueLedOn();
+            // BSP_blueLedOff();
+            BSP_blueLedToggle();
         }
         // QXThread_delay(50U);
     }
@@ -41,14 +39,16 @@ uint32_t stack_blinky3[40];
 QXThread blinky3;
 void main_blinky3(QXThread * const me) {
     while (1) {
-        BSP_redLedToggle();
-        QXThread_delay(50);
+        BSP_send_morse_code(0xE22A3800U); /* TEST */
+        BSP_send_morse_code(0xE22A3800U); /* TEST */
+        QXThread_delay(5U);
     }
 }
 
 int main() {
-    BSP_init();
+    // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     QF_init();
+    BSP_init();
     BSP_ledInit();
     BSP_user_button_init();
     /* Initialize SW1_sema semaphore as a binary, signalling semaphore */
@@ -71,13 +71,13 @@ int main() {
                    (void *)0, 0, /* message queue and size of queue */
                    stack_blinky2, sizeof(stack_blinky2), /* stack */
                    (void *)0); /* extra unused parameter */
-    // /* initialize and start blinky3 thread */
-    // QXThread_ctor(&blinky3, &main_blinky3, 0);
-    // QXTHREAD_START(&blinky3,
-    //                 1U, /* priority */
-    //                (void *)0, 0, /* message queue and size of queue */
-    //                stack_blinky1, sizeof(stack_blinky1), /* stack */
-    //                (void *)0); /* extra unused parameter */
+    /* initialize and start blinky3 thread */
+    QXThread_ctor(&blinky3, &main_blinky3, 0);
+    QXTHREAD_START(&blinky3,
+                    1U, /* priority */
+                   (void *)0, 0, /* message queue and size of queue */
+                   stack_blinky3, sizeof(stack_blinky3), /* stack */
+                   (void *)0); /* extra unused parameter */
 
     QF_run();
 }

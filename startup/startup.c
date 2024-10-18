@@ -1,8 +1,8 @@
 #include "qpc.h"
-#include "../include/bsp.h"
-#include "../include/main.h"
-#include "../include/cmsis/stm32f429xx.h"
-#include "../include/cmsis/stm32f4xx_it.h"
+#include "bsp.h"
+#include "main.h"
+#include "stm32f429xx.h"
+#include "stm32f4xx_it.h"
 
 extern unsigned int _data_start;
 extern unsigned int _data_end;
