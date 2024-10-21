@@ -53,7 +53,6 @@ void main_blinky3(QXThread * const me) {
 Shape s1; /* static allocation */
 
 int main() {
-    // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     Shape s2; /* automatic allocation */
     // buggy
     // Shape *ps3 = malloc(sizeof(Shape));
@@ -79,7 +78,7 @@ int main() {
             Shape_distance_from(&s1, &s3) +
             Shape_distance_from(&s3, &s3));
 
-    BSP_init();
+    // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     QF_init();
     BSP_init();
     BSP_ledInit();
