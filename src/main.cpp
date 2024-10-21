@@ -1,4 +1,12 @@
+#ifdef NO_NORETURN
+#define _Noreturn [[noreturn]]
+#endif
+
+extern "C"{
 #include "qpc.h"
+}
+#undef _Noreturn
+
 #include "bsp.h"
 #include "shape.h"
 
@@ -92,24 +100,24 @@ int main() {
     QXThread_ctor(&blinky1, &main_blinky1, 0);
     QXTHREAD_START(&blinky1,
                     5U, /* priority */
-                   (void *)0, 0, /* message queue and size of queue */
+                   (QEvt const **)0, 0, /* message queue and size of queue */
                    stack_blinky1, sizeof(stack_blinky1), /* stack */
-                   (void *)0); /* extra unused parameter */
+                   (QEvt *)0); /* extra unused parameter */
 
     /* initialize and start blinky2 thread */
     QXThread_ctor(&blinky2, &main_blinky2, 0);
     QXTHREAD_START(&blinky2,
                     2U, /* priority */
-                   (void *)0, 0, /* message queue and size of queue */
+                   (QEvt const **)0, 0, /* message queue and size of queue */
                    stack_blinky2, sizeof(stack_blinky2), /* stack */
-                   (void *)0); /* extra unused parameter */
+                   (QEvt *)0); /* extra unused parameter */
     /* initialize and start blinky3 thread */
     QXThread_ctor(&blinky3, &main_blinky3, 0);
     QXTHREAD_START(&blinky3,
                     1U, /* priority */
-                   (void *)0, 0, /* message queue and size of queue */
+                   (QEvt const **)0, 0, /* message queue and size of queue */
                    stack_blinky3, sizeof(stack_blinky3), /* stack */
-                   (void *)0); /* extra unused parameter */
+                   (QEvt *)0); /* extra unused parameter */
 
     QF_run();
 }

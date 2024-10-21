@@ -1,9 +1,19 @@
+#ifdef NO_NORETURN
+#define _Noreturn [[noreturn]]
+#endif
+
+extern "C" {
 #include "qpc.h"
+}
+
+#undef _Noreturn
+
 #include "bsp.h"
 #include "main.h"
 #include "stm32f429xx.h"
+extern "C" {
 #include "stm32f4xx_it.h"
-
+}
 extern unsigned int _data_start;
 extern unsigned int _data_end;
 extern unsigned int  _bss_start;
@@ -160,7 +170,7 @@ void UsageFault_Handler (void)
     
 }
 
-void Unused_Handler (void) 
+void SVC_Handler (void)
 {
     while (1)
     {
@@ -170,7 +180,17 @@ void Unused_Handler (void)
     
 }
 
-#pragma weak SVC_Handler = Unused_Handler
-#pragma weak DebugMon_Handler = Unused_Handler
+void DebugMon_Handler (void)
+{
+    while (1)
+    {
+        /* code */
+        assert_failed("Unused_Handler", __LINE__);
+    }
+
+}
+
+// #pragma weak SVC_Handler = Unused_Handler
+// #pragma weak DebugMon_Handler = Unused_Handler
 // #pragma weak PendSV_Handler = Unused_Handler
 // #pragma weak SysTick_Handler = Unused_Handler
