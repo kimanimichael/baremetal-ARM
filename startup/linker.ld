@@ -32,4 +32,16 @@ SECTIONS
         . = ALIGN(4);
         _bss_end = .;
     } > RAM
+
+    /* Define 'end' symbol for dynamic memory allocation */
+    end = .;  /* End of BSS */
+
+    /* Section for Exception Handling */
+    .ARM.exidx : {
+        PROVIDE(__exidx_start = .);
+        *(.ARM.exidx.*)
+        PROVIDE(__exidx_end = .);
+    } > ROM
+
+
 }
