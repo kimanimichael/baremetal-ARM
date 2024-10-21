@@ -16,7 +16,7 @@ target_link_options(baremetal_arm PRIVATE "-T${LINKER_SCRIPT}"
         "-nostartfiles")
 
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=soft -Wall")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -g -Werror -Wdiscarded-qualifiers")
 #set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/startup/linker.ld -Wl,-Map=${CMAKE_BINARY_DIR}/${APP_TARGET}.map ${CPU_FLAGS} --specs=nosys.specs" CACHE INTERNAL "")
 
 set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
@@ -48,6 +48,7 @@ target_sources(${APP_TARGET}
         src/main.c
         src/delay.c
         src/bsp.c
+        src/shape.c
         core/system_stm32f4xx.c
         startup/startup.c
 )
