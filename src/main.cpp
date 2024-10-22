@@ -58,33 +58,30 @@ void main_blinky3(QXThread * const me) {
     }
 }
 
-Shape s1; /* static allocation */
+Shape s1(1, 2); /* static allocation */
 
 int main() {
-    Shape s2; /* automatic allocation */
+    Shape s2(3, 4); /* automatic allocation */
     // buggy
     // Shape *ps3 = malloc(sizeof(Shape));
     //
     // free(ps3);
 
-    Shape s3;
+    Shape s3(5, 6);
     // Shape const *ps1 = &s1;
 
-    Shape_ctor(&s1, 1, 2);
-    Shape_ctor(&s2, 3, 4);
-    Shape_ctor(&s3, 5, 6);
+    s1.move_by(7, 8);
+    s2.move_by(9, 10);
+    s3.move_by(-1, -2);
 
-    Shape_move_by(&s1, 7,8);
-    Shape_move_by(&s2, 9,10);
-    Shape_move_by(&s3, -1,-2);
     // Shape_move_by(ps1,-3,-4);
 
-    Q_ASSERT(Shape_distance_from(&s1, &s1) == 0U);
-    Q_ASSERT(Shape_distance_from(&s1, &s2) ==
-             Shape_distance_from(&s2, &s1));
-    Q_ASSERT(Shape_distance_from(&s1, &s2) <=
-            Shape_distance_from(&s1, &s3) +
-            Shape_distance_from(&s3, &s3));
+    Q_ASSERT(s1.distance_from(&s1) == 0U);
+    Q_ASSERT(s1.distance_from(&s2) ==
+             s2.distance_from(&s1));
+    Q_ASSERT(s1.distance_from(&s2) <=
+            s1.distance_from(&s3) +
+            s3.distance_from(&s2));
 
     // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     QF_init();

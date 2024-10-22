@@ -1,17 +1,18 @@
 #include "shape.h"
 
-void Shape_ctor(Shape* const me, int16_t x0, int16_t y0) {
-    me -> x = x0;
-    me -> y = y0;
-}
-void Shape_move_by(Shape* const me, int16_t dx, int16_t dy) {
-    me -> x += dx;
-    me -> y += dy;
+Shape::Shape(int16_t x0, int16_t y0)
+    : x(x0), y(y0)
+{
 }
 
-uint16_t Shape_distance_from(Shape const* const me, Shape const* other) {
-    int16_t dx = me -> x - other -> x;
-    int16_t dy = me -> y - other -> y;
+void Shape::move_by(int16_t dx, int16_t dy) {
+    x += dx;
+    y += dy;
+}
+
+uint16_t Shape::distance_from(Shape const* other)const {
+    int16_t dx = x - other -> x;
+    int16_t dy = y - other -> y;
 
     if (dx < 0 ) {
         dx = -dx;
