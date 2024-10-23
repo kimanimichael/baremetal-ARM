@@ -23,10 +23,15 @@ QXSemaphore SW1_sema;
 uint32_t stack_blinky1[40];
 QXThread blinky1;
 
+Shape s1(1, 2); /* static allocation */
+
 void main_blinky1(QXThread * const me) {
     while (1)
     {
         BSP_send_morse_code(0xA8EEE2A0U); /* SOS */
+
+        s1.move_by(7, 8);
+
         QXThread_delay(1U);
     }
 
@@ -43,6 +48,8 @@ void main_blinky2(QXThread * const me) {
             // BSP_blueLedOn();
             // BSP_blueLedOff();
             BSP_blueLedToggle();
+
+            Q_ASSERT(s1.distance_from(&s1) == 0U);
         }
         // QXThread_delay(50U);
     }
@@ -57,8 +64,6 @@ void main_blinky3(QXThread * const me) {
         QXThread_delay(5U);
     }
 }
-
-Shape s1(1, 2); /* static allocation */
 
 int main() {
     Shape s2(3, 4); /* automatic allocation */
