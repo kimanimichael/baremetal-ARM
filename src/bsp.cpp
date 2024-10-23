@@ -1,6 +1,16 @@
 #include "stm32f429xx.h"
 
+#ifdef NO_NORETURN
+#define _Noreturn [[noreturn]]
+#endif
+
+extern "C" {
 #include "qpc.h"
+}
+
+#undef _Noreturn
+
+
 #include "bsp.h"
 
 // static QXSemaphore morse_sema;
@@ -47,7 +57,7 @@ void QXK_onIdle(void) {
 
 unsigned int volatile l_tickrCtr;
 
-void SysTick_Handler (void) 
+extern "C" void SysTick_Handler (void)
 {
     GPIOx_ODR |= (0b01 << 1);
     QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */

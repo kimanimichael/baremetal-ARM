@@ -1,9 +1,19 @@
+#ifdef NO_NORETURN
+#define _Noreturn [[noreturn]]
+#endif
+
+extern "C" {
 #include "qpc.h"
+}
+
+#undef _Noreturn
+
 #include "bsp.h"
 #include "main.h"
 #include "stm32f429xx.h"
+extern "C" {
 #include "stm32f4xx_it.h"
-
+}
 extern unsigned int _data_start;
 extern unsigned int _data_end;
 extern unsigned int  _bss_start;
@@ -72,6 +82,12 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 
 };
 
+extern "C" {
+    void _init() {} // Provide empty _init implementation
+    void _fini() {} // Provide empty _fini implementation
+    void __libc_init_array(void);
+}
+
 void start()
 {
    volatile unsigned int *src, *dest;
@@ -83,7 +99,9 @@ void start()
 // Initialize all uninitialized variables (bss section) to 0
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
+
    SystemInit();
+    __libc_init_array();
    main();
 
    while (1);
@@ -160,7 +178,7 @@ void UsageFault_Handler (void)
     
 }
 
-void Unused_Handler (void) 
+void SVC_Handler (void)
 {
     while (1)
     {
@@ -170,7 +188,17 @@ void Unused_Handler (void)
     
 }
 
-#pragma weak SVC_Handler = Unused_Handler
-#pragma weak DebugMon_Handler = Unused_Handler
+void DebugMon_Handler (void)
+{
+    while (1)
+    {
+        /* code */
+        assert_failed("Unused_Handler", __LINE__);
+    }
+
+}
+
+// #pragma weak SVC_Handler = Unused_Handler
+// #pragma weak DebugMon_Handler = Unused_Handler
 // #pragma weak PendSV_Handler = Unused_Handler
 // #pragma weak SysTick_Handler = Unused_Handler
