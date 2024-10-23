@@ -1,12 +1,4 @@
-#ifdef NO_NORETURN
-#define _Noreturn [[noreturn]]
-#endif
-
-extern "C"{
 #include "qpc.h"
-}
-#undef _Noreturn
-
 #include "bsp.h"
 #include "shape.h"
 
@@ -23,15 +15,10 @@ QXSemaphore SW1_sema;
 uint32_t stack_blinky1[40];
 QXThread blinky1;
 
-Shape s1(1, 2); /* static allocation */
-
 void main_blinky1(QXThread * const me) {
     while (1)
     {
         BSP_send_morse_code(0xA8EEE2A0U); /* SOS */
-
-        s1.move_by(7, 8);
-
         QXThread_delay(1U);
     }
 
@@ -48,8 +35,6 @@ void main_blinky2(QXThread * const me) {
             // BSP_blueLedOn();
             // BSP_blueLedOff();
             BSP_blueLedToggle();
-
-            Q_ASSERT(s1.distance_from(&s1) == 0U);
         }
         // QXThread_delay(50U);
     }
@@ -65,28 +50,33 @@ void main_blinky3(QXThread * const me) {
     }
 }
 
+Shape s1; /* static allocation */
+
 int main() {
-    Shape s2(3, 4); /* automatic allocation */
+    Shape s2; /* automatic allocation */
     // buggy
     // Shape *ps3 = malloc(sizeof(Shape));
     //
     // free(ps3);
 
-    Shape s3(5, 6);
+    Shape s3;
     // Shape const *ps1 = &s1;
 
-    s1.move_by(7, 8);
-    s2.move_by(9, 10);
-    s3.move_by(-1, -2);
+    Shape_ctor(&s1, 1, 2);
+    Shape_ctor(&s2, 3, 4);
+    Shape_ctor(&s3, 5, 6);
 
+    Shape_move_by(&s1, 7,8);
+    Shape_move_by(&s2, 9,10);
+    Shape_move_by(&s3, -1,-2);
     // Shape_move_by(ps1,-3,-4);
 
-    Q_ASSERT(s1.distance_from(&s1) == 0U);
-    Q_ASSERT(s1.distance_from(&s2) ==
-             s2.distance_from(&s1));
-    Q_ASSERT(s1.distance_from(&s2) <=
-            s1.distance_from(&s3) +
-            s3.distance_from(&s2));
+    Q_ASSERT(Shape_distance_from(&s1, &s1) == 0U);
+    Q_ASSERT(Shape_distance_from(&s1, &s2) ==
+             Shape_distance_from(&s2, &s1));
+    Q_ASSERT(Shape_distance_from(&s1, &s2) <=
+            Shape_distance_from(&s1, &s3) +
+            Shape_distance_from(&s3, &s3));
 
     // QF_init must be called before BSP_init() which initializes a mutex(as a thread)
     QF_init();
@@ -102,24 +92,24 @@ int main() {
     QXThread_ctor(&blinky1, &main_blinky1, 0);
     QXTHREAD_START(&blinky1,
                     5U, /* priority */
-                   (QEvt const **)0, 0, /* message queue and size of queue */
+                   (void *)0, 0, /* message queue and size of queue */
                    stack_blinky1, sizeof(stack_blinky1), /* stack */
-                   (QEvt *)0); /* extra unused parameter */
+                   (void *)0); /* extra unused parameter */
 
     /* initialize and start blinky2 thread */
     QXThread_ctor(&blinky2, &main_blinky2, 0);
     QXTHREAD_START(&blinky2,
                     2U, /* priority */
-                   (QEvt const **)0, 0, /* message queue and size of queue */
+                   (void *)0, 0, /* message queue and size of queue */
                    stack_blinky2, sizeof(stack_blinky2), /* stack */
-                   (QEvt *)0); /* extra unused parameter */
+                   (void *)0); /* extra unused parameter */
     /* initialize and start blinky3 thread */
     QXThread_ctor(&blinky3, &main_blinky3, 0);
     QXTHREAD_START(&blinky3,
                     1U, /* priority */
-                   (QEvt const **)0, 0, /* message queue and size of queue */
+                   (void *)0, 0, /* message queue and size of queue */
                    stack_blinky3, sizeof(stack_blinky3), /* stack */
-                   (QEvt *)0); /* extra unused parameter */
+                   (void *)0); /* extra unused parameter */
 
     QF_run();
 }
