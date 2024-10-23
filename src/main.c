@@ -77,6 +77,9 @@ int main() {
 
     Rectangle_draw(&r1);
     rectangle_area = Rectangle_area(&r1);
+    Shape_move_by((Shape *)&r1, 7, 8);
+    Q_ASSERT(Shape_distance_from((Shape *)&r1, (Shape *)&r1) == 0U);
+
     Q_ASSERT(Shape_distance_from(&s1, &s1) == 0U);
     Q_ASSERT(Shape_distance_from(&s1, &s2) ==
              Shape_distance_from(&s2, &s1));
