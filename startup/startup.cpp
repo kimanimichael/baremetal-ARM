@@ -82,6 +82,12 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 
 };
 
+extern "C" {
+    void _init() {} // Provide empty _init implementation
+    void _fini() {} // Provide empty _fini implementation
+    void __libc_init_array(void);
+}
+
 void start()
 {
    volatile unsigned int *src, *dest;
@@ -93,7 +99,9 @@ void start()
 // Initialize all uninitialized variables (bss section) to 0
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
+
    SystemInit();
+    __libc_init_array();
    main();
 
    while (1);

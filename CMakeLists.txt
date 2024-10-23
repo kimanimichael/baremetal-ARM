@@ -13,14 +13,16 @@ set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
 target_link_options(baremetal_arm PRIVATE "-T${LINKER_SCRIPT}"
-        "-nostartfiles")
+        "-nostartfiles"
+        "-lc"
+        "-lnosys")
 
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=soft -Wall")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -g -Werror -Wdiscarded-qualifiers")
-set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -g -DNO_NORETURN")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Werror -Wdiscarded-qualifiers")
+set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -DNO_NORETURN")
 #set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/startup/linker.ld -Wl,-Map=${CMAKE_BINARY_DIR}/${APP_TARGET}.map ${CPU_FLAGS} --specs=nosys.specs" CACHE INTERNAL "")
 
-set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs" CACHE INTERNAL "")
+set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lc -lnosys" CACHE INTERNAL "")
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 
