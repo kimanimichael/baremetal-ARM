@@ -49,6 +49,7 @@ target_sources(${APP_TARGET}
         src/delay.c
         src/bsp.c
         src/shape.c
+        src/rectangle.c
         core/system_stm32f4xx.c
         startup/startup.c
 )

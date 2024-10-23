@@ -1,6 +1,7 @@
 #include "qpc.h"
 #include "bsp.h"
 #include "shape.h"
+#include "rectangle.h"
 
 #include "stdlib.h"
 
@@ -51,6 +52,8 @@ void main_blinky3(QXThread * const me) {
 }
 
 Shape s1; /* static allocation */
+Rectangle r1;
+uint32_t rectangle_area;
 
 int main() {
     Shape s2; /* automatic allocation */
@@ -65,12 +68,15 @@ int main() {
     Shape_ctor(&s1, 1, 2);
     Shape_ctor(&s2, 3, 4);
     Shape_ctor(&s3, 5, 6);
+    Rectangle_ctor(&r1, 1, 2, 15, 10);
 
     Shape_move_by(&s1, 7,8);
     Shape_move_by(&s2, 9,10);
     Shape_move_by(&s3, -1,-2);
     // Shape_move_by(ps1,-3,-4);
 
+    Rectangle_draw(&r1);
+    rectangle_area = Rectangle_area(&r1);
     Q_ASSERT(Shape_distance_from(&s1, &s1) == 0U);
     Q_ASSERT(Shape_distance_from(&s1, &s2) ==
              Shape_distance_from(&s2, &s1));
