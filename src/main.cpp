@@ -22,6 +22,7 @@ Q_DEFINE_THIS_FILE
 Shape s1(1, 2); /* static allocation */
 Rectangle r1(1, 2, 15, 10);
 uint32_t rectangle_area;
+uint32_t upcast_rectangle_area;
 
 QXSemaphore SW1_sema;
 
@@ -76,6 +77,11 @@ int main() {
 
     Shape s3(5, 6);
     // Shape const *ps1 = &s1;
+
+    Shape* ps = &r1;
+    ps->draw(10);
+
+    upcast_rectangle_area = ps->area();
 
     s1.move_by(7, 8);
     s2.move_by(9, 10);
