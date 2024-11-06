@@ -22,7 +22,7 @@ public:
     * @param y0 initialized y-coordinate
     */
     Shape(int16_t x0, int16_t y0);
-private:
+protected:
     /**
     * x-coordinate of shape
     */

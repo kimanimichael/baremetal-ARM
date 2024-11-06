@@ -9,6 +9,7 @@ extern "C"{
 
 #include "bsp.h"
 #include "shape.h"
+#include "rectangle.h"
 
 #include "stdlib.h"
 
@@ -18,13 +19,14 @@ Q_DEFINE_THIS_FILE
 
 #ifdef blocking
 
+Shape s1(1, 2); /* static allocation */
+Rectangle r1(1, 2, 15, 10);
+uint32_t rectangle_area;
+
 QXSemaphore SW1_sema;
 
 uint32_t stack_blinky1[40];
 QXThread blinky1;
-
-Shape s1(1, 2); /* static allocation */
-
 void main_blinky1(QXThread * const me) {
     while (1)
     {
@@ -80,6 +82,12 @@ int main() {
     s3.move_by(-1, -2);
 
     // Shape_move_by(ps1,-3,-4);
+
+    r1.draw(10);
+    rectangle_area = r1.area();
+
+    r1.move_by(7, 8);
+    Q_ASSERT(r1.distance_from(&r1) == 0U);
 
     Q_ASSERT(s1.distance_from(&s1) == 0U);
     Q_ASSERT(s1.distance_from(&s2) ==
