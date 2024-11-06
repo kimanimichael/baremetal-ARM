@@ -44,6 +44,16 @@ public:
     * @return distance from other shape
     */
     uint16_t distance_from(Shape const * other)const;
+    /**
+    * @brief draw shape interface
+    * @param test test parameter
+    */
+    void draw(int16_t test);
+    /**
+    * @brief calculate area of shape
+    * @return shape area
+    */
+    uint32_t area()const;
 };
 
 #endif

@@ -23,5 +23,19 @@ uint16_t Shape::distance_from(Shape const* other)const {
     return dx + dy;
 }
 
+void Shape::draw(int16_t test) {
+    x += test;
+    //drawHorLine(x, y, width);
+    //drawVerLine(x + width,
+    //            y, height);
+    //drawHorLine(x + width,
+    //            y + height, width);
+    //drawVerLine(x, y, height);
+}
+
+uint32_t Shape::area() const {
+    return 0U;
+}
+
 
 
