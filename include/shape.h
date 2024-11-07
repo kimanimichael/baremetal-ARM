@@ -48,12 +48,13 @@ public:
     * @brief draw shape interface
     * @param test test parameter
     */
-    void draw(int16_t test);
+    virtual void draw(int16_t test);
     /**
     * @brief calculate area of shape
     * @return shape area
     */
-    uint32_t area()const;
+    virtual uint32_t area()const;
+
 };
 
 #endif
