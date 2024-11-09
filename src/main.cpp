@@ -10,6 +10,7 @@ extern "C"{
 #include "bsp.h"
 #include "shape.h"
 #include "rectangle.h"
+#include "circle.h"
 
 #include "stdlib.h"
 
@@ -23,6 +24,8 @@ Shape s1(1, 2); /* static allocation */
 Rectangle r1(1, 2, 15, 10);
 uint32_t rectangle_area;
 uint32_t upcast_rectangle_area;
+
+Circle c1(3, 5, 10);
 
 QXSemaphore SW1_sema;
 
@@ -79,9 +82,15 @@ int main() {
     // Shape const *ps1 = &s1;
 
     Shape* ps = &r1;
-    ps->draw(10);
+
+    r1.draw(10); /* early binding */
+    ps->draw(10); /* late binding */
 
     upcast_rectangle_area = ps->area();
+
+    Shape *graph[] = {&c1, &r1, &s3, (Shape *)nullptr};
+
+    drawGraph(graph);
 
     s1.move_by(7, 8);
     s2.move_by(9, 10);
