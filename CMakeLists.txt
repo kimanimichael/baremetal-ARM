@@ -53,6 +53,7 @@ target_sources(${APP_TARGET}
         src/bsp.cpp
         src/shape.cpp
         src/rectangle.cpp
+        src/circle.cpp
         core/system_stm32f4xx.c
         startup/startup.cpp
 )
