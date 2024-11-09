@@ -83,8 +83,8 @@ int main() {
 
     Shape* ps = &r1;
 
-    r1.draw(10); /* early binding */
-    ps->draw(10); /* late binding */
+    r1.draw(); /* early binding */
+    ps->draw(); /* late binding */
 
     upcast_rectangle_area = ps->area();
 
@@ -98,7 +98,7 @@ int main() {
 
     // Shape_move_by(ps1,-3,-4);
 
-    r1.draw(10);
+    r1.draw();
     rectangle_area = r1.area();
 
     r1.move_by(7, 8);

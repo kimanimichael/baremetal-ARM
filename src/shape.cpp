@@ -23,8 +23,7 @@ uint16_t Shape::distance_from(Shape const* other)const {
     return dx + dy;
 }
 
-void Shape::draw(int16_t test) {
-    x += test;
+void Shape::draw() {
     //drawHorLine(x, y, width);
     //drawVerLine(x + width,
     //            y, height);
@@ -39,6 +38,6 @@ uint32_t Shape::area() const {
 
 void drawGraph(Shape *graph[]) {
     for (uint8_t i = 0; graph[i] != (Shape *)nullptr; i++) {
-        graph[i] ->draw(10);
+        graph[i] ->draw();
     }
 }

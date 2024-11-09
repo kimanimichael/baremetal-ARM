@@ -48,7 +48,7 @@ public:
     * @brief draw shape interface
     * @param test test parameter
     */
-    virtual void draw(int16_t test);
+    virtual void draw();
     /**
     * @brief calculate area of shape
     * @return shape area
