@@ -37,5 +37,8 @@ uint32_t Shape::area() const {
     return 0U;
 }
 
-
-
+void drawGraph(Shape *graph[]) {
+    for (uint8_t i = 0; graph[i] != (Shape *)nullptr; i++) {
+        graph[i] ->draw(10);
+    }
+}

@@ -57,4 +57,6 @@ public:
 
 };
 
+void drawGraph(Shape *graph[]);
+
 #endif
