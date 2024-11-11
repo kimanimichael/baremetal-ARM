@@ -10,6 +10,7 @@ extern "C"{
 #include "bsp.h"
 #include "shape.h"
 #include "rectangle.h"
+#include "circle.h"
 
 #include "stdlib.h"
 
@@ -22,6 +23,9 @@ Q_DEFINE_THIS_FILE
 Shape s1(1, 2); /* static allocation */
 Rectangle r1(1, 2, 15, 10);
 uint32_t rectangle_area;
+uint32_t upcast_rectangle_area;
+
+Circle c1(3, 5, 10);
 
 QXSemaphore SW1_sema;
 
@@ -77,13 +81,24 @@ int main() {
     Shape s3(5, 6);
     // Shape const *ps1 = &s1;
 
+    Shape* ps = &r1;
+
+    r1.draw(); /* early binding */
+    ps->draw(); /* late binding */
+
+    upcast_rectangle_area = ps->area();
+
+    Shape *graph[] = {&c1, &r1, &s3, (Shape *)nullptr};
+
+    drawGraph(graph);
+
     s1.move_by(7, 8);
     s2.move_by(9, 10);
     s3.move_by(-1, -2);
 
     // Shape_move_by(ps1,-3,-4);
 
-    r1.draw(10);
+    r1.draw();
     rectangle_area = r1.area();
 
     r1.move_by(7, 8);

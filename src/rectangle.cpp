@@ -7,8 +7,7 @@ Rectangle::Rectangle(int16_t  x0, int16_t  y0,
       height(h0) {
 }
 
-void Rectangle::draw(int16_t test) {
-    x += test;
+void Rectangle::draw() {
     //drawHorLine(x, y, width);
     //drawVerLine(x + width,
     //            y, height);

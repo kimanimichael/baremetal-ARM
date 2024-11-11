@@ -14,9 +14,9 @@ private:
     uint16_t height;
 
 public:
-    void draw(int16_t test);
+    void draw() override;
 
-    uint32_t area()const;
+    uint32_t area()const override;
 };
 
 
