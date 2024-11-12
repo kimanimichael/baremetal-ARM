@@ -70,6 +70,11 @@ int main() {
     Shape_ctor(&s3, 5, 6);
     Rectangle_ctor(&r1, 1, 2, 15, 10);
 
+    Shape const *graph[] = {
+        &s1, (Shape const *)&r1, 0
+    };
+    drawGraph(graph);
+
     Shape_move_by(&s1, 7,8);
     Shape_move_by(&s2, 9,10);
     Shape_move_by(&s3, -1,-2);
