@@ -4,6 +4,11 @@ static void Shape_draw(Shape const * const me);
 static uint32_t Shape_area(Shape const * const me);
 
 void Shape_ctor(Shape* const me, int16_t x0, int16_t y0) {
+    static const struct ShapeVtable vtable = {
+        &Shape_draw,
+        &Shape_area,
+    };
+    me -> vptr = &vtable;
     me -> x = x0;
     me -> y = y0;
 }
