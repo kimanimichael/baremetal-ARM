@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19.0 FATAL_ERROR)
 
 set (APP_TARGET baremetal_arm)
 
-set(CMAKE_ASM_COMPILER "arm-none-eabi-gcc")
+set(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
 set(CMAKE_LINKER "arm-none-eabi-ld")
@@ -29,6 +29,8 @@ set(QPC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/qpc CACHE INTERNAL "")
 add_subdirectory(${QPC_PATH})
 
 project(${APP_TARGET})
+enable_language(ASM)
+
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
