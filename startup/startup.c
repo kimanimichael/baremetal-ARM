@@ -119,9 +119,12 @@ void start()
 //     }
 //
 // }
-
+#define DEBUG
 void HardFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -132,6 +135,9 @@ void HardFault_Handler (void)
 
 void MemManage_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -142,6 +148,9 @@ void MemManage_Handler (void)
 
 void BusFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -152,6 +161,9 @@ void BusFault_Handler (void)
 
 void UsageFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
