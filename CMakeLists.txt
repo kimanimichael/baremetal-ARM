@@ -69,9 +69,8 @@ target_sources(${APP_TARGET}
         qpc/3rd_party/uC-OS2/Source/os_task.c
         qpc/3rd_party/uC-OS2/Source/os_time.c
         qpc/3rd_party/uC-OS2/Source/os_tmr.c
-#        qpc/3rd_party/uC-OS2/Cfg/Template/app_hooks.c
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/ARM/os_cpu_a.asm
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/ARM/os_dbg.c
+        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
+        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
         qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
 )
 
