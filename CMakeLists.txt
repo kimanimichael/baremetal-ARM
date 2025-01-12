@@ -47,6 +47,7 @@ target_include_directories(${APP_TARGET}
         include/
         include/cmsis
         include/cmsis/m-profile
+        uc_ao
         qpc/3rd_party/uC-OS2/Source
         qpc/3rd_party/uC-OS2/Cfg/Template
         qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/ARM
@@ -61,6 +62,7 @@ target_sources(${APP_TARGET}
         src/rectangle.c
         core/system_stm32f4xx.c
         startup/startup.c
+        uc_ao/uc_ao.c
         qpc/3rd_party/uC-OS2/Source/os_core.c
         qpc/3rd_party/uC-OS2/Source/os_flag.c
         qpc/3rd_party/uC-OS2/Source/os_mbox.c
