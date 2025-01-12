@@ -1,6 +1,8 @@
 #ifndef __BSP__H
 #define __BSP__H
 
+#include "ucos_ii.h"
+
 /**
  * @brief Initialize data and call main function
 */
@@ -58,6 +60,8 @@ void EXTI15_10IRQHandler(void);
 #define GPIOC_ODR (*((unsigned int *)(0x40020814)))
 //Base GPIOC register 0x4002 0800 + offset 0x0C to find GPIOC_PUPDR
 #define GPIOC_PUPDR (*((unsigned int *)(0x4002080c)))
+//Base GPIOC register 0x4002 0800 + offset 0x10 to find GPIOC_IDR
+#define GPIOC_IDR (*((unsigned int *)(0x40020810)))
 
 /**
  * @brief Implements a delay
@@ -88,6 +92,12 @@ void BSP_ledInit();
 * @brief Initialize NUCLEO-F429ZI user button PC13
 */
 void BSP_user_button_init();
+
+/**
+* @brief Read user button status
+* @attention BSP_user_button_init() must have been called first at least once in the scope
+*/
+uint32_t BSP_user_button_read();
 
 /**
  * @brief Switches on the blue LED
@@ -151,5 +161,9 @@ void BSP_send_morse_code(uint32_t bitmask);
 void ledOn();
 
 extern QXSemaphore SW1_sema;
+
+/* global RTOS objects... */
+extern OS_EVENT *BSP_semaPress;   /* global semaphore handle */
+extern OS_EVENT *BSP_semaRelease; /* global semaphore handle */
 
 #endif
