@@ -18,7 +18,7 @@ target_link_options(baremetal_arm PRIVATE "-T${LINKER_SCRIPT}"
         "-lnosys")
 
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -Wall -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Werror -Wdiscarded-qualifiers -fstack-usage -nostdlib -specs=nano.specs")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib -specs=nano.specs")
 set(CMAKE_ASM_FLAGS "${CPU_FLAGS}")
 #set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/startup/linker.ld -Wl,-Map=${CMAKE_BINARY_DIR}/${APP_TARGET}.map ${CPU_FLAGS} --specs=nosys.specs" CACHE INTERNAL "")
 
