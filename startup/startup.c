@@ -10,6 +10,8 @@ extern unsigned int  _bss_start;
 extern unsigned int  _bss_end;
 extern unsigned int  _data_lma;
 
+extern int __stack_end__;
+
 unsigned int *vectors[] __attribute__((section(".vectors"))) = 
 {
     (unsigned int *)0x20030000, //Pointer to the top of our stack memory
@@ -72,8 +74,16 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 
 };
 
+void _init() {} // Provide empty _init implementation
+void _fini() {} // Provide empty _fini implementation
+
 void start()
 {
+    extern int __libc_init_array(void);
+    extern void software_init_hook(void) __attribute__((weak));
+
+
+
    volatile unsigned int *src, *dest;
 /**
 //     * Load initialized data from ROM to RAM
@@ -84,7 +94,17 @@ void start()
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
    SystemInit();
-   main();
+
+    /* init hook provided? */
+    if (&software_init_hook != (void (*)(void))(0)) {
+        /* give control to the RTOS */
+        software_init_hook(); /* this will also call __libc_init_array */
+    }
+    else {
+        /* call all static constructors in C++ (harmless in C programs) */
+        __libc_init_array();
+        (void)main(); /* application's entry point; should never return! */
+    }
 
    while (1);
 }
