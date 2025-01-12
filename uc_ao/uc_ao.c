@@ -33,7 +33,7 @@ static  void Active_event_loop(void *pdata) {
 
     /* initialize the AO */
     static const Event initEvt = {.sig = INIT_SIGNAL};
-    me->dispatch(me, &initEvt);
+    (*me->dispatch)(me, &initEvt);
 
     /* event loop ("message pump") */
     while (1) {
@@ -45,7 +45,7 @@ static  void Active_event_loop(void *pdata) {
         Q_ASSERT(err == 0);
 
         /* dispatch event to the active object 'me' */
-        me->dispatch(me, e);
+        (*me->dispatch)(me, e);
     }
 }
 

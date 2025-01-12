@@ -1,11 +1,13 @@
 #include "qpc.h"
 #include "bsp.h"
-#include "ucos_ii.h"
+#include "uc_ao.h"
 
 Q_DEFINE_THIS_FILE
 
 /* The Blinky thread =========================================================*/
 OS_STK stack_blinky[100]; /* task stack */
+
+Active *AO_Button;
 
 enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC / 4) };
 
@@ -32,37 +34,47 @@ void main_blinky(void *pdata) { /* task function */
     }
 }
 
-/* The Button thread =========================================================*/
-OS_STK stack_button[100]; /* task stack */
+typedef struct {
+    Active super;
+} Button;
 
-void main_button(void *pdata) { /* task function */
-    (void)pdata; /* unused parameter(s) */
+static void Button_dispatch(Button * const me, Event const * const e) {
+    switch (e->sig) {
+        case INIT_SIGNAL:
+            BSP_blueLedOff();
+            break;
+        case BUTTON_PRESSED_SIG:{
+                INT8U err; /* uC/OS-II error status */
+                BSP_blueLedOn();
 
-    while (1) { /* endless "superloop" */
-        INT8U err; /* uC/OS-II error status */
 
-        /* wait on the button-press semaphore (BLOCK indefinitely) */
-        OSSemPend(BSP_semaPress, 0, &err); /* BLOCKING! */
-        Q_ASSERT(err == 0);
-        BSP_blueLedOn();
-
-        /* update the blink time for the 'blink' thread */
-        OSMutexPend(shared_blink_time_mutex, 0, &err); /* mutual exclusion */
-        Q_ASSERT(err == 0);
-        shared_blink_time >>= 1; /* shorten the blink time by factor of 2 */
-        if (shared_blink_time == 0U) {
-            shared_blink_time = INITIAL_BLINK_TIME;
-        }
-        OSMutexPost(shared_blink_time_mutex); /* mutual exclusion */
-
-        /* wait on the button-release semaphore (BLOCK indefinitely) */
-        OSSemPend(BSP_semaRelease, 0, &err); /* BLOCKING! */
-        BSP_blueLedOff();
+                /* update the blink time for the 'blink' thread */
+                OSMutexPend(shared_blink_time_mutex, 0, &err); /* mutual exclusion */
+                Q_ASSERT(err == 0);
+                shared_blink_time >>= 1; /* shorten the blink time by factor of 2 */
+                if (shared_blink_time == 0U) {
+                    shared_blink_time = INITIAL_BLINK_TIME;
+                }
+                OSMutexPost(shared_blink_time_mutex); /* mutual exclusion */
+                break;
+            }
+        case BUTTON_RELEASED_SIG:
+            BSP_blueLedOff();
+            break;
+        default:
+            break;
     }
 }
 
-OS_EVENT *BSP_semaPress;   /* global semaphore handle */
-OS_EVENT *BSP_semaRelease; /* global semaphore handle */
+void Button_ctor(Button * const me) {
+    Active_ctor(&me->super, (DispatchHandler)&Button_dispatch);
+}
+
+/* The Button thread =========================================================*/
+OS_STK stack_button[100]; /* task stack */
+static Event *button_queue[10];
+static Button button;
+Active *AO_button = &button.super;
 
 /* the main function =========================================================*/
 int main() {
@@ -72,11 +84,6 @@ int main() {
     BSP_redLedOn();
     OSInit();   /* initialize uC/OS-II */
 
-    /* initialize the RTOS objects before using them */
-    BSP_semaPress   = OSSemCreate(0);
-    Q_ASSERT(BSP_semaPress);
-    BSP_semaRelease = OSSemCreate(0);
-    Q_ASSERT(BSP_semaRelease);
     shared_blink_time_mutex = OSMutexCreate(OS_LOWEST_PRIO - 5, &err);
     Q_ASSERT(err == 0);
 
@@ -92,17 +99,15 @@ int main() {
           (INT16U)0);     /* task options */
     Q_ASSERT(err == 0);
 
-    /* create uC/OS-II task, see NOTE1 */
-    err = OSTaskCreateExt(&main_button, /* the task function */
-          (void *)0,      /* the 'pdata' parameter (not used) */
-          &stack_button[(sizeof(stack_button) / sizeof(OS_STK)) - 1], /* ptos */
-          OS_LOWEST_PRIO - 3, /* uC/OS-II task priority */
-          OS_LOWEST_PRIO - 3, /* unique priority is used as the task ID */
-          stack_button,   /* pbos */
-          (INT32U)(sizeof(stack_button)/sizeof(OS_STK)),/* stack depth */
-          (void *)0,      /* pext */
-          (INT16U)0);     /* task options */
-    Q_ASSERT(err == 0);
+    Button_ctor(&button);
+    Active_start(AO_button,
+        1U,
+        button_queue,
+        sizeof(button_queue)/ sizeof(button_queue[0]),
+        stack_button,
+        sizeof(stack_button),
+        0U
+        );
 
     QF_onStartup(); /* configure and start the interrupts */
 

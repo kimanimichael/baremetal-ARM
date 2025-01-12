@@ -1,7 +1,7 @@
 #ifndef __BSP__H
 #define __BSP__H
 
-#include "ucos_ii.h"
+#include "uc_ao.h"
 
 /**
  * @brief Initialize data and call main function
@@ -160,10 +160,11 @@ void BSP_send_morse_code(uint32_t bitmask);
 
 void ledOn();
 
-extern QXSemaphore SW1_sema;
+enum  EventSignals {
+ BUTTON_PRESSED_SIG = USER_SIGNAL,
+ BUTTON_RELEASED_SIG,
+};
 
-/* global RTOS objects... */
-extern OS_EVENT *BSP_semaPress;   /* global semaphore handle */
-extern OS_EVENT *BSP_semaRelease; /* global semaphore handle */
+extern Active* AO_Button;
 
 #endif

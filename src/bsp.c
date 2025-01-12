@@ -245,9 +245,11 @@ void App_TimeTickHook(void) {
 
     if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
-            OSSemPost(BSP_semaPress);
+            static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
+            Active_post(AO_Button, &buttonPressedEvt);
         } else { /* button released */
-            OSSemPost(BSP_semaRelease);
+            static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
+            Active_post(AO_Button, &buttonReleasedEvt);
         }
     }
 }
