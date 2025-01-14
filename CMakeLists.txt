@@ -50,7 +50,7 @@ target_include_directories(${APP_TARGET}
         uc_ao
         qpc/3rd_party/uC-OS2/Source
         qpc/3rd_party/uC-OS2/Cfg/Template
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/ARM
+        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
 )
 
 target_sources(${APP_TARGET}
