@@ -81,6 +81,7 @@ SECTIONS
     {
         _bss_start = .;
         *(.bss)
+        . = ALIGN(4);
         *(COMMON)
         . = ALIGN(4);
         _bss_end = .;
