@@ -7,8 +7,6 @@ Q_DEFINE_THIS_FILE
 /* The Blinky thread =========================================================*/
 OS_STK stack_blinky[100]; /* task stack */
 
-Active *AO_Button;
-
 enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC / 4) };
 
 /* data shared between tasks */
@@ -74,7 +72,7 @@ void Button_ctor(Button * const me) {
 OS_STK stack_button[100]; /* task stack */
 static Event *button_queue[10];
 static Button button;
-Active *AO_button = &button.super;
+Active *AO_Button = &button.super;
 
 /* the main function =========================================================*/
 int main() {
@@ -100,7 +98,7 @@ int main() {
     Q_ASSERT(err == 0);
 
     Button_ctor(&button);
-    Active_start(AO_button,
+    Active_start(AO_Button,
         1U,
         button_queue,
         sizeof(button_queue)/ sizeof(button_queue[0]),
