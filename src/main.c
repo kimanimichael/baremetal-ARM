@@ -13,6 +13,31 @@ enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC / 4) };
 INT32U volatile shared_blink_time = INITIAL_BLINK_TIME;
 OS_EVENT *shared_blink_time_mutex;
 
+typedef struct {
+    Active super;
+} Blinky;
+
+static void Blinky_dispatch(Blinky * const me, Event const * const e) {
+    switch (e->sig) {
+        case INIT_SIGNAL:
+        
+        default:
+            break;
+    }
+}
+
+void Blinky_ctor(Blinky * const me) {
+    Active_ctor(&me->super, (DispatchHandler)&Blinky_dispatch);
+}
+
+/* The Blinky thread =========================================================*/
+
+OS_STK stack_blinky[100]; /* task stack */
+static Event *blinky_queue[10];
+static Blinky blinky;
+Active *AO_Blinky = &blinky.super;
+
+
 void main_blinky(void *pdata) { /* task function */
     (void)pdata; /* unused parameter(s) */
 
