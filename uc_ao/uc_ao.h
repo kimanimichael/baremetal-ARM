@@ -65,5 +65,15 @@ void Active_start(Active * const me,
                   uint16_t opt);
 void Active_post(Active * const me, Event const * const e);
 
+typedef struct {
+    Event super;
+    Active *act;
+    uint32_t timeout;
+    uint32_t interval;
+} TimeEvent;
+
+void TimeEvent_ctor(TimeEvent * const me, Signal sig, Active *act);
+void TimeEvent_arm(TimeEvent * const me, uint32_t timeout, uint32_t interval);
+void TimeEvent_disarm(TimeEvent * const me);
 
 #endif
