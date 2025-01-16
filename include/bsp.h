@@ -163,6 +163,7 @@ void ledOn();
 enum  EventSignals {
  BUTTON_PRESSED_SIG = USER_SIGNAL,
  BUTTON_RELEASED_SIG,
+ TIMEOUT_SIG,
 };
 
 extern Active* AO_Button;

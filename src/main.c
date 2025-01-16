@@ -15,12 +15,35 @@ OS_EVENT *shared_blink_time_mutex;
 
 typedef struct {
     Active super;
+
+    TimeEvent te;
+    bool isLedOn;
 } Blinky;
 
 static void Blinky_dispatch(Blinky * const me, Event const * const e) {
     switch (e->sig) {
-        case INIT_SIGNAL:
-        
+        case INIT_SIGNAL: //intentionally fall th
+        case TIMEOUT_SIG:
+            {
+                INT8U err;
+                INT32U bt; /* local copy of shared_blink_time */
+
+                OSMutexPend(shared_blink_time_mutex, 0, &err); /* mutual exclusion */
+                Q_ASSERT(err == 0);
+                bt = shared_blink_time;
+                OSMutexPost(shared_blink_time_mutex); /* mutual exclusion */
+
+                if (!me->isLedOn) {
+                    BSP_greenLedOn();
+                    me->isLedOn = true;
+                    TimeEvent_arm(&me->te, bt, 0U);
+                } else {
+                    BSP_greenLedOff();
+                    me->isLedOn = false;
+                    TimeEvent_arm(&me->te, bt*3U, 0U);
+                }
+            }
+            break;
         default:
             break;
     }
@@ -28,6 +51,8 @@ static void Blinky_dispatch(Blinky * const me, Event const * const e) {
 
 void Blinky_ctor(Blinky * const me) {
     Active_ctor(&me->super, (DispatchHandler)&Blinky_dispatch);
+    TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
+    me->isLedOn = false;
 }
 
 /* The Blinky thread =========================================================*/
@@ -36,26 +61,6 @@ OS_STK stack_blinky[100]; /* task stack */
 static Event *blinky_queue[10];
 static Blinky blinky;
 Active *AO_Blinky = &blinky.super;
-
-
-void main_blinky(void *pdata) { /* task function */
-    (void)pdata; /* unused parameter(s) */
-
-    while (1) { /* endless "superloop" */
-        INT8U err;
-        INT32U bt; /* local copy of shared_blink_time */
-
-        OSMutexPend(shared_blink_time_mutex, 0, &err); /* mutual exclusion */
-        Q_ASSERT(err == 0);
-        bt = shared_blink_time;
-        OSMutexPost(shared_blink_time_mutex); /* mutual exclusion */
-
-        BSP_greenLedOn();
-        OSTimeDly(bt);       /* BLOCKING! */
-        BSP_greenLedOff();
-        OSTimeDly(bt * 3U);  /* BLOCKING! */
-    }
-}
 
 typedef struct {
     Active super;
@@ -110,17 +115,16 @@ int main() {
     shared_blink_time_mutex = OSMutexCreate(OS_LOWEST_PRIO - 5, &err);
     Q_ASSERT(err == 0);
 
-    /* create uC/OS-II task, see NOTE1 */
-    err = OSTaskCreateExt(&main_blinky, /* the task function */
-          (void *)0,      /* the 'pdata' parameter (not used) */
-          &stack_blinky[(sizeof(stack_blinky) / sizeof(OS_STK)) - 1], /* ptos */
-          OS_LOWEST_PRIO - 4, /* uC/OS-II task priority */
-          OS_LOWEST_PRIO - 4, /* unique priority is used as the task ID */
-          stack_blinky,   /* pbos */
-          (INT32U)(sizeof(stack_blinky)/sizeof(OS_STK)),/* stack depth */
-          (void *)0,      /* pext */
-          (INT16U)0);     /* task options */
-    Q_ASSERT(err == 0);
+    Blinky_ctor(&blinky);
+    Active_start(AO_Blinky,
+        1U,
+        blinky_queue,
+        sizeof(blinky_queue)/ sizeof(blinky_queue[0]),
+        stack_blinky,
+        sizeof(stack_blinky),
+        0U
+        );
+
 
     Button_ctor(&button);
     Active_start(AO_Button,

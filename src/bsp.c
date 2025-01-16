@@ -234,6 +234,8 @@ void App_TimeTickHook(void) {
         uint32_t previous;
     } button = {0U, 0U};
 
+    TimeEvent_tick();
+
     const uint32_t current = BSP_user_button_read();
     uint32_t tmp     = button.depressed;
 

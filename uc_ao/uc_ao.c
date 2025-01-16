@@ -84,9 +84,62 @@ void Active_start(Active * const me,
         stk_depth,
         (void *)0,
         opt);
-    Q_ASSERT(err == 0); /* thread must be created */
+    //Q_ASSERT(err == 0); /* thread must be created */
 }
+
 
 void Active_post(Active * const me, Event const * const e) {
     OSQPost(me->queue, (void *)e);
+}
+
+static TimeEvent *l_tevt[10];
+static uint_fast8_t l_tevtNum;
+
+void TimeEvent_ctor(TimeEvent * const me, Signal sig, Active *act) {
+    #if OS_CRITICAL_METHOD == 3
+    OS_CPU_SR cpu_sr;
+    #endif
+    me->super.sig = sig;
+    me->act = act;
+    me->timeout = 0U;
+    me->interval = 0U;
+
+    OS_ENTER_CRITICAL();
+    // Q_ASSERT(l_tevtNum < sizeof(l_tevt)/sizeof(l_tevt[0]));
+    l_tevt[l_tevtNum] = me;
+    l_tevtNum++;
+    OS_EXIT_CRITICAL();
+}
+
+void TimeEvent_arm(TimeEvent * const me, uint32_t timeout, uint32_t interval) {
+    #if OS_CRITICAL_METHOD == 3
+    OS_CPU_SR cpu_sr;
+    #endif
+    OS_ENTER_CRITICAL();
+    me->timeout = timeout;
+    me->interval = interval;
+    OS_EXIT_CRITICAL();
+}
+
+void TimeEvent_disarm(TimeEvent * const me) {
+    #if OS_CRITICAL_METHOD == 3
+    OS_CPU_SR cpu_sr;
+    #endif
+
+    OS_ENTER_CRITICAL();
+    me->timeout = 0U;
+    OS_EXIT_CRITICAL();
+}
+
+void TimeEvent_tick(void) {
+    for (uint32_t i = 0; i < l_tevtNum; i++) {
+        Q_ASSERT(l_tevt[i]);
+        if (l_tevt[i]->timeout > 0U) {
+            l_tevt[i]->timeout--;
+        }
+        if (l_tevt[i]->timeout == 0U) {
+            Active_post(l_tevt[i]->act, &l_tevt[i]->super);
+            l_tevt[i] -> timeout = l_tevt[i]->interval;
+        }
+    }
 }

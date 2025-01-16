@@ -76,4 +76,7 @@ void TimeEvent_ctor(TimeEvent * const me, Signal sig, Active *act);
 void TimeEvent_arm(TimeEvent * const me, uint32_t timeout, uint32_t interval);
 void TimeEvent_disarm(TimeEvent * const me);
 
+/* static operation */
+void TimeEvent_tick(void);
+
 #endif
