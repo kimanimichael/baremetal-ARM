@@ -84,7 +84,7 @@ void Active_start(Active * const me,
         stk_depth,
         (void *)0,
         opt);
-    //Q_ASSERT(err == 0); /* thread must be created */
+    Q_ASSERT(err == 0); /* thread must be created */
 }
 
 
