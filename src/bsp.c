@@ -24,9 +24,12 @@ void QF_onStartup(void) {
     SystemCoreClockUpdate();
     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
+
+    // @TODO Confirm why NVIC_SetPriority(SysTick_IRQn, x) fails for values < 8
     /* set systick priority to be "kernel aware" */
-    // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
-    NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 1);
+    // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 5U);
+    // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
+
     // Enable IRQ for EXTI lines 10-15
     NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
