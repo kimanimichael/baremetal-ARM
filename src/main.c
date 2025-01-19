@@ -128,7 +128,7 @@ int main() {
 
     Button_ctor(&button);
     Active_start(AO_Button,
-        1U,
+        2U,
         button_queue,
         sizeof(button_queue)/ sizeof(button_queue[0]),
         stack_button,
