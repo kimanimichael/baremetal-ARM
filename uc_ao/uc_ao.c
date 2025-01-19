@@ -132,14 +132,14 @@ void TimeEvent_disarm(TimeEvent * const me) {
 }
 
 void TimeEvent_tick(void) {
-    for (uint32_t i = 0; i < l_tevtNum; i++) {
+    for (uint_fast8_t i = 0; i < l_tevtNum; i++) {
         Q_ASSERT(l_tevt[i]);
         if (l_tevt[i]->timeout > 0U) {
             l_tevt[i]->timeout--;
-        }
-        if (l_tevt[i]->timeout == 0U) {
-            Active_post(l_tevt[i]->act, &l_tevt[i]->super);
-            l_tevt[i] -> timeout = l_tevt[i]->interval;
+            if (l_tevt[i]->timeout == 0U) {
+                Active_post(l_tevt[i]->act, &l_tevt[i]->super);
+                l_tevt[i] -> timeout = l_tevt[i]->interval;
+            }
         }
     }
 }
