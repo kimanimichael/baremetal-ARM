@@ -1,24 +1,16 @@
-#ifdef NO_NORETURN
-#define _Noreturn [[noreturn]]
-#endif
-
-extern "C" {
 #include "qpc.h"
-}
-
-#undef _Noreturn
-
 #include "bsp.h"
 #include "main.h"
 #include "stm32f429xx.h"
-extern "C" {
 #include "stm32f4xx_it.h"
-}
+
 extern unsigned int _data_start;
 extern unsigned int _data_end;
 extern unsigned int  _bss_start;
 extern unsigned int  _bss_end;
 extern unsigned int  _data_lma;
+
+extern int __stack_end__;
 
 unsigned int *vectors[] __attribute__((section(".vectors"))) = 
 {
@@ -82,14 +74,16 @@ unsigned int *vectors[] __attribute__((section(".vectors"))) =
 
 };
 
-extern "C" {
-    void _init() {} // Provide empty _init implementation
-    void _fini() {} // Provide empty _fini implementation
-    void __libc_init_array(void);
-}
+void _init() {} // Provide empty _init implementation
+void _fini() {} // Provide empty _fini implementation
 
 void start()
 {
+    extern int __libc_init_array(void);
+    extern void software_init_hook(void) __attribute__((weak));
+
+
+
    volatile unsigned int *src, *dest;
 /**
 //     * Load initialized data from ROM to RAM
@@ -99,10 +93,18 @@ void start()
 // Initialize all uninitialized variables (bss section) to 0
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
-
    SystemInit();
-    __libc_init_array();
-   main();
+
+    /* init hook provided? */
+    if (&software_init_hook != (void (*)(void))(0)) {
+        /* give control to the RTOS */
+        software_init_hook(); /* this will also call __libc_init_array */
+    }
+    else {
+        /* call all static constructors in C++ (harmless in C programs) */
+        __libc_init_array();
+        (void)main(); /* application's entry point; should never return! */
+    }
 
    while (1);
 }
@@ -137,9 +139,12 @@ void start()
 //     }
 //
 // }
-
+#define DEBUG
 void HardFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -150,6 +155,9 @@ void HardFault_Handler (void)
 
 void MemManage_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -160,6 +168,9 @@ void MemManage_Handler (void)
 
 void BusFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -170,6 +181,9 @@ void BusFault_Handler (void)
 
 void UsageFault_Handler (void) 
 {
+    #ifdef DEBUG
+    __BKPT(0);
+    #endif
     while (1)
     {
         /* code */
@@ -178,7 +192,7 @@ void UsageFault_Handler (void)
     
 }
 
-void SVC_Handler (void)
+void Unused_Handler (void) 
 {
     while (1)
     {
@@ -188,17 +202,7 @@ void SVC_Handler (void)
     
 }
 
-void DebugMon_Handler (void)
-{
-    while (1)
-    {
-        /* code */
-        assert_failed("Unused_Handler", __LINE__);
-    }
-
-}
-
-// #pragma weak SVC_Handler = Unused_Handler
-// #pragma weak DebugMon_Handler = Unused_Handler
+#pragma weak SVC_Handler = Unused_Handler
+#pragma weak DebugMon_Handler = Unused_Handler
 // #pragma weak PendSV_Handler = Unused_Handler
 // #pragma weak SysTick_Handler = Unused_Handler

@@ -1,17 +1,8 @@
 #include "stm32f429xx.h"
 
-#ifdef NO_NORETURN
-#define _Noreturn [[noreturn]]
-#endif
-
-extern "C" {
 #include "qpc.h"
-}
-
-#undef _Noreturn
-
-
 #include "bsp.h"
+#include "ucos_ii.h"
 
 // static QXSemaphore morse_sema;
 
@@ -33,9 +24,11 @@ void QF_onStartup(void) {
     SystemCoreClockUpdate();
     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
+
+    // @TODO Confirm why NVIC_SetPriority(SysTick_IRQn, x) fails for values < 8
     /* set systick priority to be "kernel aware" */
-    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
-    NVIC_SetPriority(EXTI15_10_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1);
+    // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 5U);
+    // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
 
     // Enable IRQ for EXTI lines 10-15
     NVIC_EnableIRQ(EXTI15_10_IRQn);
@@ -57,22 +50,22 @@ void QXK_onIdle(void) {
 
 unsigned int volatile l_tickrCtr;
 
-extern "C" void SysTick_Handler (void)
-{
-    GPIOx_ODR |= (0b01 << 1);
-    QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
-    QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
-
-    QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
-    GPIOx_ODR &= ~(0b01 << 1);
-}
+// void SysTick_Handler (void)
+// {
+//     GPIOx_ODR |= (0b01 << 1);
+//     QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+//     QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
+//
+//     QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
+//     GPIOx_ODR &= ~(0b01 << 1);
+// }
 
 void EXTI15_10IRQHandler (void)
 {
     QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
-        QXSemaphore_signal(&SW1_sema);
+        // QXSemaphore_signal(&SW1_sema);
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
@@ -107,6 +100,9 @@ void BSP_init() {
     // QXSemaphore_init(&morse_sema,
     //     1U,
     //     1U);
+    SystemCoreClockUpdate();
+    BSP_ledInit();
+    BSP_user_button_init();
 
     QXMutex_init(&morse_mutex, 6U);
 }
@@ -148,6 +144,11 @@ void BSP_user_button_init() {
     EXTI_IMR |= (1 << 13);
     // Enable IRQ for EXTI lines 10-15
     NVIC_EnableIRQ(EXTI15_10_IRQn);
+}
+
+uint32_t BSP_user_button_read() {
+    const uint32_t button_status = (GPIOC_IDR & (0b01 << 13));
+    return button_status;
 }
 
 void BSP_greenLedToggle() {
@@ -228,4 +229,51 @@ void BSP_send_morse_code(uint32_t bitmask) {
     // Mutex
     QXMutex_unlock(&morse_mutex);
 }
+
+void App_TimeTickHook(void) {
+    /* state of button. static to persist between func calls */
+    static struct ButtonDebouncing {
+        uint32_t depressed;
+        uint32_t previous;
+    } button = {0U, 0U};
+
+    TimeEvent_tick();
+
+    const uint32_t current = BSP_user_button_read();
+    uint32_t tmp     = button.depressed;
+
+    button.depressed |= (button.previous & current); /* set depressed */
+    button.depressed &= (button.previous | current); /* set released */
+    button.previous = current; /* update history for next function call */
+
+    tmp ^= button.depressed; /* change of button depressed state */
+
+    if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
+        if ((current & (0b01 << 13)) != 0U) { /* button pressed */
+            static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
+            Active_post(AO_BlinkyButton, &buttonPressedEvt);
+        } else { /* button released */
+            static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
+            Active_post(AO_BlinkyButton, &buttonReleasedEvt);
+        }
+    }
+}
+/*..........................................................................*/
+void App_TaskIdleHook(void) {
+    #ifdef NDEBUG
+    /* Put the CPU and peripherals to the low-power mode.
+    * you might need to customize the clock management for your application,
+    * see the datasheet for your particular Cortex-M3 MCU.
+    */
+    __WFI(); /* Wait-For-Interrupt */
+    #endif
+}
+/*..........................................................................*/
+
+void App_TaskCreateHook (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskDelHook    (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskReturnHook (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskStatHook   (void)         {}
+void App_TaskSwHook     (void)         {}
+void App_TCBInitHook    (OS_TCB *ptcb) { (void)ptcb; }
 

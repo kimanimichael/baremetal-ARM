@@ -3,21 +3,24 @@
 
 #include "shape.h"
 
-class Rectangle : public Shape {
-public:
-    Rectangle(
-        int16_t  x0, int16_t  y0,
-        uint16_t w0, uint16_t h0);
+/* Rectangle's attributes */
+typedef struct {
+    Shape   super; /* inherited shape */
 
-private:
+    /* attributes specific to class */
     uint16_t width;
     uint16_t height;
+} Rectangle;
 
-public:
-    void draw() override;
+/* Rectangle's operations */
+void Rectangle_ctor(Rectangle* const me,
+                    int16_t          x0,
+                    int16_t          y0,
+                    uint16_t          w0,
+                    uint16_t          h0);
 
-    uint32_t area()const override;
-};
+void Rectangle_draw(Rectangle const* const me);
 
+uint32_t Rectangle_area(Rectangle const* const me);
 
 #endif

@@ -250,6 +250,10 @@ void SystemInit(void)
 #else
   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
 #endif
+
+  SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+  SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
+  SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk;
 }
 
 /**
