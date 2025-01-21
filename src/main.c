@@ -17,7 +17,7 @@ typedef struct {
     uint32_t blink_time;
 } TimeBomb;
 
-static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e) {
+static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
     if (e->sig == INIT_SIGNAL) {
         BSP_blueLedOff();
         TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
