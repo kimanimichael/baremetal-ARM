@@ -251,10 +251,10 @@ void App_TimeTickHook(void) {
     if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
             static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
-            Active_post(AO_BlinkyButton, &buttonPressedEvt);
+            Active_post(AO_TimeBomb, &buttonPressedEvt);
         } else { /* button released */
             static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
-            Active_post(AO_BlinkyButton, &buttonReleasedEvt);
+            Active_post(AO_TimeBomb, &buttonReleasedEvt);
         }
     }
 }

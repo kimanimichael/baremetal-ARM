@@ -1,11 +1,9 @@
-/* BlinkyButton/Button with uC/AO active-object framework */
+/* TimeBomb/Button with uC/AO active-object framework */
 #include "qpc.h"
 #include "bsp.h"
 #include "uc_ao.h"
 
-// Q_DEFINE_THIS_FILE
-
-/* The BlinkyButton AO =======================================================*/
+/* The TimeBomb AO =======================================================*/
 enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC) };
 
 typedef struct {
@@ -17,7 +15,7 @@ typedef struct {
         ON_STATE,
     }state;
     uint32_t blink_time;
-} BlinkyButton;
+} TimeBomb;
 
 static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e) {
     if (e->sig == INIT_SIGNAL) {
@@ -97,18 +95,18 @@ static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e
 
 }
 
-void BlinkyButton_ctor(BlinkyButton * const me) {
-    Active_ctor(&me->super, (DispatchHandler)&BlinkyButton_dispatch);
+void TimeBomb_ctor(TimeBomb * const me) {
+    Active_ctor(&me->super, (DispatchHandler)&TimeBomb_dispatch);
     TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
     me->state = OFF_STATE;
     me->blink_time = INITIAL_BLINK_TIME;
 }
 
-/* The BlinkyButton thread =========================================================*/
-OS_STK stack_blinky_button[100]; /* task stack */
-static Event *BlinkyButton_queue[10];
-static BlinkyButton blinkyButton;
-Active *AO_BlinkyButton = &blinkyButton.super;
+/* The TimeBomb thread =========================================================*/
+OS_STK stack_timeBomb[100]; /* task stack */
+static Event *timeBomb_queue[10];
+static TimeBomb timeBomb;
+Active *AO_TimeBomb = &timeBomb.super;
 
 
 /* the main function =========================================================*/
@@ -118,13 +116,13 @@ int main() {
     OSInit();   /* initialize uC/OS-II */
 
     /* create AO and start it */
-    BlinkyButton_ctor(&blinkyButton);
-    Active_start(AO_BlinkyButton,
+    TimeBomb_ctor(&timeBomb);
+    Active_start(AO_TimeBomb,
         1U,
-        BlinkyButton_queue,
-        sizeof(BlinkyButton_queue)/ sizeof(BlinkyButton_queue[0]),
-        stack_blinky_button,
-        sizeof(stack_blinky_button),
+        timeBomb_queue,
+        sizeof(timeBomb_queue)/ sizeof(timeBomb_queue[0]),
+        stack_timeBomb,
+        sizeof(stack_timeBomb),
         0U
         );
 
