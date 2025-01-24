@@ -62,60 +62,63 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
     <documentation>Blinky state machine</documentation>
     <!--${AOs::BlinkyButton::SM::initial}-->
     <initial target="../1">
-     <action brief="LED-off;arm TE for timeout;"/>
-     <initial_glyph conn="8,5,5,1,30,7,-4">
-      <action box="0,-2,23,2"/>
+     <action brief="Green-LED on;"/>
+     <initial_glyph conn="10,4,5,1,33,9,-6">
+      <action box="0,-2,17,3"/>
      </initial_glyph>
     </initial>
-    <!--${AOs::BlinkyButton::SM::off}-->
-    <state name="off">
-     <!--${AOs::BlinkyButton::SM::off::TIMEOUT}-->
-     <tran trig="TIMEOUT" target="../../2">
-      <action brief="LED-on;arm TE for timeout;"/>
-      <tran_glyph conn="8,16,3,1,30,30,-4">
-       <action box="0,-2,23,4"/>
+    <!--${AOs::BlinkyButton::SM::wait4Button}-->
+    <state name="wait4Button">
+     <!--${AOs::BlinkyButton::SM::wait4Button::BUTTON_PRESSED_SIG}-->
+     <tran trig="BUTTON_PRESSED_SIG" target="../../2">
+      <action brief="Green-LED off; Red-LED on;  arm-TE for 1/2 sec; blink_ctr = 3"/>
+      <tran_glyph conn="13,18,3,1,30,11,-6">
+       <action box="0,-2,24,8"/>
       </tran_glyph>
      </tran>
-     <!--${AOs::BlinkyButton::SM::off::BUTTON_PRESSED}-->
-     <tran trig="BUTTON_PRESSED">
-      <action brief="Blue-LED on; blinktime /= 2;"/>
-      <tran_glyph conn="8,24,3,-1,24">
-       <action box="0,-2,21,5"/>
-      </tran_glyph>
-     </tran>
-     <!--${AOs::BlinkyButton::SM::off::BUTTON_RELEASED}-->
-     <tran trig="BUTTON_RELEASED">
-      <action brief="Blue-LED off;"/>
-      <tran_glyph conn="8,31,3,-1,21">
-       <action box="0,-2,18,4"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="8,9,26,28"/>
+     <state_glyph node="13,10,24,16"/>
     </state>
-    <!--${AOs::BlinkyButton::SM::on}-->
-    <state name="on">
-     <!--${AOs::BlinkyButton::SM::on::TIMEOUT}-->
-     <tran trig="TIMEOUT" target="../../1">
-      <action brief="LED-off;arm TE for timeout"/>
-      <tran_glyph conn="8,51,3,1,28,-32,-2">
-       <action box="0,-2,22,5"/>
+    <!--${AOs::BlinkyButton::SM::blink}-->
+    <state name="blink">
+     <!--${AOs::BlinkyButton::SM::blink::TIMEOUT_SIG}-->
+     <tran trig="TIMEOUT_SIG" target="../../3">
+      <action brief="Red-LED off; arm-TE for 1/2 sec;"/>
+      <tran_glyph conn="13,36,3,1,27,11,-3">
+       <action box="0,-2,22,7"/>
       </tran_glyph>
      </tran>
-     <!--${AOs::BlinkyButton::SM::on::BUTTON_PRESSED}-->
-     <tran trig="BUTTON_PRESSED">
-      <action brief="Blue-LED on; blinktime /= 2;"/>
-      <tran_glyph conn="8,62,3,-1,24">
-       <action box="0,-2,21,5"/>
+     <state_glyph node="13,27,24,14"/>
+    </state>
+    <!--${AOs::BlinkyButton::SM::pause}-->
+    <state name="pause">
+     <!--${AOs::BlinkyButton::SM::pause::TIMEOUT_SIG}-->
+     <tran trig="TIMEOUT_SIG">
+      <action brief="--blink_ctr;"/>
+      <!--${AOs::BlinkyButton::SM::pause::TIMEOUT_SIG::[blink_ctr>0]}-->
+      <choice target="../../../2">
+       <guard brief="blink_ctr&gt;0"/>
+       <action brief="Red-LED on; arm-TE for 1/2 sec;"/>
+       <choice_glyph conn="43,53,4,1,-21,-6">
+        <action box="0,-11,11,8"/>
+       </choice_glyph>
+      </choice>
+      <!--${AOs::BlinkyButton::SM::pause::TIMEOUT_SIG::[eles]}-->
+      <choice target="../../../4">
+       <guard brief="eles"/>
+       <action brief="All LEDs ON"/>
+       <choice_glyph conn="43,53,4,1,12,-6">
+        <action box="0,4,11,6"/>
+       </choice_glyph>
+      </choice>
+      <tran_glyph conn="13,53,3,-1,30">
+       <action box="0,-2,22,7"/>
       </tran_glyph>
      </tran>
-     <!--${AOs::BlinkyButton::SM::on::BUTTON_RELEASED}-->
-     <tran trig="BUTTON_RELEASED">
-      <action brief="Blue-LED off;"/>
-      <tran_glyph conn="8,69,3,-1,24">
-       <action box="0,-2,18,4"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="8,44,26,30"/>
+     <state_glyph node="13,44,24,14"/>
+    </state>
+    <!--${AOs::BlinkyButton::SM::boom}-->
+    <state name="boom">
+     <state_glyph node="14,62,23,11"/>
     </state>
     <state_diagram size="59,83"/>
    </statechart>

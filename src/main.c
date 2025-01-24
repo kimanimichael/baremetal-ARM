@@ -11,41 +11,32 @@ typedef struct {
 
     TimeEvent te;
     enum {
-        OFF_STATE,
-        ON_STATE,
+        WAIT_FOR_BUTTON,
+        BLINK,
+        PAUSE,
+        BOOM
     }state;
     uint32_t blink_time;
+    uint32_t blink_ctr;
 } TimeBomb;
 
 static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
     if (e->sig == INIT_SIGNAL) {
-        BSP_blueLedOff();
+        BSP_greenLedOn();
         TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
-        me->state = OFF_STATE;
+        me->state = WAIT_FOR_BUTTON;
     }
     switch (me->state) {
-        case OFF_STATE:
+        case WAIT_FOR_BUTTON:
             {
                 switch (e->sig) {
-                    case TIMEOUT_SIG:
-                        {
-                            BSP_greenLedOn();
-                            TimeEvent_arm(&me->te, (me->blink_time), 0U);
-                            me->state = ON_STATE;
-                            break;
-                        }
                     case BUTTON_PRESSED_SIG:
                         {
-                            BSP_blueLedOn();
-                            me->blink_time >>= 1; /* shorten the blink time by factor of 2 */
-                            if (me->blink_time == 0U) {
-                                me->blink_time = INITIAL_BLINK_TIME;
-                            }
-                            break;
-                        }
-                    case BUTTON_RELEASED_SIG:
-                        {
-                            BSP_blueLedOff();
+                            BSP_greenLedOff();
+                            BSP_redLedOn();
+                            TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
+                            me->blink_ctr = 3;
+                            me->state = BLINK;
                             break;
                         }
                     default:
@@ -55,28 +46,14 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
                 }
                 break;
             }
-        case ON_STATE:
+        case BLINK:
             {
                 switch (e->sig) {
                     case TIMEOUT_SIG:
                         {
-                            BSP_greenLedOff();
-                            TimeEvent_arm(&me->te, (me->blink_time) * 3U, 0U);
-                            me->state = OFF_STATE;
-                            break;
-                        }
-                    case BUTTON_PRESSED_SIG:
-                        {
-                            BSP_blueLedOn();
-                            me->blink_time >>= 1; /* shorten the blink time by factor of 2 */
-                            if (me->blink_time == 0U) {
-                                me->blink_time = INITIAL_BLINK_TIME;
-                            }
-                            break;
-                        }
-                    case BUTTON_RELEASED_SIG:
-                        {
-                            BSP_blueLedOff();
+                            BSP_redLedOff();
+                            TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
+                            me->state = PAUSE;
                             break;
                         }
                     default:
@@ -84,6 +61,35 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
                             break;
                         }
                 }
+                break;
+            }
+        case PAUSE:
+            {
+                switch (e->sig) {
+                    case TIMEOUT_SIG:
+                        {
+                            if (--me->blink_ctr > 0) {
+                                BSP_redLedOn();
+                                TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
+                                me->state = BLINK;
+                            } else {
+                                BSP_redLedOn();
+                                BSP_greenLedOn();
+                                BSP_blueLedOn();
+                                me->state = BOOM;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+                break;
+            }
+        case  BOOM:
+            {
+                BSP_blueLedOn();
                 break;
             }
         default:
@@ -98,7 +104,7 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
 void TimeBomb_ctor(TimeBomb * const me) {
     Active_ctor(&me->super, (DispatchHandler)&TimeBomb_dispatch);
     TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
-    me->state = OFF_STATE;
+    me->state = BLINK;
     me->blink_time = INITIAL_BLINK_TIME;
 }
 
@@ -112,7 +118,6 @@ Active *AO_TimeBomb = &timeBomb.super;
 /* the main function =========================================================*/
 int main() {
     BSP_init(); /* initialize the BSP */
-    BSP_redLedOn();
     OSInit();   /* initialize uC/OS-II */
 
     /* create AO and start it */
