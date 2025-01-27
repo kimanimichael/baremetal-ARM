@@ -52,15 +52,16 @@ void QXK_onIdle(void) {
 
 unsigned int volatile l_tickrCtr;
 
-// void SysTick_Handler (void)
-// {
-//     GPIOx_ODR |= (0b01 << 1);
-//     QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
-//     QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
-//
-//     QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
-//     GPIOx_ODR &= ~(0b01 << 1);
-// }
+void SysTick_Handler (void)
+{
+    // GPIOx_ODR |= (0b01 << 1);
+    // QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+    // QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
+    //
+    // QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
+    // GPIOx_ODR &= ~(0b01 << 1);
+    ++l_tickrCtr;
+}
 
 void EXTI15_10IRQHandler (void)
 {
@@ -99,15 +100,22 @@ uint32_t BSP_Tickr(void) {
 }
 
 void BSP_init() {
-    // QXSemaphore_init(&morse_sema,
-    //     1U,
-    //     1U);
-    SystemCoreClockUpdate();
+    // SystemCoreClockUpdate();
+    SysTick_Config(16000000/BSP_TICKS_PER_SEC);
     BSP_ledInit();
-    BSP_user_button_init();
-
-    QXMutex_init(&morse_mutex, 6U);
+    //Find out why this isn't necessary
+    __enable_irq();
 }
+// void BSP_init() {
+//     // QXSemaphore_init(&morse_sema,
+//     //     1U,
+//     //     1U);
+//     SystemCoreClockUpdate();
+//     BSP_ledInit();
+//     BSP_user_button_init();
+//
+//     QXMutex_init(&morse_mutex, 6U);
+// }
 
 void BSP_ledInit() {
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
@@ -234,31 +242,31 @@ void BSP_send_morse_code(uint32_t bitmask) {
 
 void App_TimeTickHook(void) {
     /* state of button. static to persist between func calls */
-    static struct ButtonDebouncing {
-        uint32_t depressed;
-        uint32_t previous;
-    } button = {0U, 0U};
-
-    TimeEvent_tick();
-
-    const uint32_t current = BSP_user_button_read();
-    uint32_t tmp     = button.depressed;
-
-    button.depressed |= (button.previous & current); /* set depressed */
-    button.depressed &= (button.previous | current); /* set released */
-    button.previous = current; /* update history for next function call */
-
-    tmp ^= button.depressed; /* change of button depressed state */
-
-    if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
-        if ((current & (0b01 << 13)) != 0U) { /* button pressed */
-            static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
-            Active_post(AO_TimeBomb, &buttonPressedEvt);
-        } else { /* button released */
-            static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
-            Active_post(AO_TimeBomb, &buttonReleasedEvt);
-        }
-    }
+    // static struct ButtonDebouncing {
+    //     uint32_t depressed;
+    //     uint32_t previous;
+    // } button = {0U, 0U};
+    //
+    // TimeEvent_tick();
+    //
+    // const uint32_t current = BSP_user_button_read();
+    // uint32_t tmp     = button.depressed;
+    //
+    // button.depressed |= (button.previous & current); /* set depressed */
+    // button.depressed &= (button.previous | current); /* set released */
+    // button.previous = current; /* update history for next function call */
+    //
+    // tmp ^= button.depressed; /* change of button depressed state */
+    //
+    // if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
+    //     if ((current & (0b01 << 13)) != 0U) { /* button pressed */
+    //         static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
+    //         Active_post(AO_TimeBomb, &buttonPressedEvt);
+    //     } else { /* button released */
+    //         static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
+    //         Active_post(AO_TimeBomb, &buttonReleasedEvt);
+    //     }
+    // }
 }
 /*..........................................................................*/
 void App_TaskIdleHook(void) {
