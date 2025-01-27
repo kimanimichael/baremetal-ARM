@@ -166,6 +166,6 @@ enum  EventSignals {
  TIMEOUT_SIG,
 };
 
-extern Active* AO_BlinkyButton;
+extern Active* AO_TimeBomb;
 
 #endif

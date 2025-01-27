@@ -31,7 +31,9 @@ void QF_onStartup(void) {
     // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
 
     // Enable IRQ for EXTI lines 10-15
+    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
+    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
 }
 
 void QF_onCleanup(void) {
@@ -143,7 +145,7 @@ void BSP_user_button_init() {
     // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
     EXTI_IMR |= (1 << 13);
     // Enable IRQ for EXTI lines 10-15
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
+    // NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 uint32_t BSP_user_button_read() {
@@ -251,10 +253,10 @@ void App_TimeTickHook(void) {
     if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
             static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
-            Active_post(AO_BlinkyButton, &buttonPressedEvt);
+            Active_post(AO_TimeBomb, &buttonPressedEvt);
         } else { /* button released */
             static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
-            Active_post(AO_BlinkyButton, &buttonReleasedEvt);
+            Active_post(AO_TimeBomb, &buttonReleasedEvt);
         }
     }
 }
