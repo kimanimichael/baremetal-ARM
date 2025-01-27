@@ -150,25 +150,26 @@ int main() {
 
     while (1) {
         /* code */
-
+        // Buffer now variable
+        uint32_t now = BSP_Tickr();
         switch (state) {
             case INIT_STATE:
 
-                start = BSP_Tickr();
+                start = now;
                 state = OFF_STATE;
                 break;
             case OFF_STATE:
-                if ((BSP_Tickr() - start) > (BSP_TICKS_PER_SEC / 2)) {
+                if ((now - start) > (BSP_TICKS_PER_SEC / 2)) {
                     BSP_greenLedOn();
                     state = ON_STATE;
-                    start = BSP_Tickr();
+                    start = now;
                 }
                 break;
             case ON_STATE:
-                if ((BSP_Tickr() - start) > (BSP_TICKS_PER_SEC / 2)) {
+                if ((now - start) > (BSP_TICKS_PER_SEC / 2)) {
                     BSP_greenLedOff();
                     state = OFF_STATE;
-                    start = BSP_Tickr();
+                    start = now;
                 }
                 break;
 
