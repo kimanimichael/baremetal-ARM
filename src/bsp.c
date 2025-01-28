@@ -1,54 +1,54 @@
 #include "stm32f429xx.h"
 
-#include "qpc.h"
+// #include "qpc.h"
 #include "bsp.h"
 #include "ucos_ii.h"
 
 // static QXSemaphore morse_sema;
 
 // Mutex
-static QXMutex morse_mutex;
-
-void assert_failed(char const* module, int id) {
-    Q_onError(module, id);
-}
-
-void Q_onError(char const* module, int id) {
-    /* TBD Damage control */
-    (void)module;
-    (void)id;
-    NVIC_SystemReset();
-}
-
-void QF_onStartup(void) {
-    SystemCoreClockUpdate();
-    /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
-    SysTick_Config(16000000/BSP_TICKS_PER_SEC);
-
-    // @TODO Confirm why NVIC_SetPriority(SysTick_IRQn, x) fails for values < 8
-    /* set systick priority to be "kernel aware" */
-    // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 5U);
-    // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
-
-    // Enable IRQ for EXTI lines 10-15
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
-}
-
-void QF_onCleanup(void) {
-}
-
-void QXK_onIdle(void) {
-    /* @TODO Investigate why this causes irregular thread switching */
-    // GPIOx_ODR |= (0b01 << 14);
-    // GPIOx_ODR &= ~(0b01 << 14);
-
-    GPIOA_ODR |= (0b01 << 12);
-    GPIOA_ODR &= ~(0b01 << 12);
-    // __WFI();
-
-}
+// static QXMutex morse_mutex;
+//
+// void assert_failed(char const* module, int id) {
+//     Q_onError(module, id);
+// }
+//
+// void Q_onError(char const* module, int id) {
+//     /* TBD Damage control */
+//     (void)module;
+//     (void)id;
+//     NVIC_SystemReset();
+// }
+//
+// void QF_onStartup(void) {
+//     SystemCoreClockUpdate();
+//     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
+//     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
+//
+//     // @TODO Confirm why NVIC_SetPriority(SysTick_IRQn, x) fails for values < 8
+//     /* set systick priority to be "kernel aware" */
+//     // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 5U);
+//     // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
+//
+//     // Enable IRQ for EXTI lines 10-15
+//     NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
+//     NVIC_EnableIRQ(EXTI15_10_IRQn);
+//     NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
+// }
+//
+// void QF_onCleanup(void) {
+// }
+//
+// void QXK_onIdle(void) {
+//     /* @TODO Investigate why this causes irregular thread switching */
+//     // GPIOx_ODR |= (0b01 << 14);
+//     // GPIOx_ODR &= ~(0b01 << 14);
+//
+//     GPIOA_ODR |= (0b01 << 12);
+//     GPIOA_ODR &= ~(0b01 << 12);
+//     // __WFI();
+//
+// }
 
 unsigned int volatile l_tickrCtr;
 
@@ -65,14 +65,14 @@ void SysTick_Handler (void)
 
 void EXTI15_10IRQHandler (void)
 {
-    QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+    // QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
         // QXSemaphore_signal(&SW1_sema);
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
-    QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
+    // QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
 }
 
 void ledOn() {
@@ -103,6 +103,7 @@ void BSP_init() {
     // SystemCoreClockUpdate();
     SysTick_Config(16000000/BSP_TICKS_PER_SEC);
     BSP_ledInit();
+    BSP_user_button_init();
     //Find out why this isn't necessary
     __enable_irq();
 }
@@ -119,7 +120,7 @@ void BSP_init() {
 
 void BSP_ledInit() {
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 1) | (0b01 << 0);
+    RCC_AH1BENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
@@ -133,27 +134,34 @@ void BSP_ledInit() {
 
 void BSP_user_button_init() {
     //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOC_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 2);
+    RCC_AH1BENR |= (0b01 << 2);
 
-    //Bitwise AND the 27th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 27);
-    //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 26);
-    //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 27);
-    //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 26);
+    // //Bitwise AND the 27th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
+    // GPIOC_MODER &= (0b00 << 27);
+    // //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
+    // GPIOC_MODER &= (0b00 << 26);
+    GPIOC_MODER &= ~(0b11 << 26);  // Clear bits 26 and 27 to configure PC13 as input
+    // //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
+    // GPIOC_PUPDR &= (0b00 << 27);
+    // //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
+    // GPIOC_PUPDR &= (0b00 << 26);
+    GPIOC_PUPDR &= ~(0b11 << 26);
+    GPIOC_PUPDR |= (2 << (13 * 2));  // Set pull-down for PC13
 
     //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
     RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
     //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
-    SYSCFG_EXTICR4 |= (0b0010 << 4);
+    // SYSCFG_EXTICR4 |= (0b0010 << 4);
+
+    SYSCFG_EXTICR4 &= ~(0xF << 4);  // Clear bits 4-7
+    SYSCFG_EXTICR4 |= (0x2 << 4);   // Set bits 4-7 to 0b0010 (PC13)
+
     // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
     EXTI_RTSR |= (1 << 13);
     // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
     EXTI_IMR |= (1 << 13);
     // Enable IRQ for EXTI lines 10-15
-    // NVIC_EnableIRQ(EXTI15_10_IRQn);
+    NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 uint32_t BSP_user_button_read() {
@@ -162,9 +170,9 @@ uint32_t BSP_user_button_read() {
 }
 
 void BSP_greenLedToggle() {
-    QF_CRIT_ENTRY();
+    // QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 0);
-    QF_CRIT_EXIT();
+    // QF_CRIT_EXIT();
 }
 
 void BSP_greenLedOn() {
@@ -176,9 +184,9 @@ void BSP_greenLedOff() {
 }
 
 void BSP_blueLedToggle() {
-    QF_CRIT_ENTRY();
+    // QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 7);
-    QF_CRIT_EXIT();
+    // QF_CRIT_EXIT();
 }
 
 void BSP_blueLedOn() {
@@ -198,9 +206,9 @@ void BSP_redLedOff() {
 }
 
 void BSP_redLedToggle() {
-    QF_CRIT_ENTRY();
+    // QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 14);
-    QF_CRIT_EXIT();
+    // QF_CRIT_EXIT();
 }
 
 void BSP_send_morse_code(uint32_t bitmask) {
@@ -214,7 +222,7 @@ void BSP_send_morse_code(uint32_t bitmask) {
     // const QSchedStatus lock_status = QXK_schedLock(5U);
 
     // Mutex
-    QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
+    // QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
 
     for (; bitmask != 0U; bitmask <<= 1U) {
         if ((bitmask & (1U << 31U)) != 0U) {
@@ -237,7 +245,7 @@ void BSP_send_morse_code(uint32_t bitmask) {
     // QXK_schedUnlock(lock_status);
 
     // Mutex
-    QXMutex_unlock(&morse_mutex);
+    // QXMutex_unlock(&morse_mutex);
 }
 
 void App_TimeTickHook(void) {
@@ -287,3 +295,9 @@ void App_TaskStatHook   (void)         {}
 void App_TaskSwHook     (void)         {}
 void App_TCBInitHook    (OS_TCB *ptcb) { (void)ptcb; }
 
+void assert_failed(char const* file, int line) {
+    /**
+     * @brief Resets the system,
+    */
+    NVIC_SystemReset();
+}

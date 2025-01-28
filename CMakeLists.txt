@@ -37,10 +37,10 @@ enable_language(ASM)
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
-target_link_libraries(${APP_TARGET}
-    PRIVATE
-        qpc
-)
+#target_link_libraries(${APP_TARGET}
+#    PRIVATE
+#        qpc
+#)
 
 target_include_directories(${APP_TARGET}
         PRIVATE
@@ -62,20 +62,20 @@ target_sources(${APP_TARGET}
         src/rectangle.c
         core/system_stm32f4xx.c
         startup/startup.c
-        uc_ao/uc_ao.c
-        qpc/3rd_party/uC-OS2/Source/os_core.c
-        qpc/3rd_party/uC-OS2/Source/os_flag.c
-        qpc/3rd_party/uC-OS2/Source/os_mbox.c
-        qpc/3rd_party/uC-OS2/Source/os_mem.c
-        qpc/3rd_party/uC-OS2/Source/os_mutex.c
-        qpc/3rd_party/uC-OS2/Source/os_q.c
-        qpc/3rd_party/uC-OS2/Source/os_sem.c
-        qpc/3rd_party/uC-OS2/Source/os_task.c
-        qpc/3rd_party/uC-OS2/Source/os_time.c
-        qpc/3rd_party/uC-OS2/Source/os_tmr.c
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
+#        uc_ao/uc_ao.c
+#        qpc/3rd_party/uC-OS2/Source/os_core.c
+#        qpc/3rd_party/uC-OS2/Source/os_flag.c
+#        qpc/3rd_party/uC-OS2/Source/os_mbox.c
+#        qpc/3rd_party/uC-OS2/Source/os_mem.c
+#        qpc/3rd_party/uC-OS2/Source/os_mutex.c
+#        qpc/3rd_party/uC-OS2/Source/os_q.c
+#        qpc/3rd_party/uC-OS2/Source/os_sem.c
+#        qpc/3rd_party/uC-OS2/Source/os_task.c
+#        qpc/3rd_party/uC-OS2/Source/os_time.c
+#        qpc/3rd_party/uC-OS2/Source/os_tmr.c
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
 )
 
 # Post-build step to generate binary

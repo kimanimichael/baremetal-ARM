@@ -152,6 +152,7 @@ int main() {
         /* code */
         // Buffer now variable
         uint32_t now = BSP_Tickr();
+        uint32_t button_state = BSP_user_button_read();
         switch (state) {
             case INIT_STATE:
 
@@ -163,6 +164,12 @@ int main() {
                     BSP_greenLedOn();
                     state = ON_STATE;
                     start = now;
+                } else {
+                    if (button_state != 0) {
+                        BSP_blueLedOn();
+                    } else {
+                        BSP_greenLedOff();
+                    }
                 }
                 break;
             case ON_STATE:
@@ -170,6 +177,12 @@ int main() {
                     BSP_greenLedOff();
                     state = OFF_STATE;
                     start = now;
+                } else {
+                    if (button_state != 0) {
+                        BSP_blueLedOn();
+                    } else {
+                        BSP_blueLedOff();
+                    }
                 }
                 break;
 
