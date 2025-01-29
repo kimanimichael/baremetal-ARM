@@ -149,42 +149,49 @@ int main() {
     static uint32_t start;
     uint32_t prev_button_state = 0U;
 
+    struct {
+        uint32_t now;
+        uint32_t button_state;
+    } evt, *e;
+
+    e = &evt;
+
     while (1) {
         /* code */
         // Buffer now variable
-        uint32_t now = BSP_Tickr();
-        uint32_t button_state = BSP_user_button_read();
+        e->now = BSP_Tickr();
+        e->button_state = BSP_user_button_read();
 
         switch (state) {
             case INIT_STATE:
 
-                start = now;
+                start = e->now;
                 state = OFF_STATE;
                 break;
             case OFF_STATE:
-                if ((now - start) > (BSP_TICKS_PER_SEC / 2)) {
+                if ((e->now - start) > (BSP_TICKS_PER_SEC / 2)) {
                     BSP_greenLedOn();
                     state = ON_STATE;
-                    start = now;
-                } else if (button_state != 0U && prev_button_state == 0U) {
+                    start = e->now;
+                } else if (e->button_state != 0U && prev_button_state == 0U) {
                     BSP_blueLedOn();
-                    prev_button_state = button_state;
-                } else if (button_state == 0U && prev_button_state != 0U) {
+                    prev_button_state = e->button_state;
+                } else if (e->button_state == 0U && prev_button_state != 0U) {
                     BSP_blueLedOff();
-                    prev_button_state = button_state;
+                    prev_button_state = e->button_state;
                 }
                 break;
             case ON_STATE:
-                if ((now - start) > (BSP_TICKS_PER_SEC / 2)) {
+                if ((e->now - start) > (BSP_TICKS_PER_SEC / 2)) {
                     BSP_greenLedOff();
                     state = OFF_STATE;
-                    start = now;
-                } else if (button_state != 0U && prev_button_state == 0U) {
+                    start = e->now;
+                } else if (e->button_state != 0U && prev_button_state == 0U) {
                     BSP_blueLedOn();
-                    prev_button_state = button_state;
-                } else if (button_state == 0U && prev_button_state != 0U) {
+                    prev_button_state = e->button_state;
+                } else if (e->button_state == 0U && prev_button_state != 0U) {
                     BSP_blueLedOff();
-                    prev_button_state = button_state;
+                    prev_button_state = e->button_state;
                 }
                 break;
 
