@@ -4,19 +4,18 @@
 #include "uc_ao.h"
 
 /* The TimeBomb AO =======================================================*/
-enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC) };
+enum { blink_time = OS_TICKS_PER_SEC * 3U };
 
 typedef struct {
     Active super;
-
     TimeEvent te;
+
     enum {
         WAIT_FOR_BUTTON,
         BLINK,
         PAUSE,
         BOOM
     }state;
-    uint32_t blink_time;
     uint32_t blink_ctr;
 } TimeBomb;
 
@@ -104,8 +103,7 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
 void TimeBomb_ctor(TimeBomb * const me) {
     Active_ctor(&me->super, (DispatchHandler)&TimeBomb_dispatch);
     TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
-    me->state = BLINK;
-    me->blink_time = INITIAL_BLINK_TIME;
+    me->state = WAIT_FOR_BUTTON;
 }
 
 /* The TimeBomb thread =========================================================*/
