@@ -14,90 +14,61 @@ typedef struct {
         WAIT_FOR_BUTTON,
         BLINK,
         PAUSE,
-        BOOM
+        BOOM,
+        /* */
+        MAX_STATE
     }state;
     uint32_t blink_ctr;
 } TimeBomb;
 
-static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
-    if (e->sig == INIT_SIGNAL) {
-        BSP_greenLedOn();
-        TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
-        me->state = WAIT_FOR_BUTTON;
-    }
-    switch (me->state) {
-        case WAIT_FOR_BUTTON:
-            {
-                switch (e->sig) {
-                    case BUTTON_PRESSED_SIG:
-                        {
-                            BSP_greenLedOff();
-                            BSP_redLedOn();
-                            TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
-                            me->blink_ctr = 3;
-                            me->state = BLINK;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
-                break;
-            }
-        case BLINK:
-            {
-                switch (e->sig) {
-                    case TIMEOUT_SIG:
-                        {
-                            BSP_redLedOff();
-                            TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
-                            me->state = PAUSE;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
-                break;
-            }
-        case PAUSE:
-            {
-                switch (e->sig) {
-                    case TIMEOUT_SIG:
-                        {
-                            if (--me->blink_ctr > 0) {
-                                BSP_redLedOn();
-                                TimeEvent_arm(&me->te, (me->blink_time)*3U, 0U);
-                                me->state = BLINK;
-                            } else {
-                                BSP_redLedOn();
-                                BSP_greenLedOn();
-                                BSP_blueLedOn();
-                                me->state = BOOM;
-                            }
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
-                break;
-            }
-        case  BOOM:
-            {
-                BSP_blueLedOn();
-                break;
-            }
-        default:
-            {
-                // Q_ASSERT(0);
-                break;
-            }
-    }
+void TimeBomb_init(TimeBomb * const  me, Event const * const e) {
+    BSP_greenLedOn();
+    me->state = WAIT_FOR_BUTTON;
+}
 
+void TimeBomb_wait4button_pressed(TimeBomb * const  me, Event const * const e) {
+    BSP_greenLedOff();
+    BSP_redLedOn();
+    TimeEvent_arm(&me->te, (blink_time), 0U);
+    me->blink_ctr = 3;
+    me->state = BLINK;
+}
+
+void TimeBomb_ignore(TimeBomb * const  me, Event const * const e) {
+
+}
+
+void TimeBomb_blink_timeout(TimeBomb * const  me, Event const * const e) {
+    BSP_redLedOff();
+    TimeEvent_arm(&me->te, (blink_time), 0U);
+    me->state = PAUSE;
+}
+
+void TimeBomb_pause_timeout(TimeBomb * const  me, Event const * const e) {
+    if (--me->blink_ctr > 0) {
+        BSP_redLedOn();
+        TimeEvent_arm(&me->te, (blink_time), 0U);
+        me->state = BLINK;
+    } else {
+        BSP_redLedOn();
+        BSP_greenLedOn();
+        BSP_blueLedOn();
+        me->state = BOOM;
+    }
+}
+
+typedef void(*TimeBombAction)(TimeBomb * const  me, Event const * const e);
+
+TimeBombAction const TimeBomb_table[MAX_STATE][MAX_SIG] = {
+                        /* INIT_SIGNAL       | BUTTON_PRESSED_SIG           |BUTTON_RELEASED_SIG |   TIMEOUT_SIG */
+    /*wait_for_button*/{&TimeBomb_init,   &TimeBomb_wait4button_pressed, &TimeBomb_ignore,    &TimeBomb_ignore},
+    /*blink*/          {&TimeBomb_ignore, &TimeBomb_ignore,              &TimeBomb_ignore,    &TimeBomb_blink_timeout},
+    /*pause*/          {&TimeBomb_ignore, &TimeBomb_ignore,              &TimeBomb_ignore,    &TimeBomb_pause_timeout},
+    /*boom*/           {&TimeBomb_ignore, &TimeBomb_ignore,              &TimeBomb_ignore,    &TimeBomb_ignore}
+};
+
+static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
+    (*TimeBomb_table[me->state][e->sig])(me, e);
 }
 
 void TimeBomb_ctor(TimeBomb * const me) {
