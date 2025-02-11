@@ -1,7 +1,7 @@
 #ifndef __BSP__H
 #define __BSP__H
 
-// #include "uc_ao.h"
+#include "uc_ao.h"
 
 /**
  * @brief Initialize data and call main function
@@ -27,7 +27,7 @@ void EXTI15_10IRQHandler(void);
 #define BSP_TICKS_PER_SEC 1000
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
-#define RCC_AH1BENR (*((unsigned int *)(0x40023830)))
+#define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
 //Base SYSCFG register 0x4001 3800 + offset 0x14 to find SYSCFG_EXTICR4
 #define SYSCFG_EXTICR4 (*((unsigned int *)(0x40013814)))
 // Base EXTI register 0x4001 3C00 + offset 0x08 to find EXTI_RTSR(Rising trigger selection register)
@@ -160,12 +160,14 @@ void BSP_send_morse_code(uint32_t bitmask);
 
 void ledOn();
 
-// enum  EventSignals {
-//  BUTTON_PRESSED_SIG = USER_SIGNAL,
-//  BUTTON_RELEASED_SIG,
-//  TIMEOUT_SIG,
-// };
-//
-// extern Active* AO_TimeBomb;
+enum  EventSignals {
+ BUTTON_PRESSED_SIG = USER_SIGNAL,
+ BUTTON_RELEASED_SIG,
+ TIMEOUT_SIG,
+ /* */
+ MAX_SIG
+};
+
+extern Active* AO_TimeBomb;
 
 #endif

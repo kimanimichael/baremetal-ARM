@@ -1,4 +1,4 @@
-// #include "qpc.h"
+#include "qpc.h"
 #include "bsp.h"
 #include "main.h"
 #include "stm32f429xx.h"
@@ -130,15 +130,15 @@ void start()
 //     while (1);
 // }
 
-void NMI_Handler (void)
-{
-    while (1)
-    {
-        /* code */
-        assert_failed("NMI_Handler", __LINE__);
-    }
-
-}
+// void NMI_Handler (void)
+// {
+//     while (1)
+//     {
+//         /* code */
+//         assert_failed("NMI_Handler", __LINE__);
+//     }
+//
+// }
 #define DEBUG
 void HardFault_Handler (void) 
 {
@@ -204,5 +204,5 @@ void Unused_Handler (void)
 
 #pragma weak SVC_Handler = Unused_Handler
 #pragma weak DebugMon_Handler = Unused_Handler
-#pragma weak PendSV_Handler = Unused_Handler
+// #pragma weak PendSV_Handler = Unused_Handler
 // #pragma weak SysTick_Handler = Unused_Handler
