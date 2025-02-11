@@ -29,6 +29,8 @@ typedef uint16_t Signal;
 
 enum ReservedSignals {
     INIT_SIGNAL = 0, /* dispatched to AO before entering event-loop */
+    ENTRY_SIGNAL,
+    EXIT_SIGNAL,
     USER_SIGNAL, /* first signal available to the users */
 };
 
