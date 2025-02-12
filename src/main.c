@@ -1,5 +1,5 @@
 /* TimeBomb/Button with uC/AO active-object framework */
-#include "qpc.h"
+
 #include "bsp.h"
 #include "uc_ao.h"
 
@@ -144,10 +144,6 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
         }
         (*me->state)(me, &entryEvt);
 
-        // (*TimeBomb_table[prev_state][EXIT_SIGNAL])(me, (Event *)0);
-        // (*TimeBomb_table[me->state][ENTRY_SIGNAL])(me, (Event *)0);
-    } else if (stat == INIT_STATUS) {
-        // (*TimeBomb_table[me->state][ENTRY_SIGNAL])(me, (Event *)0);
     }
 }
 
