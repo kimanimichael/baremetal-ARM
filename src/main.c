@@ -3,6 +3,8 @@
 #include "bsp.h"
 #include "uc_ao.h"
 
+Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
+
 #define TRAN(target_) (me->state = (target_), TRAN_STATUS)
 
 /* The TimeBomb AO =======================================================*/
@@ -133,9 +135,11 @@ State TimeBomb_boom(TimeBomb * const  me, Event const * const e) {
 static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
     StateHandler prev_state = me->state;
 
+    Q_ASSERT((me->state != (StateHandler)0) && (e->sig) < MAX_SIG);
     State stat = (*me->state)(me, e);
 
     if (stat == TRAN_STATUS) {
+        Q_ASSERT(me->state != (StateHandler)0);
         static Event const entryEvt = {ENTRY_SIGNAL};
         static Event const exitEvt = {EXIT_SIGNAL};
 
@@ -143,7 +147,6 @@ static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
             (*prev_state)(me, &exitEvt);
         }
         (*me->state)(me, &entryEvt);
-
     }
 }
 
