@@ -21,7 +21,6 @@
 #define _UC_AO_H_
 
 #include "ucos_ii.h"
-#include "qpc.h"
 /*---------------------------------------------------------------------------*/
 /* Event facilities... */
 
@@ -41,6 +40,25 @@ typedef struct {
 } Event;
 
 /*---------------------------------------------------------------------------*/
+/* Finite State Machine facilities... */
+
+typedef struct FSM FSM; /* forward declaration */
+
+typedef enum{TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS} State;
+
+typedef State(*StateHandler)(FSM * const me, Event const * const e);
+
+#define TRAN(target_) (((FSM*)me)->state = (StateHandler)(target_), TRAN_STATUS)
+
+struct FSM {
+    StateHandler state; /* the "state" variable */
+};
+
+void FSM_ctor(FSM * const me, StateHandler initial);
+void FSM_init(FSM * const me, Event const * const e);
+void FSM_dispatch(FSM * const me, Event const * const e);
+
+/*---------------------------------------------------------------------------*/
 /* Active Object facilities... */
 
 typedef struct Active Active; /* forward declaration */
@@ -49,15 +67,14 @@ typedef void(*DispatchHandler)(Active * const me, Event const * const e);
 
 /* Active Object base class */
 struct Active {
+    FSM super;
     INT8U thread; /* private thread (the unique uC/OS-II task priority) */
     OS_EVENT *queue; /* private message queue */
-
-    DispatchHandler dispatch; /* pointer to the dispatch() function */
 
     /* active object data added in subclasses of Active */
 };
 
-void Active_ctor(Active * const me, DispatchHandler dispatch);
+void Active_ctor(Active * const me, StateHandler initial);
 void Active_start(Active * const me,
                   uint8_t prio,             /* priority (1-based) */
                   Event **queueSto,

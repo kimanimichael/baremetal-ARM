@@ -2,25 +2,19 @@
 
 #include "bsp.h"
 #include "uc_ao.h"
+#include "qpc.h"
 
-Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
+// Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
 
-#define TRAN(target_) (me->state = (target_), TRAN_STATUS)
-
-/* The TimeBomb AO =======================================================*/
 enum { blink_time = OS_TICKS_PER_SEC * 3U };
 
+/* The TimeBomb AO =======================================================*/
 typedef struct TimeBomb TimeBomb;
-
-typedef enum {TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS} State;
-
-typedef State (*StateHandler)(TimeBomb * const  me, Event const * const e);
 
 struct TimeBomb {
     Active super;
     TimeEvent te;
 
-    StateHandler state;
     uint32_t blink_ctr;
 } ;
 
@@ -132,28 +126,9 @@ State TimeBomb_boom(TimeBomb * const  me, Event const * const e) {
     return status;
 }
 
-static void TimeBomb_dispatch(TimeBomb * const me, Event const * const e) {
-    StateHandler prev_state = me->state;
-
-    Q_ASSERT((me->state != (StateHandler)0) && (e->sig) < MAX_SIG);
-    State stat = (*me->state)(me, e);
-
-    if (stat == TRAN_STATUS) {
-        Q_ASSERT(me->state != (StateHandler)0);
-        static Event const entryEvt = {ENTRY_SIGNAL};
-        static Event const exitEvt = {EXIT_SIGNAL};
-
-        if (e->sig != INIT_SIGNAL) {
-            (*prev_state)(me, &exitEvt);
-        }
-        (*me->state)(me, &entryEvt);
-    }
-}
-
 void TimeBomb_ctor(TimeBomb * const me) {
-    Active_ctor(&me->super, (DispatchHandler)&TimeBomb_dispatch);
+    Active_ctor(&me->super, (StateHandler)TimeBomb_initial);
     TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
-    me->state = TimeBomb_initial;
 }
 
 /* The TimeBomb thread =========================================================*/
