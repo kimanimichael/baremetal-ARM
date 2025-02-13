@@ -63,8 +63,6 @@ void FSM_dispatch(FSM * const me, Event const * const e);
 
 typedef struct Active Active; /* forward declaration */
 
-typedef void(*DispatchHandler)(Active * const me, Event const * const e);
-
 /* Active Object base class */
 struct Active {
     FSM super;
