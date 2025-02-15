@@ -152,14 +152,14 @@
 
 /************************* PLL Parameters *************************************/
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
-#define PLL_M      9
-#define PLL_N      192
+#define PLL_M      8
+#define PLL_N      180
 
 /* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      6
+#define PLL_P     2
 
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
-#define PLL_Q      4
+#define PLL_Q      8
 
 /******************************************************************************/
 
@@ -350,25 +350,42 @@ void SystemCoreClockUpdate(void)
   */
 static void SetSysClock(void)
 {
+  /* 1. Enable HSI (already enabled by SystemInit, but confirm) */
+  RCC->CR |= RCC_CR_HSION;
+  while ((RCC->CR & RCC_CR_HSIRDY) == 0) {} // Wait for HSI ready
 
-/******************************************************************************/
-/*                        HSI used as System clock source                     */
-/******************************************************************************/
+  /* 2. Enable Power Interface Clock */
+  RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+  __DSB(); // Ensure write completion
 
-  /* At this stage the HSI is already enabled and used as System clock source */
+  /* 3. Set Voltage Scaling to Scale 1 (required for 180 MHz) */
+  PWR->CR &= ~PWR_CR_VOS;         // Clear existing settings
+  PWR->CR |= 0x00008000U;        // Scale 1 (1.8V core voltage)
 
-  /* Configure Flash prefetch, Instruction cache, Data cache and wait state */
-  FLASH->ACR = FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_0WS;
-  
-  /* HCLK = SYSCLK / 1*/
-  RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
-      
-  /* PCLK2 = HCLK / 1*/
-  RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;
-    
-  /* PCLK1 = HCLK / 1*/
-  RCC->CFGR |= RCC_CFGR_PPRE1_DIV1;
+  /* 4. Configure Flash Latency (5 wait states for 180 MHz at VOS1) */
+  FLASH->ACR = FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_LATENCY_5WS;
 
+  /* 5. Configure PLL Source and Parameters */
+  RCC->PLLCFGR = (PLL_M << 0)              | // PLLM divider
+                 (PLL_N << 6)              | // PLLN multiplier
+                 (((PLL_P >> 1) - 1) << 16) | // PLLP divider (P=2 → 0b00)
+                 RCC_PLLCFGR_PLLSRC_HSI    | // HSI as PLL source
+                 ((PLL_Q - 1) << 24);        // PLLQ divider
+
+  /* 6. Enable PLL and Wait Until Ready */
+  RCC->CR |= RCC_CR_PLLON;
+  while ((RCC->CR & RCC_CR_PLLRDY) == 0) {}
+
+  /* 7. Configure Bus Prescalers */
+  RCC->CFGR &= ~(RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2);
+  RCC->CFGR |= RCC_CFGR_HPRE_DIV1  |  // HCLK = 180 MHz
+               RCC_CFGR_PPRE1_DIV4 |  // APB1 = 45 MHz (max 45 MHz)
+               RCC_CFGR_PPRE2_DIV2;    // APB2 = 90 MHz (max 90 MHz)
+
+  /* 8. Switch to PLL as System Clock Source */
+  RCC->CFGR &= ~RCC_CFGR_SW;
+  RCC->CFGR |= RCC_CFGR_SW_PLL;
+  while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {} // Wait until PLL active
 }
 
 /**

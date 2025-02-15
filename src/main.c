@@ -6,7 +6,7 @@
 
 // Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
 
-enum { blink_time = OS_TICKS_PER_SEC * 3U };
+enum { blink_time = OS_TICKS_PER_SEC * 27U };
 
 /* The TimeBomb AO =======================================================*/
 typedef struct TimeBomb TimeBomb;
@@ -44,7 +44,7 @@ State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e) {
                 break;
             }
         case BUTTON_PRESSED_SIG: {
-                me->blink_ctr = 3;
+                me->blink_ctr = 3000;
                 status = TRAN(TimeBomb_blink);
                 break;
             }
