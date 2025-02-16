@@ -275,8 +275,8 @@ void App_TimeTickHook(void) {
     button.depressed &= (button.previous | current); /* set released */
     button.previous = current; /* update history for next function call */
 
-    button2.depressed &= (button2.previous & current); /* set depressed */
-    button2.depressed |= (button2.previous | current); /* set released */
+    button2.depressed &= (button2.previous | current); /* set depressed */
+    button2.depressed |= (button2.previous & current); /* set released */
     button2.previous = current; /* update history for next function call */
 
     tmp ^= button.depressed; /* change of button depressed state */
@@ -294,10 +294,10 @@ void App_TimeTickHook(void) {
 
     if ((tmp2 & (0b01 << 12)) == 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 12)) == 0U) { /* button pressed */
-            static const Event button2PressedEvt = {BUTTON2_PRESSED_SIG};
+            static const Event button2PressedEvt = {BUTTON_PRESSED_SIG};
             Active_post(AO_TimeBomb, &button2PressedEvt);
         } else { /* button released */
-            static const Event button2ReleasedEvt = {BUTTON2_PRESSED_SIG};
+            static const Event button2ReleasedEvt = {BUTTON_RELEASED_SIG};
             Active_post(AO_TimeBomb, &button2ReleasedEvt);
         }
     }
