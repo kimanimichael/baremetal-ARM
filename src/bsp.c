@@ -31,9 +31,9 @@ void QF_onStartup(void) {
     // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
 
     // Enable IRQ for EXTI lines 10-15
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
+    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 1U);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 12U);
+    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 1U);
 }
 
 void QF_onCleanup(void) {
@@ -64,14 +64,16 @@ unsigned int volatile l_tickrCtr;
 
 void EXTI15_10IRQHandler (void)
 {
-    QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+    // QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
+    OSIntEnter();
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
         // QXSemaphore_signal(&SW1_sema);
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
-    QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
+    OSIntExit();
+    // QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
 }
 
 void ledOn() {
@@ -145,7 +147,7 @@ void BSP_user_button_init() {
     // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
     EXTI_IMR |= (1 << 13);
     // Enable IRQ for EXTI lines 10-15
-    // NVIC_EnableIRQ(EXTI15_10_IRQn);
+    NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 uint32_t BSP_user_button_read() {
