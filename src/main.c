@@ -44,7 +44,7 @@ State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e) {
                 break;
             }
         case BUTTON_PRESSED_SIG: {
-                me->blink_ctr = 3000;
+                me->blink_ctr = 10;
                 status = TRAN(TimeBomb_blink);
                 break;
             }

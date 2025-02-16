@@ -33,6 +33,7 @@ void FSM_ctor(FSM * const me, StateHandler initial) {
 void FSM_init(FSM * const me, Event const * const e) {
     Q_ASSERT(me->state != (StateHandler)0);
     (*me->state)(me, e);
+    Q_ASSERT(me->state != (StateHandler)0);
     (*me->state)(me, &entryEvt);
 }
 void FSM_dispatch(FSM * const me, Event const * const e){
