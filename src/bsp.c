@@ -68,7 +68,6 @@ void EXTI15_10IRQHandler (void)
     OSIntEnter();
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
-        // QXSemaphore_signal(&SW1_sema);
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
@@ -145,26 +144,27 @@ void BSP_user_button_init() {
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 26);
 
-    //Bitwise AND the 25th bit of GPIOC_PUPDR with 1 - CONFIG PC12 as input pull-down
-    GPIOC_PUPDR &= (0b01 << 25);
-    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input pull-down
+    //Bitwise AND the 25th bit of GPIOC_PUPDR with 1 - CONFIG PC12 as input floating
+    GPIOC_PUPDR &= (0b00 << 25);
+    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input floating
     GPIOC_PUPDR &= (0b00 << 24);
 
 
-    //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
-    RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
-    //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
-    SYSCFG_EXTICR4 |= (0b0010 << 4);
-    // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
-    EXTI_RTSR |= (1 << 13);
-    // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
-    EXTI_IMR |= (1 << 13);
-    // Enable IRQ for EXTI lines 10-15
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
+    // //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
+    // RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
+    // //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
+    // SYSCFG_EXTICR4 |= (0b0010 << 4);
+    // // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
+    // EXTI_RTSR |= (1 << 13);
+    // // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
+    // EXTI_IMR |= (1 << 13);
+    // // Enable IRQ for EXTI lines 10-15
+    // NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 uint32_t BSP_user_button_read() {
-    const uint32_t button_status = (GPIOC_IDR & (0b01 << 13));
+    uint32_t button_status = 0;
+    button_status = (GPIOC_IDR & ((0b01 << 13) | (0b01 << 12)));
     return button_status;
 }
 
@@ -259,16 +259,28 @@ void App_TimeTickHook(void) {
         uint32_t previous;
     } button = {0U, 0U};
 
+    static struct Button2Debouncing {
+        uint32_t depressed;
+        uint32_t previous;
+    } button2 = {1U, 1U};
+
     TimeEvent_tick();
 
     const uint32_t current = BSP_user_button_read();
+
     uint32_t tmp     = button.depressed;
+    uint32_t tmp2     = button2.depressed;
 
     button.depressed |= (button.previous & current); /* set depressed */
     button.depressed &= (button.previous | current); /* set released */
     button.previous = current; /* update history for next function call */
 
+    button2.depressed &= (button2.previous & current); /* set depressed */
+    button2.depressed |= (button2.previous | current); /* set released */
+    button2.previous = current; /* update history for next function call */
+
     tmp ^= button.depressed; /* change of button depressed state */
+    tmp2 ^= button2.depressed; /* change of button depressed state */
 
     if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
@@ -277,6 +289,16 @@ void App_TimeTickHook(void) {
         } else { /* button released */
             static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
             Active_post(AO_TimeBomb, &buttonReleasedEvt);
+        }
+    }
+
+    if ((tmp2 & (0b01 << 12)) == 0U) { /* check change of button depressed state */
+        if ((current & (0b01 << 12)) == 0U) { /* button pressed */
+            static const Event button2PressedEvt = {BUTTON2_PRESSED_SIG};
+            Active_post(AO_TimeBomb, &button2PressedEvt);
+        } else { /* button released */
+            static const Event button2ReleasedEvt = {BUTTON2_PRESSED_SIG};
+            Active_post(AO_TimeBomb, &button2ReleasedEvt);
         }
     }
 }
