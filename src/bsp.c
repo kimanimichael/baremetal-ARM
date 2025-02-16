@@ -133,10 +133,23 @@ void BSP_user_button_init() {
     GPIOC_MODER &= (0b00 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
     GPIOC_MODER &= (0b00 << 26);
+
+    //Bitwise AND the 25th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
+    GPIOC_MODER &= (0b00 << 25);
+    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
+    GPIOC_MODER &= (0b00 << 24);
+
+
     //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 26);
+
+    //Bitwise AND the 25th bit of GPIOC_PUPDR with 1 - CONFIG PC12 as input pull-down
+    GPIOC_PUPDR &= (0b01 << 25);
+    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input pull-down
+    GPIOC_PUPDR &= (0b00 << 24);
+
 
     //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
     RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
@@ -152,6 +165,11 @@ void BSP_user_button_init() {
 
 uint32_t BSP_user_button_read() {
     const uint32_t button_status = (GPIOC_IDR & (0b01 << 13));
+    return button_status;
+}
+
+uint32_t BSP_user_button2_read() {
+    const uint32_t button_status = (GPIOC_IDR & (0b01 << 12));
     return button_status;
 }
 
