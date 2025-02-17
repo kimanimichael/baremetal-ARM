@@ -22,6 +22,7 @@ State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e);
 State TimeBomb_blink(TimeBomb * const  me, Event const * const e);
 State TimeBomb_pause(TimeBomb * const  me, Event const * const e);
 State TimeBomb_boom(TimeBomb * const  me, Event const * const e);
+State TimeBomb_defused(TimeBomb * const  me, Event const * const e);
 State TimeBomb_initial(TimeBomb * const  me, Event const * const e);
 
 
@@ -48,6 +49,11 @@ State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e) {
                 status = TRAN(TimeBomb_blink);
                 break;
             }
+        case BUTTON2_PRESSED_SIG: {
+                status = TRAN(TimeBomb_defused);
+                break;
+                break;
+        }
         default: {
                 status = IGNORED_STATUS;
                 break;
@@ -72,6 +78,10 @@ State TimeBomb_blink(TimeBomb * const  me, Event const * const e) {
         }
         case TIMEOUT_SIG: {
                 status = TRAN(TimeBomb_pause);
+                break;
+        }
+        case BUTTON2_PRESSED_SIG: {
+                status = TRAN(TimeBomb_defused);
                 break;
         }
         default: {
@@ -99,6 +109,11 @@ State TimeBomb_pause(TimeBomb * const  me, Event const * const e) {
                 }
                 break;
         }
+        case BUTTON2_PRESSED_SIG: {
+                status = TRAN(TimeBomb_defused);
+                break;
+                break;
+        }
         default: {
                 status = IGNORED_STATUS;
                 break;
@@ -118,6 +133,18 @@ State TimeBomb_boom(TimeBomb * const  me, Event const * const e) {
                 status = HANDLED_STATUS;
                 break;
         }
+
+        case EXIT_SIGNAL: {
+                BSP_redLedOff();
+                BSP_greenLedOff();
+                BSP_blueLedOff();
+                status = HANDLED_STATUS;
+                break;
+        }
+        case BUTTON2_PRESSED_SIG: {
+                status = TRAN(TimeBomb_defused);
+                break;
+            }
         default: {
                 status = IGNORED_STATUS;
                 break;
@@ -125,6 +152,24 @@ State TimeBomb_boom(TimeBomb * const  me, Event const * const e) {
     }
     return status;
 }
+
+State TimeBomb_defused(TimeBomb * const  me, Event const * const e) {
+    State status;
+    switch (e->sig) {
+
+        case ENTRY_SIGNAL: {
+                BSP_blueLedOn();
+                status = HANDLED_STATUS;
+                break;
+        }
+        default: {
+                status = IGNORED_STATUS;
+                break;
+        }
+    }
+    return status;
+}
+
 
 void TimeBomb_ctor(TimeBomb * const me) {
     Active_ctor(&me->super, (StateHandler)TimeBomb_initial);
