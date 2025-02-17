@@ -40,23 +40,27 @@ typedef struct {
 } Event;
 
 /*---------------------------------------------------------------------------*/
-/* Finite State Machine facilities... */
+/* Hierarchical State Machine facilities... */
 
-typedef struct FSM FSM; /* forward declaration */
+typedef struct HSM HSM; /* forward declaration */
 
-typedef enum{TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS} State;
+typedef enum{TRAN_STATUS, HANDLED_STATUS, IGNORED_STATUS, INIT_STATUS, SUPER_STATUS} State;
 
-typedef State(*StateHandler)(FSM * const me, Event const * const e);
+typedef State(*StateHandler)(HSM * const me, Event const * const e);
 
-#define TRAN(target_) (((FSM*)me)->state = (StateHandler)(target_), TRAN_STATUS)
+#define TRAN(target_) (((HSM*)me)->state = (StateHandler)(target_), TRAN_STATUS)
+#define SUPER(super_) (((HSM*)me)->temp = (StateHandler)(super_), SUPER_STATUS)
 
-struct FSM {
+struct HSM {
     StateHandler state; /* the "state" variable */
+    StateHandler temp; /* top state machine variable */
 };
 
-void FSM_ctor(FSM * const me, StateHandler initial);
-void FSM_init(FSM * const me, Event const * const e);
-void FSM_dispatch(FSM * const me, Event const * const e);
+void HSM_ctor(HSM * const me, StateHandler initial);
+void HSM_init(HSM * const me, Event const * const e);
+void HSM_dispatch(HSM * const me, Event const * const e);
+
+State HSM_top(HSM * const me, Event const * const e);
 
 /*---------------------------------------------------------------------------*/
 /* Active Object facilities... */
@@ -65,7 +69,7 @@ typedef struct Active Active; /* forward declaration */
 
 /* Active Object base class */
 struct Active {
-    FSM super;
+    HSM super;
     INT8U thread; /* private thread (the unique uC/OS-II task priority) */
     OS_EVENT *queue; /* private message queue */
 

@@ -27,20 +27,24 @@ Q_DEFINE_THIS_FILE
 static Event const entryEvt = {ENTRY_SIGNAL};
 static Event const exitEvt = {EXIT_SIGNAL};
 
-void FSM_ctor(FSM * const me, StateHandler initial) {
+void HSM_ctor(HSM * const me, StateHandler initial) {
     me->state = initial;
 }
-void FSM_init(FSM * const me, Event const * const e) {
+void HSM_init(HSM * const me, Event const * const e) {
     Q_ASSERT(me->state != (StateHandler)0);
     (*me->state)(me, e);
     Q_ASSERT(me->state != (StateHandler)0);
     (*me->state)(me, &entryEvt);
 }
-void FSM_dispatch(FSM * const me, Event const * const e){
+void HSM_dispatch(HSM * const me, Event const * const e){
     StateHandler prev_state = me->state;
 
     Q_ASSERT(me->state != (StateHandler)0);
     State stat = (*me->state)(me, e); /* Updates me->state if transition is needed */
+
+    while (stat == SUPER_STATUS) {
+        stat = (*me->temp)(me, e);
+    }
     if (stat == TRAN_STATUS) { /* Transition taken? */
         Q_ASSERT(me->state != (StateHandler)0);
         (*prev_state)(me, &exitEvt);
@@ -48,9 +52,13 @@ void FSM_dispatch(FSM * const me, Event const * const e){
     }
 }
 
+State HSM_top(HSM * const me, Event const * const e) {
+    return IGNORED_STATUS;
+}
+
 /*..........................................................................*/
 void Active_ctor(Active * const me, StateHandler initial) {
-    FSM_ctor(&me->super, initial);
+    HSM_ctor(&me->super, initial);
 }
 
 /*..........................................................................*/
@@ -59,7 +67,7 @@ static  void Active_event_loop(void *pdata) {
     Active *me = (Active *)pdata; /* the AO instance "me" */
 
     /* initialize the AO */
-    FSM_init(&me->super, (Event*)0);
+    HSM_init(&me->super, (Event*)0);
 
     /* event loop ("message pump") */
     while (1) {
@@ -71,7 +79,7 @@ static  void Active_event_loop(void *pdata) {
         Q_ASSERT(err == 0);
 
         /* dispatch event to the active object 'me' */
-        FSM_dispatch(&me->super, e); /* NO BLOCKING ' */
+        HSM_dispatch(&me->super, e); /* NO BLOCKING ' */
     }
 }
 
