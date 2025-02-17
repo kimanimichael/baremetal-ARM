@@ -292,7 +292,7 @@ void App_TimeTickHook(void) {
         }
     }
 
-    if ((tmp2 & (0b01 << 12)) == 0U) { /* check change of button depressed state */
+    if ((tmp2 & (0b01 << 12)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 12)) == 0U) { /* button pressed */
             static const Event button2PressedEvt = {BUTTON2_PRESSED_SIG};
             Active_post(AO_TimeBomb, &button2PressedEvt);
