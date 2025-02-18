@@ -1,7 +1,10 @@
+/**********************************************************************************************************
+* BSP for STM32F429ZI with QP/C framework
+**********************************************************************************************************/
 #ifndef __BSP__H
 #define __BSP__H
 
-#include "uc_ao.h"
+#include "qpc.h"
 
 /**
  * @brief Initialize data and call main function
@@ -24,7 +27,7 @@ void EXTI15_10IRQHandler(void);
 
 #define SYS_CLCK_HZ 16000000U
 
-#define BSP_TICKS_PER_SEC 1000
+#define BSP_TICKS_PER_SEC 100
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
@@ -161,7 +164,7 @@ void BSP_send_morse_code(uint32_t bitmask);
 void ledOn();
 
 enum  EventSignals {
- BUTTON_PRESSED_SIG = USER_SIGNAL,
+ BUTTON_PRESSED_SIG = Q_USER_SIG,
  BUTTON_RELEASED_SIG,
  BUTTON2_PRESSED_SIG,
  BUTTON2_RELEASED_SIG,
@@ -170,6 +173,6 @@ enum  EventSignals {
  MAX_SIG
 };
 
-extern Active* AO_TimeBomb;
+extern QActive* AO_TimeBomb;
 
 #endif

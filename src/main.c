@@ -1,204 +1,204 @@
-/* TimeBomb/Button with uC/AO active-object framework */
-
-#include "bsp.h"
-#include "uc_ao.h"
+/* TimeBomb/Button with QPC framework */
 #include "qpc.h"
+#include "bsp.h"
 
 // Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
 
-enum { blink_time = OS_TICKS_PER_SEC * 27U };
+enum { blink_time = BSP_TICKS_PER_SEC / 4U };
 
 /* The TimeBomb AO =======================================================*/
 typedef struct TimeBomb TimeBomb;
 
 struct TimeBomb {
-    Active super;
-    TimeEvent te;
+    QActive super;
+    QTimeEvt te;
 
     uint32_t blink_ctr;
 } ;
 
-State TimeBomb_armed(TimeBomb *  me, Event const * e);
-State TimeBomb_wait_for_button(TimeBomb *  me, Event const * e);
-State TimeBomb_blink(TimeBomb *  me, Event const * e);
-State TimeBomb_pause(TimeBomb *  me, Event const * e);
-State TimeBomb_boom(TimeBomb *  me, Event const * e);
-State TimeBomb_defused(TimeBomb *  me, Event const * e);
-State TimeBomb_initial(TimeBomb *  me, Event const * e);
+QState TimeBomb_armed(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_wait_for_button(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_blink(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_pause(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_boom(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_defused(TimeBomb *  me, QEvt const * e);
+QState TimeBomb_initial(TimeBomb *  me, QEvt const * e);
 
 
-State TimeBomb_initial(TimeBomb * const  me, Event const * const e) {
-    return  TRAN(TimeBomb_wait_for_button);
+QState TimeBomb_initial(TimeBomb * const  me, QEvt const * const e) {
+    return  Q_TRAN(TimeBomb_wait_for_button);
 }
 
-State TimeBomb_armed(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_armed(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
+        case Q_EXIT_SIG: {
+                BSP_redLedOff();
+                BSP_greenLedOff();
+                BSP_blueLedOff();
+                status = Q_HANDLED();
+                break;
+        }
+        case Q_INIT_SIG:{
+                status = Q_TRAN(TimeBomb_wait_for_button);
+                break;
+            }
         case BUTTON2_PRESSED_SIG: {
-                status = TRAN(TimeBomb_defused);
+                status = Q_TRAN(TimeBomb_defused);
                 break;
         }
         default: {
-                status = SUPER(HSM_top);
+                status = Q_SUPER(QHsm_top);
                 break;
         }
     }
     return status;
 }
 
-State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_wait_for_button(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
 
-        case ENTRY_SIGNAL: {
+        case Q_ENTRY_SIG: {
                 BSP_greenLedOn();
-                status = HANDLED_STATUS;
+                status = Q_HANDLED();
                 break;
             }
-        case EXIT_SIGNAL: {
+        case Q_EXIT_SIG: {
                 BSP_greenLedOff();
-                status = HANDLED_STATUS;
+                status = Q_HANDLED();
                 break;
             }
         case BUTTON_PRESSED_SIG: {
-                me->blink_ctr = 3;
-                status = TRAN(TimeBomb_blink);
+                me->blink_ctr = 5;
+                status = Q_TRAN(TimeBomb_blink);
                 break;
             }
         default: {
-                status = SUPER(TimeBomb_armed);
+                status = Q_SUPER(TimeBomb_armed);
                 break;
             }
     }
     return status;
 }
 
-State TimeBomb_blink(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_blink(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
-        case ENTRY_SIGNAL: {
+        case Q_ENTRY_SIG: {
                 BSP_redLedOn();
-                TimeEvent_arm(&me->te, (blink_time), 0U);
-                status = HANDLED_STATUS;
+                QTimeEvt_armX(&me->te, (blink_time), 0U);
+                status = Q_HANDLED();
                 break;
         }
-        case EXIT_SIGNAL: {
+        case Q_EXIT_SIG: {
                 BSP_redLedOff();
-                status = HANDLED_STATUS;
+                status = Q_HANDLED();
                 break;
         }
         case TIMEOUT_SIG: {
-                status = TRAN(TimeBomb_pause);
+                status = Q_TRAN(TimeBomb_pause);
                 break;
         }
         default: {
-                status = SUPER(TimeBomb_armed);
+                status = Q_SUPER(TimeBomb_armed);
                 break;
         }
     }
     return status;
 }
 
-State TimeBomb_pause(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_pause(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
-        case ENTRY_SIGNAL: {
-                TimeEvent_arm(&me->te, (blink_time), 0U);
-                status = HANDLED_STATUS;
+        case Q_ENTRY_SIG: {
+                QTimeEvt_armX(&me->te, (blink_time), 0U);
+                status = Q_HANDLED();
                 break;
         }
 
         case TIMEOUT_SIG: {
                 if (--me->blink_ctr > 0) {
-                    status = TRAN(TimeBomb_blink);
+                    status = Q_TRAN(TimeBomb_blink);
                 } else {
-                    status = TRAN(TimeBomb_boom);
+                    status = Q_TRAN(TimeBomb_boom);
                 }
                 break;
         }
         default: {
-                status = SUPER(TimeBomb_armed);
+                status = Q_SUPER(TimeBomb_armed);
                 break;
         }
     }
     return status;
 }
 
-State TimeBomb_boom(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_boom(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
 
-        case ENTRY_SIGNAL: {
+        case Q_ENTRY_SIG: {
                 BSP_redLedOn();
                 BSP_greenLedOn();
                 BSP_blueLedOn();
-                status = HANDLED_STATUS;
+                status = Q_HANDLED();
                 break;
         }
 
-        case EXIT_SIGNAL: {
-                BSP_redLedOff();
-                BSP_greenLedOff();
-                BSP_blueLedOff();
-                status = HANDLED_STATUS;
-                break;
-        }
         default: {
-                status = SUPER(TimeBomb_armed);
+                status = Q_SUPER(TimeBomb_armed);
                 break;
         }
     }
     return status;
 }
 
-State TimeBomb_defused(TimeBomb * const  me, Event const * const e) {
-    State status;
+QState TimeBomb_defused(TimeBomb * const  me, QEvt const * const e) {
+    QState status;
     switch (e->sig) {
 
-        case ENTRY_SIGNAL: {
+        case Q_ENTRY_SIG: {
                 BSP_blueLedOn();
-                status = HANDLED_STATUS;
+                status = Q_HANDLED();
+                break;
+        }
+        case BUTTON2_PRESSED_SIG: {
+                status = Q_TRAN(TimeBomb_armed);
                 break;
         }
         default: {
-                status = SUPER(HSM_top);
+                status = Q_SUPER(QHsm_top);
                 break;
         }
     }
     return status;
 }
 
-
 void TimeBomb_ctor(TimeBomb * const me) {
-    Active_ctor(&me->super, (StateHandler)TimeBomb_initial);
-    TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
+    QActive_ctor(&me->super, (QStateHandler)&TimeBomb_initial);
+    QTimeEvt_ctorX(&me->te, &me->super, TIMEOUT_SIG, 0U);
 }
 
-/* The TimeBomb thread =========================================================*/
-OS_STK stack_timeBomb[100]; /* task stack */
-static Event *timeBomb_queue[10];
+static QEvt const *timeBomb_queue[10];
 static TimeBomb timeBomb;
-Active *AO_TimeBomb = &timeBomb.super;
+QActive *AO_TimeBomb = &timeBomb.super;
 
 
 /* the main function =========================================================*/
 int main() {
     BSP_init(); /* initialize the BSP */
-    OSInit();   /* initialize uC/OS-II */
+    QF_init();   /* initialize QP/C */
 
     /* create AO and start it */
     TimeBomb_ctor(&timeBomb);
-    Active_start(AO_TimeBomb,
-        1U,
+    QACTIVE_START(AO_TimeBomb,
+        2U,
         timeBomb_queue,
         sizeof(timeBomb_queue)/ sizeof(timeBomb_queue[0]),
-        stack_timeBomb,
-        sizeof(stack_timeBomb),
-        0U
+        (void*)0, 0U,
+        (void*)0
         );
 
-    QF_onStartup(); /* configure and start the interrupts */
-
-    OSStart(); /* start the uC/OS-II scheduler... */
+    QF_run(); /* run QP/C */
     return 0; /* NOTE: the scheduler does NOT return */
 }

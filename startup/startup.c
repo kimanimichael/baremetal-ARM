@@ -204,5 +204,5 @@ void Unused_Handler (void)
 
 #pragma weak SVC_Handler = Unused_Handler
 #pragma weak DebugMon_Handler = Unused_Handler
-// #pragma weak PendSV_Handler = Unused_Handler
+#pragma weak PendSV_Handler = Unused_Handler
 // #pragma weak SysTick_Handler = Unused_Handler
