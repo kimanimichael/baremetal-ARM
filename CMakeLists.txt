@@ -47,9 +47,8 @@ target_include_directories(${APP_TARGET}
         include/
         include/cmsis
         include/cmsis/m-profile
-        uc_ao
+        uc_ao/include
         qpc/3rd_party/uC-OS2/Source
-        qpc/3rd_party/uC-OS2/Cfg/Template
         qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
 )
 
