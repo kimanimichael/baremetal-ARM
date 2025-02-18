@@ -7,7 +7,7 @@
 // static QXSemaphore morse_sema;
 
 // Mutex
-static QXMutex morse_mutex;
+// static QVMutex morse_mutex;
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -107,7 +107,7 @@ void BSP_init() {
     BSP_ledInit();
     BSP_user_button_init();
 
-    QXMutex_init(&morse_mutex, 6U);
+    // QXMutex_init(&morse_mutex, 6U);
 }
 
 void BSP_ledInit() {
@@ -226,7 +226,7 @@ void BSP_send_morse_code(uint32_t bitmask) {
     // const QSchedStatus lock_status = QXK_schedLock(5U);
 
     // Mutex
-    QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
+    // QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
 
     for (; bitmask != 0U; bitmask <<= 1U) {
         if ((bitmask & (1U << 31U)) != 0U) {
@@ -249,7 +249,7 @@ void BSP_send_morse_code(uint32_t bitmask) {
     // QXK_schedUnlock(lock_status);
 
     // Mutex
-    QXMutex_unlock(&morse_mutex);
+    // QXMutex_unlock(&morse_mutex);
 }
 
 void App_TimeTickHook(void) {
