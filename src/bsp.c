@@ -1,13 +1,9 @@
-#include "stm32f429xx.h"
-
+/**********************************************************************************************************
+* BSP for STM32F429ZI with QP/C framework
+**********************************************************************************************************/
 #include "qpc.h"
 #include "bsp.h"
-#include "ucos_ii.h"
-
-// static QXSemaphore morse_sema;
-
-// Mutex
-static QXMutex morse_mutex;
+#include "stm32f429xx.h"
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -23,17 +19,14 @@ void Q_onError(char const* module, int id) {
 void QF_onStartup(void) {
     SystemCoreClockUpdate();
     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
-    SysTick_Config(16000000/BSP_TICKS_PER_SEC);
-
-    // @TODO Confirm why NVIC_SetPriority(SysTick_IRQn, x) fails for values < 8
+    SysTick_Config(SystemCoreClock/BSP_TICKS_PER_SEC);
     /* set systick priority to be "kernel aware" */
-    // NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 5U);
-    // NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 4U);
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
 
     // Enable IRQ for EXTI lines 10-15
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 1U);
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
-    NVIC_SetPriority(EXTI15_10_IRQn, CPU_CFG_KA_IPL_BOUNDARY + 1U);
+    // NVIC_SetPriority(EXTI15_10_IRQn, QF_AWARE_ISR_CMSIS_PRI + 2U);
+    // NVIC_EnableIRQ(EXTI15_10_IRQn);
+    // NVIC_SetPriority(EXTI15_10_IRQn, QF_AWARE_ISR_CMSIS_PRI + 2U);
 }
 
 void QF_onCleanup(void) {
@@ -52,27 +45,16 @@ void QXK_onIdle(void) {
 
 unsigned int volatile l_tickrCtr;
 
-// void SysTick_Handler (void)
-// {
-//     GPIOx_ODR |= (0b01 << 1);
-//     QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
-//     QF_TICK_X(0, (void *)0); /* process timeouts at a specific clock tick rate */
-//
-//     QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
-//     GPIOx_ODR &= ~(0b01 << 1);
-// }
-
 void EXTI15_10IRQHandler (void)
 {
     // QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
-    OSIntEnter();
+    // OSIntEnter();
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
-        // QXSemaphore_signal(&SW1_sema);
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
-    OSIntExit();
+    // OSIntExit();
     // QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
 }
 
@@ -101,14 +83,9 @@ uint32_t BSP_Tickr(void) {
 }
 
 void BSP_init() {
-    // QXSemaphore_init(&morse_sema,
-    //     1U,
-    //     1U);
     SystemCoreClockUpdate();
     BSP_ledInit();
     BSP_user_button_init();
-
-    QXMutex_init(&morse_mutex, 6U);
 }
 
 void BSP_ledInit() {
@@ -133,25 +110,44 @@ void BSP_user_button_init() {
     GPIOC_MODER &= (0b00 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
     GPIOC_MODER &= (0b00 << 26);
+
+    //Bitwise AND the 25th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
+    GPIOC_MODER &= (0b00 << 25);
+    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
+    GPIOC_MODER &= (0b00 << 24);
+
+
     //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
     GPIOC_PUPDR &= (0b00 << 26);
 
-    //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
-    RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
-    //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
-    SYSCFG_EXTICR4 |= (0b0010 << 4);
-    // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
-    EXTI_RTSR |= (1 << 13);
-    // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
-    EXTI_IMR |= (1 << 13);
-    // Enable IRQ for EXTI lines 10-15
-    NVIC_EnableIRQ(EXTI15_10_IRQn);
+    //Bitwise AND the 25th bit of GPIOC_PUPDR with 0 - CONFIG PC12 as input floating
+    GPIOC_PUPDR &= (0b00 << 25);
+    //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input floating
+    GPIOC_PUPDR &= (0b00 << 24);
+
+
+    // //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
+    // RCC_APB2ENR |= (0b01 << 14); // Enable SYSCFG clock
+    // //Bitwise OR the 4th bit of SYSCFG_EXTICR4 with 0b0010 to configure EXTI line for PC13
+    // SYSCFG_EXTICR4 |= (0b0010 << 4);
+    // // Bitwise OR the 13th bit of EXTI_RTSR with 1 to enable the rising edge trigger for EXTI13
+    // EXTI_RTSR |= (1 << 13);
+    // // Bitwise OR the 13th bit of EXTI_IMR to unmask interrupt requests for line 13
+    // EXTI_IMR |= (1 << 13);
+    // // Enable IRQ for EXTI lines 10-15
+    // NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 uint32_t BSP_user_button_read() {
-    const uint32_t button_status = (GPIOC_IDR & (0b01 << 13));
+    uint32_t button_status = 0;
+    button_status = (GPIOC_IDR & ((0b01 << 13) | (0b01 << 12)));
+    return button_status;
+}
+
+uint32_t BSP_user_button2_read() {
+    const uint32_t button_status = (GPIOC_IDR & (0b01 << 12));
     return button_status;
 }
 
@@ -197,87 +193,70 @@ void BSP_redLedToggle() {
     QF_CRIT_EXIT();
 }
 
-void BSP_send_morse_code(uint32_t bitmask) {
-    uint32_t volatile delay_ctr;
-    enum {DOT_DELAY = 75 };
-    // SEMA
-    // QXSemaphore_wait(&morse_sema,
-    //     QXTHREAD_NO_TIMEOUT);
-
-    // Scheduler lock
-    // const QSchedStatus lock_status = QXK_schedLock(5U);
-
-    // Mutex
-    QXMutex_lock(&morse_mutex, QXTHREAD_NO_TIMEOUT);
-
-    for (; bitmask != 0U; bitmask <<= 1U) {
-        if ((bitmask & (1U << 31U)) != 0U) {
-            BSP_greenLedOn();
-        } else {
-            BSP_greenLedOff();
-        }
-        for (delay_ctr = DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
-
-        }
-    }
-    BSP_greenLedOff();
-    for(delay_ctr = 7 * DOT_DELAY; delay_ctr != 0U; --delay_ctr) {
-
-    }
-    // SEMA
-    // QXSemaphore_signal(&morse_sema);
-
-    // Scheduler lock
-    // QXK_schedUnlock(lock_status);
-
-    // Mutex
-    QXMutex_unlock(&morse_mutex);
-}
-
-void App_TimeTickHook(void) {
+void SysTick_Handler(void) {
     /* state of button. static to persist between func calls */
     static struct ButtonDebouncing {
         uint32_t depressed;
         uint32_t previous;
     } button = {0U, 0U};
 
-    TimeEvent_tick();
+    static struct Button2Debouncing {
+        uint32_t depressed;
+        uint32_t previous;
+    } button2 = {1U, 1U};
+
+    QF_TICK_X(0U, (void *)0); /* process all QP/c time events */
 
     const uint32_t current = BSP_user_button_read();
+
     uint32_t tmp     = button.depressed;
+    uint32_t tmp2     = button2.depressed;
 
     button.depressed |= (button.previous & current); /* set depressed */
     button.depressed &= (button.previous | current); /* set released */
     button.previous = current; /* update history for next function call */
 
+    button2.depressed &= (button2.previous | current); /* set depressed */
+    button2.depressed |= (button2.previous & current); /* set released */
+    button2.previous = current; /* update history for next function call */
+
     tmp ^= button.depressed; /* change of button depressed state */
+    tmp2 ^= button2.depressed; /* change of button depressed state */
 
     if ((tmp & (0b01 << 13)) != 0U) { /* check change of button depressed state */
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
-            static const Event buttonPressedEvt = {BUTTON_PRESSED_SIG};
-            Active_post(AO_TimeBomb, &buttonPressedEvt);
+            static QEvt const buttonPressedEvt
+                              = QEVT_INITIALIZER(BUTTON_PRESSED_SIG);
+            QACTIVE_POST(AO_TimeBomb, &buttonPressedEvt, 0U);
         } else { /* button released */
-            static const Event buttonReleasedEvt = {BUTTON_RELEASED_SIG};
-            Active_post(AO_TimeBomb, &buttonReleasedEvt);
+            static QEvt const buttonReleasedEvt
+                              = QEVT_INITIALIZER(BUTTON_RELEASED_SIG);
+            QACTIVE_POST(AO_TimeBomb, &buttonReleasedEvt, 0U);
+        }
+    }
+
+    if ((tmp2 & (0b01 << 12)) != 0U) { /* check change of button depressed state */
+        if ((current & (0b01 << 12)) == 0U) { /* button pressed */
+            static QEvt const button2PressedEvt
+                              = QEVT_INITIALIZER(BUTTON2_PRESSED_SIG);
+            QACTIVE_POST(AO_TimeBomb, &button2PressedEvt, 0U);
+        } else { /* button released */
+            static QEvt const button2ReleasedEvt
+                              = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
+            QACTIVE_POST(AO_TimeBomb, &button2ReleasedEvt, 0U);
         }
     }
 }
 /*..........................................................................*/
-void App_TaskIdleHook(void) {
+void QV_onIdle(void) {
     #ifdef NDEBUG
     /* Put the CPU and peripherals to the low-power mode.
     * you might need to customize the clock management for your application,
     * see the datasheet for your particular Cortex-M3 MCU.
     */
-    __WFI(); /* Wait-For-Interrupt */
+    QV_CPU_SLEEP(); /* automatically sleep and wait for interrupts */
+    #else
+    QF_INT_ENABLE();
     #endif
 }
 /*..........................................................................*/
-
-void App_TaskCreateHook (OS_TCB *ptcb) { (void)ptcb; }
-void App_TaskDelHook    (OS_TCB *ptcb) { (void)ptcb; }
-void App_TaskReturnHook (OS_TCB *ptcb) { (void)ptcb; }
-void App_TaskStatHook   (void)         {}
-void App_TaskSwHook     (void)         {}
-void App_TCBInitHook    (OS_TCB *ptcb) { (void)ptcb; }
-

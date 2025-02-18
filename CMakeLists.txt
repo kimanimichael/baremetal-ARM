@@ -26,7 +26,7 @@ set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lc -lnosys" CACHE INTERNAL "")
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 
-set(QPC_CFG_KERNEL qxk)
+set(QPC_CFG_KERNEL qv)
 set(QPC_CFG_PORT arm-cm)
 set(QPC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/qpc CACHE INTERNAL "")
 add_subdirectory(${QPC_PATH})
@@ -47,10 +47,9 @@ target_include_directories(${APP_TARGET}
         include/
         include/cmsis
         include/cmsis/m-profile
-        uc_ao
-        qpc/3rd_party/uC-OS2/Source
-        qpc/3rd_party/uC-OS2/Cfg/Template
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
+#        uc_ao/include
+#        qpc/3rd_party/uC-OS2/Source
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
 )
 
 target_sources(${APP_TARGET}
@@ -62,20 +61,20 @@ target_sources(${APP_TARGET}
         src/rectangle.c
         core/system_stm32f4xx.c
         startup/startup.c
-        uc_ao/uc_ao.c
-        qpc/3rd_party/uC-OS2/Source/os_core.c
-        qpc/3rd_party/uC-OS2/Source/os_flag.c
-        qpc/3rd_party/uC-OS2/Source/os_mbox.c
-        qpc/3rd_party/uC-OS2/Source/os_mem.c
-        qpc/3rd_party/uC-OS2/Source/os_mutex.c
-        qpc/3rd_party/uC-OS2/Source/os_q.c
-        qpc/3rd_party/uC-OS2/Source/os_sem.c
-        qpc/3rd_party/uC-OS2/Source/os_task.c
-        qpc/3rd_party/uC-OS2/Source/os_time.c
-        qpc/3rd_party/uC-OS2/Source/os_tmr.c
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
-        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
+#        uc_ao/uc_ao.c
+#        qpc/3rd_party/uC-OS2/Source/os_core.c
+#        qpc/3rd_party/uC-OS2/Source/os_flag.c
+#        qpc/3rd_party/uC-OS2/Source/os_mbox.c
+#        qpc/3rd_party/uC-OS2/Source/os_mem.c
+#        qpc/3rd_party/uC-OS2/Source/os_mutex.c
+#        qpc/3rd_party/uC-OS2/Source/os_q.c
+#        qpc/3rd_party/uC-OS2/Source/os_sem.c
+#        qpc/3rd_party/uC-OS2/Source/os_task.c
+#        qpc/3rd_party/uC-OS2/Source/os_time.c
+#        qpc/3rd_party/uC-OS2/Source/os_tmr.c
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
+#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
 )
 
 # Post-build step to generate binary
