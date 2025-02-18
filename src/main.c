@@ -18,13 +18,13 @@ struct TimeBomb {
     uint32_t blink_ctr;
 } ;
 
-State TimeBomb_armed(TimeBomb * const  me, Event const * const e);
-State TimeBomb_wait_for_button(TimeBomb * const  me, Event const * const e);
-State TimeBomb_blink(TimeBomb * const  me, Event const * const e);
-State TimeBomb_pause(TimeBomb * const  me, Event const * const e);
-State TimeBomb_boom(TimeBomb * const  me, Event const * const e);
-State TimeBomb_defused(TimeBomb * const  me, Event const * const e);
-State TimeBomb_initial(TimeBomb * const  me, Event const * const e);
+State TimeBomb_armed(TimeBomb *  me, Event const * e);
+State TimeBomb_wait_for_button(TimeBomb *  me, Event const * e);
+State TimeBomb_blink(TimeBomb *  me, Event const * e);
+State TimeBomb_pause(TimeBomb *  me, Event const * e);
+State TimeBomb_boom(TimeBomb *  me, Event const * e);
+State TimeBomb_defused(TimeBomb *  me, Event const * e);
+State TimeBomb_initial(TimeBomb *  me, Event const * e);
 
 
 State TimeBomb_initial(TimeBomb * const  me, Event const * const e) {
