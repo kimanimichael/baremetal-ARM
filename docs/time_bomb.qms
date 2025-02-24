@@ -9,7 +9,7 @@
   <item name="backups">0</item>
  </group>
  <group name="windows">
-  <item id="AOs::BlinkyButton::SM">0,0,1302,682,*</item>
+  <item id="AOs::TimeBomb::SM">0,0,1229,682,*</item>
  </group>
  <group name="search">
   <item name="options">2032128</item>
