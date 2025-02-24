@@ -53,10 +53,17 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
  <package name="AOs" stereotype="0x02">
   <!--${AOs::TimeBomb}-->
   <class name="TimeBomb" superclass="qpc::QActive">
-   <!--${AOs::TimeBomb::timeEvt}-->
-   <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${AOs::TimeBomb::te}-->
+   <attribute name="te" type="QTimeEvt" visibility="0x02" properties="0x00"/>
    <!--${AOs::TimeBomb::inst}-->
-   <attribute name="inst" type="TImeBomb" visibility="0x00" properties="0x01"/>
+   <attribute name="inst" type="TimeBomb" visibility="0x00" properties="0x01"/>
+   <!--${AOs::TimeBomb::blink_ctr}-->
+   <attribute name="blink_ctr" type="int32_t" visibility="0x02" properties="0x00"/>
+   <!--${AOs::TimeBomb::ctor}-->
+   <operation name="ctor" type="void" visibility="0x00" properties="0x00">
+    <code>QActive_ctor(&amp;me-&gt;super, (QStateHandler)&amp;TimeBomb_initial);
+QTimeEvt_ctorX(&amp;me-&gt;te, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
+   </operation>
    <!--${AOs::TimeBomb::SM}-->
    <statechart properties="0x03">
     <documentation>Blinky state machine</documentation>
@@ -68,7 +75,9 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
     </initial>
     <!--${AOs::TimeBomb::SM::armed}-->
     <state name="armed">
-     <exit brief="all-LEDs=off;"/>
+     <exit brief="all-LEDs=off;">BSP_redLedOff();
+BSP_greenLedOff();
+BSP_blueLedOff();</exit>
      <!--${AOs::TimeBomb::SM::armed::initial}-->
      <initial target="../2">
       <initial_glyph conn="48,16,4,1,12,-11">
@@ -83,11 +92,11 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
      </tran>
      <!--${AOs::TimeBomb::SM::armed::wait4Button}-->
      <state name="wait4Button">
-      <entry brief="Green-LED on;"/>
-      <exit brief="Green-LED off;"/>
-      <!--${AOs::TimeBomb::SM::armed::wait4Button::BUTTON_PRESSED_SIG}-->
-      <tran trig="BUTTON_PRESSED_SIG" target="../../3">
-       <action brief="blink_ctr = 3"/>
+      <entry brief="Green-LED on;">BSP_greenLedOn();</entry>
+      <exit brief="Green-LED off;">BSP_greenLedOff();</exit>
+      <!--${AOs::TimeBomb::SM::armed::wait4Button::BUTTON_PRESSED}-->
+      <tran trig="BUTTON_PRESSED" target="../../3">
+       <action brief="blink_ctr = 5">me-&gt;blink_ctr = 5;</action>
        <tran_glyph conn="13,31,3,1,30,10,-6">
         <action box="0,-2,24,8"/>
        </tran_glyph>
@@ -99,10 +108,11 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
      </state>
      <!--${AOs::TimeBomb::SM::armed::blink}-->
      <state name="blink">
-      <entry brief="Red-LED on; arm-TE for 1/2 sec;"/>
-      <exit brief="Red-LED off;"/>
-      <!--${AOs::TimeBomb::SM::armed::blink::TIMEOUT_SIG}-->
-      <tran trig="TIMEOUT_SIG" target="../../4">
+      <entry brief="Red-LED on; arm-TE for 1/2 sec;">BSP_redLedOn();
+QTimeEvt_armX(&amp;me-&gt;te, (blink_time), 0U);</entry>
+      <exit brief="Red-LED off;">BSP_redLedOff();</exit>
+      <!--${AOs::TimeBomb::SM::armed::blink::TIMEOUT}-->
+      <tran trig="TIMEOUT" target="../../4">
        <tran_glyph conn="13,48,3,1,27,6,-3">
         <action box="0,-2,22,7"/>
        </tran_glyph>
@@ -114,18 +124,18 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
      </state>
      <!--${AOs::TimeBomb::SM::armed::pause}-->
      <state name="pause">
-      <entry brief="arm-TE for 1/2 sec;"/>
-      <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT_SIG}-->
-      <tran trig="TIMEOUT_SIG">
-       <action brief="--blink_ctr;"/>
-       <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT_SIG::[blink_ctr>0]}-->
+      <entry brief="arm-TE for 1/2 sec;">QTimeEvt_armX(&amp;me-&gt;te, (blink_time), 0U);</entry>
+      <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT}-->
+      <tran trig="TIMEOUT">
+       <action brief="--blink_ctr;">--me-&gt;blink_ctr;</action>
+       <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT::[blink_ctr>0]}-->
        <choice target="../../../3">
-        <guard brief="blink_ctr&gt;0"/>
+        <guard brief="blink_ctr&gt;0">--me-&gt;blink_ctr &gt; 0</guard>
         <choice_glyph conn="43,60,4,1,-16,-6">
          <action box="0,-11,11,8"/>
         </choice_glyph>
        </choice>
-       <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT_SIG::[else]}-->
+       <!--${AOs::TimeBomb::SM::armed::pause::TIMEOUT::[else]}-->
        <choice target="../../../5">
         <guard brief="else"/>
         <choice_glyph conn="43,60,4,1,8,-6">
@@ -142,7 +152,9 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
      </state>
      <!--${AOs::TimeBomb::SM::armed::boom}-->
      <state name="boom">
-      <entry brief="All-LEDs ON"/>
+      <entry brief="All-LEDs ON">BSP_redLedOn();
+BSP_greenLedOn();
+BSP_blueLedOn();</entry>
       <state_glyph node="13,65,24,8">
        <entry box="0,3,18,2"/>
       </state_glyph>
@@ -153,7 +165,8 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
     </state>
     <!--${AOs::TimeBomb::SM::defused}-->
     <state name="defused">
-     <entry brief="blue-LED=on;"/>
+     <entry brief="blue-LED=on;">BSP_blueLedOn();</entry>
+     <exit brief="blue-LED=off;">BSP_blueLedOff();</exit>
      <!--${AOs::TimeBomb::SM::defused::BUTTON2_PRESSED}-->
      <tran trig="BUTTON2_PRESSED" target="../../1">
       <tran_glyph conn="79,18,2,1,22,-25">
@@ -162,366 +175,54 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
      </tran>
      <state_glyph node="64,7,21,11">
       <entry box="0,3,17,2"/>
+      <exit box="0,5,17,2"/>
      </state_glyph>
     </state>
     <state_diagram size="118,83"/>
    </statechart>
   </class>
- </package>
- <!--${.}-->
- <directory name=".">
-  <!--${.::bsp.h}-->
-  <file name="bsp.h">
-   <text>#ifndef BSP_H_
-#define BSP_H_
+  <!--${AOs::../src}-->
+  <directory name="../src">
+   <!--${AOs::../src::main.c}-->
+   <file name="main.c">
+    <text>/* TimeBomb/Button with QPC framework */
+#include &quot;qpc.h&quot;
+#include &quot;bsp.h&quot;
 
-#define BSP_TICKS_PER_SEC    100U
+// Q_DEFINE_THIS_MODULE(&quot;main&quot;) /* this module name for Q_ASSERT() */
 
-void BSP_init(void);
-void BSP_start(void);
-void BSP_ledOn(void);
-void BSP_ledOff(void);
+enum { blink_time = BSP_TICKS_PER_SEC / 4U };
 
-$declare ${Shared}
+/* The TimeBomb AO =======================================================*/
+$declare${AOs::TimeBomb}
 
-#endif // BSP_H_</text>
-  </file>
-  <!--${.::bsp.c}-->
-  <file name="bsp.c">
-   <text>// Board Support Package implementation for desktop OS (Windows, Linux, MacOS)
-#include &quot;qpc.h&quot;    // QP/C real-time embedded framework
-#include &quot;bsp.h&quot;    // Board Support Package interface
-#include &lt;stdio.h&gt;  // for printf()/fprintf()
-#include &lt;stdlib.h&gt; // for exit()
+$define${AOs::TimeBomb}
 
-//............................................................................
-void BSP_init(void)   {
-    printf(&quot;Simple Blinky example\n&quot;
-           &quot;QP/C version: %s\n&quot;
-           &quot;Press Ctrl-C to quit...\n&quot;,
-           QP_VERSION_STR);
-}
-//............................................................................
-void BSP_start(void) {
-    // no need to initialize event pools
-    //static QF_MPOOL_EL(QEvt) smlPoolSto[10];
-    //QF_poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+static QEvt const *timeBomb_queue[10];
+static TimeBomb timeBomb;
+QActive *AO_TimeBomb = &amp;timeBomb.super;
 
-    // no need to initialize publish-subscribe
-    //QActive_psInit(subscrSto, Q_DIM(subscrSto));
 
-    // instantiate and start AOs/threads...
-
-    static QEvt const *blinkyQueueSto[10];
-    Blinky_ctor();
-    QACTIVE_START(AO_Blinky,
-        1U,                          // QP prio. of the AO
-        blinkyQueueSto,              // event queue storage
-        Q_DIM(blinkyQueueSto),       // queue length [events]
-        (void *)0, 0U,               // no stack storage
-        (void *)0);                  // no initialization param
-}
-//............................................................................
-void BSP_ledOff(void) { printf(&quot;LED OFF\n&quot;); }
-//............................................................................
-void BSP_ledOn(void)  { printf(&quot;LED ON\n&quot;);  }
-
-// callback functions needed by the framework --------------------------------
-void QF_onStartup(void) {}
-void QF_onCleanup(void) {}
-void QF_onClockTick(void) {
-    QF_TICK_X(0U, (void *)0); // QF clock tick processing for rate 0
-}
-void Q_onError(char const * const module, int id) {
-    fprintf(stderr, &quot;Assertion failed in %s:%d&quot;, module, id);
-    exit(-1);
-}</text>
-  </file>
-  <!--${.::blinky.c}-->
-  <file name="blinky.c">
-   <text>#include &quot;qpc.h&quot;    // QP/C real-time embedded framework
-#include &quot;bsp.h&quot;    // Board Support Package interface
-
-// ask QM to declare the Blinky class
-$declare ${AOs::Blinky}
-
-$define ${Shared}
-
-$define ${AOs::Blinky}</text>
-  </file>
-  <!--${.::main.c}-->
-  <file name="main.c">
-   <text>#include &quot;qpc.h&quot;                 // QP/C real-time embedded framework
-#include &quot;bsp.h&quot;                 // Board Support Package
-
-//............................................................................
+/* the main function =========================================================*/
 int main() {
-    QF_init();       // initialize the framework and the underlying RT kernel
-    BSP_init();      // initialize the BSP
-    BSP_start();     // start the AOs/Threads
-    return QF_run(); // run the QF application
-}</text>
-  </file>
-  <!--${.::Makefile}-->
-  <file name="Makefile">
-   <text># Makefile for building QP/C application on Windows and POSIX hosts
-#
-# examples of invoking this Makefile:
-# building configurations: Debug (default), Release, and Spy
-# make
-# make CONF=rel
-# make CONF=spy
-# make clean   # cleanup the build
-# make CONF=spy clean   # cleanup the build
-#
-# NOTE:
-# To use this Makefile on Windows, you will need the GNU make utility, which
-# is included in the QTools collection for Windows, see:
-#    http://sourceforge.net/projects/qpc/files/QTools/
-#
+    BSP_init(); /* initialize the BSP */
+    QF_init();   /* initialize QP/C */
 
-#-----------------------------------------------------------------------------
-# project name:
-#
-PROJECT := blinky
+    /* create AO and start it */
+    TimeBomb_ctor(&amp;timeBomb);
+    QACTIVE_START(AO_TimeBomb,
+        2U,
+        timeBomb_queue,
+        sizeof(timeBomb_queue)/ sizeof(timeBomb_queue[0]),
+        (void*)0, 0U,
+        (void*)0
+        );
 
-#-----------------------------------------------------------------------------
-# project directories:
-#
-
-# list of all source directories used by this project
-VPATH := . \
-
-# list of all include directories needed by this project
-INCLUDES := -I. \
-
-# location of the QP/C framework (if not provided in an env. variable)
-ifeq ($(QPC),)
-QPC := /qp/qpc
-endif
-
-#-----------------------------------------------------------------------------
-# project files:
-#
-
-# C source files...
-C_SRCS := \
-    blinky.c \
-    bsp.c \
-    main.c
-
-# C++ source files...
-CPP_SRCS :=
-
-LIB_DIRS :=
-LIBS     :=
-
-# defines...
-# QP_API_VERSION controls the QP API compatibility; 9999 means the latest API
-DEFINES   := -DQP_API_VERSION=9999
-
-ifeq (,$(CONF))
-    CONF := dbg
-endif
-
-#-----------------------------------------------------------------------------
-# add QP/C framework:
-#
-C_SRCS += \
-    qep_hsm.c \
-    qep_msm.c \
-    qf_act.c \
-    qf_actq.c \
-    qf_defer.c \
-    qf_dyn.c \
-    qf_mem.c \
-    qf_ps.c \
-    qf_qact.c \
-    qf_qeq.c \
-    qf_qmact.c \
-    qf_time.c \
-    qf_port.c
-
-QS_SRCS := \
-    qs.c \
-    qs_64bit.c \
-    qs_rx.c \
-    qs_fp.c \
-    qs_port.c
-
-ifeq ($(OS),Windows_NT)
-
-# NOTE:
-# For Windows hosts, you can choose:
-# - the single-threaded QP/C port (win32-qv) or
-# - the multithreaded QP/C port (win32).
-#
-QP_PORT_DIR := $(QPC)/ports/win32-qv
-#QP_PORT_DIR := $(QPC)/ports/win32
-LIBS += -lws2_32
-
-else
-
-# NOTE:
-# For POSIX hosts (Linux, MacOS), you can choose:
-# - the single-threaded QP/C port (win32-qv) or
-# - the multithreaded QP/C port (win32).
-#
-QP_PORT_DIR := $(QPC)/ports/posix-qv
-#QP_PORT_DIR := $(QPC)/ports/posix
-LIBS += -lpthread
-
-endif
-
-#============================================================================
-# Typically you should not need to change anything below this line
-
-VPATH    += $(QPC)/src/qf $(QP_PORT_DIR)
-INCLUDES += -I$(QPC)/include -I$(QP_PORT_DIR)
-
-#-----------------------------------------------------------------------------
-# GNU toolset:
-#
-# NOTE:
-# GNU toolset (MinGW) is included in the QTools collection for Windows, see:
-#     https://www.state-machine.com/qtools
-# It is assumed that %QTOOLS%\bin directory is added to the PATH
-#
-CC    := gcc
-CPP   := g++
-LINK  := gcc    # for C programs
-#LINK  := g++   # for C++ programs
-
-#-----------------------------------------------------------------------------
-# basic utilities (depends on the OS this Makefile runs on):
-#
-ifeq ($(OS),Windows_NT)
-    MKDIR      := mkdir
-    RM         := rm
-    TARGET_EXT := .exe
-else ifeq ($(OSTYPE),cygwin)
-    MKDIR      := mkdir -p
-    RM         := rm -f
-    TARGET_EXT := .exe
-else
-    MKDIR      := mkdir -p
-    RM         := rm -f
-    TARGET_EXT :=
-endif
-
-#-----------------------------------------------------------------------------
-# build configurations...
-
-ifeq (rel, $(CONF)) # Release configuration ..................................
-
-BIN_DIR := build_rel
-# gcc options:
-CFLAGS  = -c -O3 -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
-    $(INCLUDES) $(DEFINES) -DNDEBUG
-
-CPPFLAGS = -c -O3 -fno-pie -std=c++11 -pedantic -Wall -Wextra \
-    -fno-rtti -fno-exceptions \
-    $(INCLUDES) $(DEFINES) -DNDEBUG
-
-else ifeq (spy, $(CONF))  # Spy configuration ................................
-
-BIN_DIR := build_spy
-
-C_SRCS   += $(QS_SRCS)
-VPATH    += $(QPC)/src/qs
-
-# gcc options:
-CFLAGS  = -c -g -O -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
-    $(INCLUDES) $(DEFINES) -DQ_SPY
-
-CPPFLAGS = -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
-    -fno-rtti -fno-exceptions \
-    $(INCLUDES) $(DEFINES) -DQ_SPY
-
-else # default Debug configuration .........................................
-
-BIN_DIR := build
-
-# gcc options:
-CFLAGS  = -c -g -O -fno-pie -std=c11 -pedantic -Wall -Wextra -W \
-    $(INCLUDES) $(DEFINES)
-
-CPPFLAGS = -c -g -O -fno-pie -std=c++11 -pedantic -Wall -Wextra \
-    -fno-rtti -fno-exceptions \
-    $(INCLUDES) $(DEFINES)
-
-endif  # .....................................................................
-
-ifndef GCC_OLD
-    LINKFLAGS := -no-pie
-endif
-
-#-----------------------------------------------------------------------------
-C_OBJS       := $(patsubst %.c,%.o,   $(C_SRCS))
-CPP_OBJS     := $(patsubst %.cpp,%.o, $(CPP_SRCS))
-
-TARGET_EXE   := $(BIN_DIR)/$(PROJECT)$(TARGET_EXT)
-C_OBJS_EXT   := $(addprefix $(BIN_DIR)/, $(C_OBJS))
-C_DEPS_EXT   := $(patsubst %.o,%.d, $(C_OBJS_EXT))
-CPP_OBJS_EXT := $(addprefix $(BIN_DIR)/, $(CPP_OBJS))
-CPP_DEPS_EXT := $(patsubst %.o,%.d, $(CPP_OBJS_EXT))
-
-#-----------------------------------------------------------------------------
-# rules
-#
-
-.PHONY: clean show
-
-all: $(TARGET_EXE)
-
-$(TARGET_EXE) : $(C_OBJS_EXT) $(CPP_OBJS_EXT)
-    $(CC) $(CFLAGS) $(QPC)/src/qs/qstamp.c -o $(BIN_DIR)/qstamp.o
-    $(LINK) $(LINKFLAGS) $(LIB_DIRS) -o $@ $^ $(BIN_DIR)/qstamp.o $(LIBS)
-
-$(BIN_DIR)/%.d : %.c
-    $(CC) -MM -MT $(@:.d=.o) $(CFLAGS) $&lt; &gt; $@
-
-$(BIN_DIR)/%.d : %.cpp
-    $(CPP) -MM -MT $(@:.d=.o) $(CPPFLAGS) $&lt; &gt; $@
-
-$(BIN_DIR)/%.o : %.c
-    $(CC) $(CFLAGS) $&lt; -o $@
-
-$(BIN_DIR)/%.o : %.cpp
-    $(CPP) $(CPPFLAGS) $&lt; -o $@
-
-# create BIN_DIR and include dependencies only if needed
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(MAKECMDGOALS),show)
-ifneq ($(MAKECMDGOALS),debug)
-ifeq (&quot;$(wildcard $(BIN_DIR))&quot;,&quot;&quot;)
-$(shell $(MKDIR) $(BIN_DIR))
-endif
--include $(C_DEPS_EXT) $(CPP_DEPS_EXT)
-endif
-endif
-endif
-
-clean :
-    -$(RM) $(BIN_DIR)/*.o \
-    $(BIN_DIR)/*.d \
-    $(TARGET_EXE)
-
-show :
-    @echo PROJECT      = $(PROJECT)
-    @echo TARGET_EXE   = $(TARGET_EXE)
-    @echo VPATH        = $(VPATH)
-    @echo C_SRCS       = $(C_SRCS)
-    @echo CPP_SRCS     = $(CPP_SRCS)
-    @echo C_DEPS_EXT   = $(C_DEPS_EXT)
-    @echo C_OBJS_EXT   = $(C_OBJS_EXT)
-    @echo C_DEPS_EXT   = $(C_DEPS_EXT)
-    @echo CPP_DEPS_EXT = $(CPP_DEPS_EXT)
-    @echo CPP_OBJS_EXT = $(CPP_OBJS_EXT)
-    @echo LIB_DIRS     = $(LIB_DIRS)
-    @echo LIBS         = $(LIBS)
-    @echo DEFINES      = $(DEFINES)
+    QF_run(); /* run QP/C */
+    return 0; /* NOTE: the scheduler does NOT return */
+}
 </text>
-  </file>
- </directory>
+   </file>
+  </directory>
+ </package>
 </model>
