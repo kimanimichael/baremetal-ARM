@@ -162,6 +162,11 @@ QState TimeBomb_defused(TimeBomb * const  me, QEvt const * const e) {
                 status = Q_HANDLED();
                 break;
         }
+        case Q_EXIT_SIG: {
+                BSP_blueLedOff();
+                status = Q_HANDLED();
+                break;
+        }
         case BUTTON2_PRESSED_SIG: {
                 status = Q_TRAN(TimeBomb_armed);
                 break;
