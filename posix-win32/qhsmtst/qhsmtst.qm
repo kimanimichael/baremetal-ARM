@@ -109,10 +109,9 @@ BSP_display(&quot;s-I;&quot;);</action>
       </tran_glyph>
      </tran>
      <!--${SMs::QHsmTst::SM::s::TERMINATE}-->
-     <tran trig="TERMINATE">
-      <action>BSP_terminate(0);</action>
-      <tran_glyph conn="71,19,1,-1,4,17">
-       <action box="0,-2,9,2"/>
+     <tran trig="TERMINATE" target="../../2">
+      <tran_glyph conn="71,19,1,0,11,12">
+       <action box="0,-2,11,2"/>
       </tran_glyph>
      </tran>
      <!--${SMs::QHsmTst::SM::s::s1}-->
@@ -336,7 +335,14 @@ BSP_display(&quot;s2-I;&quot;);</action>
       <exit box="0,5,5,2"/>
      </state_glyph>
     </state>
-    <state_diagram size="79,41"/>
+    <!--${SMs::QHsmTst::SM::final}-->
+    <state name="final">
+     <entry>BSP_terminate(0);</entry>
+     <state_glyph node="74,31,15,8">
+      <entry box="0,3,6,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="106,53"/>
    </statechart>
   </class>
  </package>

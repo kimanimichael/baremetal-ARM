@@ -61,6 +61,7 @@ static QState QHsmTst_s11(QHsmTst * const me, QEvt const * const e);
 static QState QHsmTst_s2(QHsmTst * const me, QEvt const * const e);
 static QState QHsmTst_s21(QHsmTst * const me, QEvt const * const e);
 static QState QHsmTst_s211(QHsmTst * const me, QEvt const * const e);
+static QState QHsmTst_final(QHsmTst * const me, QEvt const * const e);
 //$enddecl${SMs::QHsmTst} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
@@ -111,6 +112,7 @@ static QState QHsmTst_initial(QHsmTst * const me, void const * const par) {
     QS_FUN_DICTIONARY(&QHsmTst_s2);
     QS_FUN_DICTIONARY(&QHsmTst_s21);
     QS_FUN_DICTIONARY(&QHsmTst_s211);
+    QS_FUN_DICTIONARY(&QHsmTst_final);
 
     return Q_TRAN(&QHsmTst_s2);
 }
@@ -158,8 +160,7 @@ static QState QHsmTst_s(QHsmTst * const me, QEvt const * const e) {
         }
         //${SMs::QHsmTst::SM::s::TERMINATE}
         case TERMINATE_SIG: {
-            BSP_terminate(0);
-            status_ = Q_HANDLED();
+            status_ = Q_TRAN(&QHsmTst_final);
             break;
         }
         default: {
@@ -426,6 +427,24 @@ static QState QHsmTst_s211(QHsmTst * const me, QEvt const * const e) {
         }
         default: {
             status_ = Q_SUPER(&QHsmTst_s21);
+            break;
+        }
+    }
+    return status_;
+}
+
+//${SMs::QHsmTst::SM::final} .................................................
+static QState QHsmTst_final(QHsmTst * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        //${SMs::QHsmTst::SM::final}
+        case Q_ENTRY_SIG: {
+            BSP_terminate(0);
+            status_ = Q_HANDLED();
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&QHsm_top);
             break;
         }
     }
