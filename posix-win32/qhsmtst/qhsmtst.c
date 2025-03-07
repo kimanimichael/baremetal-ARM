@@ -273,8 +273,9 @@ static QState QHsmTst_s11(QHsmTst * const me, QEvt const * const e) {
                 BSP_display("s11-D;");
                 status_ = Q_TRAN(&QHsmTst_s1);
             }
+            //${SMs::QHsmTst::SM::s::s1::s11::D::[else]}
             else {
-                status_ = Q_UNHANDLED();
+                status_ = Q_HANDLED();
             }
             break;
         }
