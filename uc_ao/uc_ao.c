@@ -45,10 +45,10 @@ void HSM_dispatch(HSM * const me, Event const * const e){
     while (stat == SUPER_STATUS) {
         stat = (*me->temp)(me, e);
     }
-    if (stat == TRAN_STATUS) { /* Transition taken? */
+    while (stat == TRAN_STATUS) { /* Transition taken? */
         Q_ASSERT(me->state != (StateHandler)0);
         (*prev_state)(me, &exitEvt);
-        (*me->state)(me, &entryEvt);
+        stat = (*me->state)(me, &entryEvt);
     }
 }
 

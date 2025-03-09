@@ -38,6 +38,10 @@ State TimeBomb_armed(TimeBomb * const  me, Event const * const e) {
                 status = TRAN(TimeBomb_defused);
                 break;
         }
+        case ENTRY_SIGNAL: {
+                status = TRAN(TimeBomb_initial);
+                break;
+            }
         default: {
                 status = SUPER(HSM_top);
                 break;
@@ -160,6 +164,15 @@ State TimeBomb_defused(TimeBomb * const  me, Event const * const e) {
                 status = HANDLED_STATUS;
                 break;
         }
+        case EXIT_SIGNAL: {
+                BSP_blueLedOff();
+                status = HANDLED_STATUS;
+                break;
+        }
+        case BUTTON2_PRESSED_SIG: {
+                status = TRAN(TimeBomb_armed);
+                break;
+            }
         default: {
                 status = SUPER(HSM_top);
                 break;
