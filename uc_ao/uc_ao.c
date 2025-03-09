@@ -26,6 +26,7 @@ Q_DEFINE_THIS_FILE
 
 static Event const entryEvt = {ENTRY_SIGNAL};
 static Event const exitEvt = {EXIT_SIGNAL};
+static Event const initEvt = {INIT_SIGNAL};
 
 void HSM_ctor(HSM * const me, StateHandler initial) {
     me->state = initial;
@@ -48,6 +49,7 @@ void HSM_dispatch(HSM * const me, Event const * const e){
     while (stat == TRAN_STATUS) { /* Transition taken? */
         Q_ASSERT(me->state != (StateHandler)0);
         (*prev_state)(me, &exitEvt);
+        (*me->state)(me, &initEvt);
         stat = (*me->state)(me, &entryEvt);
     }
 }

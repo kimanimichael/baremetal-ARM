@@ -38,7 +38,7 @@ State TimeBomb_armed(TimeBomb * const  me, Event const * const e) {
                 status = TRAN(TimeBomb_defused);
                 break;
         }
-        case ENTRY_SIGNAL: {
+        case INIT_SIGNAL: {
                 status = TRAN(TimeBomb_initial);
                 break;
             }
