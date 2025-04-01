@@ -139,9 +139,9 @@ void BSP_user_button_init() {
     GPIOC_MODER &= (0b00 << 24);
 
 
-    //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
+    //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input floating
     GPIOC_PUPDR &= (0b00 << 27);
-    //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
+    //Bitwise AND the 26th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input floating
     GPIOC_PUPDR &= (0b00 << 26);
 
     //Bitwise AND the 25th bit of GPIOC_PUPDR with 0 - CONFIG PC12 as input floating
