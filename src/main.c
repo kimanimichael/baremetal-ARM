@@ -148,7 +148,7 @@ static QState Blinky2_active(Blinky2 * const me, QEvt const * const e) {
     switch (e->sig) {
         //${AOs::Blinky2::SM::active::BUTTON_PRESSED}
         case BUTTON_PRESSED_SIG: {
-            for (uint32_t volatile i = 8 * 1500U;i != 0U;i--) {
+            for (uint32_t volatile i = 5 * 1500U;i != 0U;i--) {
                         BSP_blueLedOn();
                         BSP_blueLedOff();
                     }
@@ -180,7 +180,7 @@ int main() {
 
     Blinky1_ctor(&blinky1);
     QACTIVE_START(&blinky1,
-        2U,
+        5U,
         blinky1_queue,
         sizeof(blinky1_queue)/ sizeof(blinky1_queue[0]),
         (void*)0, 0U,
@@ -189,7 +189,7 @@ int main() {
 
     Blinky2_ctor(&blinky2);
     QACTIVE_START(&blinky2,
-        5U,
+        2U,
         blinky2_queue,
         sizeof(blinky2_queue)/ sizeof(blinky2_queue[0]),
         (void*)0, 0U,

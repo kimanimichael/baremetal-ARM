@@ -109,7 +109,7 @@ QTimeEvt_ctorX(&amp;me-&gt;te, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
     <state name="active">
      <!--${AOs::Blinky2::SM::active::BUTTON_PRESSED}-->
      <tran trig="BUTTON_PRESSED">
-      <action>for (uint32_t volatile i = 8 * 1500U;i != 0U;i--) {
+      <action>for (uint32_t volatile i = 5 * 1500U;i != 0U;i--) {
             BSP_blueLedOn();
             BSP_blueLedOff();
         }</action>
@@ -153,7 +153,7 @@ int main() {
 
     Blinky1_ctor(&amp;blinky1);
     QACTIVE_START(&amp;blinky1,
-        2U,
+        5U,
         blinky1_queue,
         sizeof(blinky1_queue)/ sizeof(blinky1_queue[0]),
         (void*)0, 0U,
@@ -162,7 +162,7 @@ int main() {
 
     Blinky2_ctor(&amp;blinky2);
     QACTIVE_START(&amp;blinky2,
-        5U,
+        2U,
         blinky2_queue,
         sizeof(blinky2_queue)/ sizeof(blinky2_queue[0]),
         (void*)0, 0U,
