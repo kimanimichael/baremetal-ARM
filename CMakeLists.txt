@@ -26,7 +26,7 @@ set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lc -lnosys" CACHE INTERNAL "")
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 
-set(QPC_CFG_KERNEL qv)
+set(QPC_CFG_KERNEL qxk)
 set(QPC_CFG_PORT arm-cm)
 set(QPC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/qpc CACHE INTERNAL "")
 add_subdirectory(${QPC_PATH})

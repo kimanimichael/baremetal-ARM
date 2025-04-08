@@ -21,7 +21,7 @@ void QF_onStartup(void) {
     /* For 16MHz clock frequency. This results in BSP_TICKS_PER_SEC SysTick interrupts per sec*/
     SysTick_Config(SystemCoreClock/BSP_TICKS_PER_SEC);
     /* set systick priority to be "kernel aware" */
-    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
 
     // Enable IRQ for EXTI lines 10-15
     // NVIC_SetPriority(EXTI15_10_IRQn, QF_AWARE_ISR_CMSIS_PRI + 2U);
@@ -47,15 +47,13 @@ unsigned int volatile l_tickrCtr;
 
 void EXTI15_10IRQHandler (void)
 {
-    // QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
-    // OSIntEnter();
+    QXK_ISR_ENTRY(); /* inform qxk about entering an ISR */
     /* check that the interrupt is actually from EXTI 13*/
     if (EXTI_PR & 0b01 << 13) {
     }
     //clear the pending interrupt
     EXTI_PR |= 0b01 << 13;
-    // OSIntExit();
-    // QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
+    QXK_ISR_EXIT(); /* inform qxk about exiting an ISR */
 }
 
 void ledOn() {
@@ -152,9 +150,7 @@ uint32_t BSP_user_button2_read() {
 }
 
 void BSP_greenLedToggle() {
-    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 0);
-    QF_CRIT_EXIT();
 }
 
 void BSP_greenLedOn() {
@@ -166,9 +162,7 @@ void BSP_greenLedOff() {
 }
 
 void BSP_blueLedToggle() {
-    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 7);
-    QF_CRIT_EXIT();
 }
 
 void BSP_blueLedOn() {
@@ -188,12 +182,11 @@ void BSP_redLedOff() {
 }
 
 void BSP_redLedToggle() {
-    QF_CRIT_ENTRY();
     GPIOx_ODR ^= (0b01 << 14);
-    QF_CRIT_EXIT();
 }
 
 void SysTick_Handler(void) {
+    QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
     /* state of button. static to persist between func calls */
     static struct ButtonDebouncing {
         uint32_t depressed;
@@ -227,11 +220,11 @@ void SysTick_Handler(void) {
         if ((current & (0b01 << 13)) != 0U) { /* button pressed */
             static QEvt const buttonPressedEvt
                               = QEVT_INITIALIZER(BUTTON_PRESSED_SIG);
-            QACTIVE_POST(AO_TimeBomb, &buttonPressedEvt, 0U);
+            QACTIVE_POST(AO_Blinky2, &buttonPressedEvt, 0U);
         } else { /* button released */
             static QEvt const buttonReleasedEvt
                               = QEVT_INITIALIZER(BUTTON_RELEASED_SIG);
-            QACTIVE_POST(AO_TimeBomb, &buttonReleasedEvt, 0U);
+            QACTIVE_POST(AO_Blinky2, &buttonReleasedEvt, 0U);
         }
     }
 
@@ -239,13 +232,14 @@ void SysTick_Handler(void) {
         if ((current & (0b01 << 12)) == 0U) { /* button pressed */
             static QEvt const button2PressedEvt
                               = QEVT_INITIALIZER(BUTTON2_PRESSED_SIG);
-            QACTIVE_POST(AO_TimeBomb, &button2PressedEvt, 0U);
+            QACTIVE_POST(AO_Blinky2, &button2PressedEvt, 0U);
         } else { /* button released */
             static QEvt const button2ReleasedEvt
                               = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
-            QACTIVE_POST(AO_TimeBomb, &button2ReleasedEvt, 0U);
+            QACTIVE_POST(AO_Blinky2, &button2ReleasedEvt, 0U);
         }
     }
+    QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
 }
 /*..........................................................................*/
 void QV_onIdle(void) {
