@@ -38,8 +38,8 @@
 #include "qpc.h"
 #include "bsp.h"
 
-uint32_t g_ticks = 2U;
-uint32_t g_iter = 3000U;
+uint32_t g_ticks = 1U;
+uint32_t g_iter = 1500U;
 
 //$declare${AOs::Blinky1} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
