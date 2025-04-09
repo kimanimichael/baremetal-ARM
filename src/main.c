@@ -158,12 +158,14 @@ static QState Blinky2_active(Blinky2 * const me, QEvt const * const e) {
             me->seq = (me->seq + 1U) % N_SEQ;
             static uint32_t const n_ticks[N_SEQ] = {2U, 1U};
             static uint32_t const n_iter[N_SEQ] = {3000U, 1500U};
+            QSchedStatus ssat = QXK_schedLock(5U);
             g_ticks = n_ticks[me->seq];
             for (uint32_t volatile i = 10 * 1500U;i != 0U;i--) {
                 BSP_blueLedOn();
                 BSP_blueLedOff();
             }
             g_iter = n_iter[me->seq];
+            QXK_schedUnlock(ssat);
             for (uint32_t volatile i = 1 * 1500U;i != 0U;i--) {
                         BSP_blueLedOn();
                         BSP_blueLedOff();
