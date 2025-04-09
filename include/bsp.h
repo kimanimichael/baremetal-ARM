@@ -27,7 +27,7 @@ void EXTI15_10IRQHandler(void);
 
 #define SYS_CLCK_HZ 16000000U
 
-#define BSP_TICKS_PER_SEC 500
+#define BSP_TICKS_PER_SEC 1200
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
