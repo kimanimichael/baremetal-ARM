@@ -155,6 +155,13 @@ void BSP_redLedOff();
  * @author @Mike-Kimani
 */
 void BSP_redLedToggle();
+
+/**
+ * @brief Toggles a GPIO for logic analyzer traces
+ * @author @Mike-Kimani
+*/
+void BSP_idle_toggle();
+
 /**
 * @brief blink green led to send morse code
 * @param bitmask message to be sent in bits

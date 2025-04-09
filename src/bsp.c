@@ -185,6 +185,11 @@ void BSP_redLedToggle() {
     GPIOx_ODR ^= (0b01 << 14);
 }
 
+void BSP_idle_toggle() {
+    GPIOA_ODR |= (0b01 << 12);
+    GPIOA_ODR &= ~(0b01 << 12);
+}
+
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
     /* state of button. static to persist between func calls */
