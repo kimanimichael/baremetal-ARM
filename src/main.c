@@ -38,6 +38,8 @@
 #include "qpc.h"
 #include "bsp.h"
 
+uint32_t g_ticks = 2U;
+uint32_t g_iter = 3000U;
 
 //$declare${AOs::Blinky1} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
@@ -66,6 +68,8 @@ typedef struct {
 
 // private:
     QTimeEvt te;
+
+    uint8_t seq;
 } Blinky2;
 
 // public:
@@ -95,7 +99,7 @@ static void Blinky1_ctor(Blinky1 * const me) {
 //${AOs::Blinky1::SM} ........................................................
 static QState Blinky1_initial(Blinky1 * const me, void const * const par) {
     //${AOs::Blinky1::SM::initial}
-    QTimeEvt_armX(&me->te, 1U, 1U);
+    QTimeEvt_armX(&me->te, g_ticks, 0U);
 
     QS_FUN_DICTIONARY(&Blinky1_active);
 
@@ -108,7 +112,9 @@ static QState Blinky1_active(Blinky1 * const me, QEvt const * const e) {
     switch (e->sig) {
         //${AOs::Blinky1::SM::active::TIMEOUT}
         case TIMEOUT_SIG: {
-            for (uint32_t volatile i = 1500U;i != 0U;i--) {
+            QTimeEvt_armX(&me->te, g_ticks, 0U);
+            uint32_t volatile i = g_iter;
+            for (;i != 0U;i--) {
                         BSP_greenLedOn();
                         BSP_greenLedOff();
                     }
@@ -138,17 +144,27 @@ static QState Blinky2_initial(Blinky2 * const me, void const * const par) {
     //${AOs::Blinky2::SM::initial}
 
     QS_FUN_DICTIONARY(&Blinky2_active);
-
+    me->seq = 0U;
     return Q_TRAN(&Blinky2_active);
 }
 
 //${AOs::Blinky2::SM::active} ................................................
 static QState Blinky2_active(Blinky2 * const me, QEvt const * const e) {
     QState status_;
+    enum {N_SEQ = 2};
     switch (e->sig) {
         //${AOs::Blinky2::SM::active::BUTTON_PRESSED}
         case BUTTON_PRESSED_SIG: {
-            for (uint32_t volatile i = 5 * 1500U;i != 0U;i--) {
+            me->seq = (me->seq + 1U) % N_SEQ;
+            static uint32_t const n_ticks[N_SEQ] = {2U, 1U};
+            static uint32_t const n_iter[N_SEQ] = {3000U, 1500U};
+            g_ticks = n_ticks[me->seq];
+            for (uint32_t volatile i = 10 * 1500U;i != 0U;i--) {
+                BSP_blueLedOn();
+                BSP_blueLedOff();
+            }
+            g_iter = n_iter[me->seq];
+            for (uint32_t volatile i = 1 * 1500U;i != 0U;i--) {
                         BSP_blueLedOn();
                         BSP_blueLedOff();
                     }
