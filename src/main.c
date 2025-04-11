@@ -38,6 +38,12 @@
 #include "qpc.h"
 #include "bsp.h"
 
+typedef struct {
+    QEvt super;
+    uint32_t ticks;
+    uint32_t iter;
+} BlinkyPatternEvt;
+
 uint32_t g_ticks = 1U;
 uint32_t g_iter = 1500U;
 
@@ -50,6 +56,8 @@ typedef struct {
 
 // private:
     QTimeEvt te;
+
+    uint32_t iter;
 } Blinky1;
 
 // public:
@@ -99,7 +107,8 @@ static void Blinky1_ctor(Blinky1 * const me) {
 //${AOs::Blinky1::SM} ........................................................
 static QState Blinky1_initial(Blinky1 * const me, void const * const par) {
     //${AOs::Blinky1::SM::initial}
-    QTimeEvt_armX(&me->te, g_ticks, 0U);
+    QTimeEvt_armX(&me->te, 1U, 1U);
+    me->iter = 1500U;
 
     QS_FUN_DICTIONARY(&Blinky1_active);
 
@@ -111,9 +120,15 @@ static QState Blinky1_active(Blinky1 * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
         //${AOs::Blinky1::SM::active::TIMEOUT}
+        case BLINK_PATTERN_UPDATE_SIG:{
+                QTimeEvt_disarm(&me->te);
+                QTimeEvt_armX(&me->te, ((BlinkyPatternEvt const * )e)->ticks, ((BlinkyPatternEvt const* )e)->ticks);
+                me->iter = ((BlinkyPatternEvt* )e)->iter;
+                status_ = Q_HANDLED();
+                break;
+            }
         case TIMEOUT_SIG: {
-            QTimeEvt_armX(&me->te, g_ticks, 0U);
-            uint32_t volatile i = g_iter;
+            uint32_t volatile i = me->iter;
             for (;i != 0U;i--) {
                         BSP_greenLedOn();
                         BSP_greenLedOff();
@@ -158,14 +173,18 @@ static QState Blinky2_active(Blinky2 * const me, QEvt const * const e) {
             me->seq = (me->seq + 1U) % N_SEQ;
             static uint32_t const n_ticks[N_SEQ] = {2U, 1U};
             static uint32_t const n_iter[N_SEQ] = {3000U, 1500U};
-            QSchedStatus ssat = QXK_schedLock(5U);
-            g_ticks = n_ticks[me->seq];
+
+            BlinkyPatternEvt bp_evt = QEVT_INITIALIZER(BLINK_PATTERN_UPDATE_SIG);
+
+            bp_evt.ticks = n_ticks[me->seq];
             for (uint32_t volatile i = 10 * 1500U;i != 0U;i--) {
                 BSP_blueLedOn();
                 BSP_blueLedOff();
             }
-            g_iter = n_iter[me->seq];
-            QXK_schedUnlock(ssat);
+            bp_evt.iter = n_iter[me->seq];
+            QACTIVE_POST(AO_Blinky1, &bp_evt.super, 0U);
+
+
             for (uint32_t volatile i = 1 * 1500U;i != 0U;i--) {
                         BSP_blueLedOn();
                         BSP_blueLedOff();
