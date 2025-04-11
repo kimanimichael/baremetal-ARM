@@ -174,15 +174,15 @@ static QState Blinky2_active(Blinky2 * const me, QEvt const * const e) {
             static uint32_t const n_ticks[N_SEQ] = {2U, 1U};
             static uint32_t const n_iter[N_SEQ] = {3000U, 1500U};
 
-            BlinkyPatternEvt bp_evt = QEVT_INITIALIZER(BLINK_PATTERN_UPDATE_SIG);
+            BlinkyPatternEvt *bp_evt = Q_NEW(BlinkyPatternEvt, BLINK_PATTERN_UPDATE_SIG);
 
-            bp_evt.ticks = n_ticks[me->seq];
+            bp_evt->ticks = n_ticks[me->seq];
             for (uint32_t volatile i = 10 * 1500U;i != 0U;i--) {
                 BSP_blueLedOn();
                 BSP_blueLedOff();
             }
-            bp_evt.iter = n_iter[me->seq];
-            QACTIVE_POST(AO_Blinky1, &bp_evt.super, 0U);
+            bp_evt->iter = n_iter[me->seq];
+            QACTIVE_POST(AO_Blinky1, &bp_evt->super, 0U);
 
 
             for (uint32_t volatile i = 1 * 1500U;i != 0U;i--) {
@@ -207,6 +207,8 @@ static Blinky1 blinky1;
 static QEvt const *blinky2_queue[10];
 static Blinky2 blinky2;
 
+static BlinkyPatternEvt evt_pool[10];
+
 QActive* const AO_Blinky1 = &blinky1.super;
 QActive* const AO_Blinky2 = &blinky2.super;
 
@@ -214,6 +216,8 @@ QActive* const AO_Blinky2 = &blinky2.super;
 int main() {
     BSP_init(); /* initialize the BSP */
     QF_init();   /* initialize QP/C */
+
+    QF_poolInit(evt_pool, sizeof(evt_pool), sizeof(evt_pool[0]));
 
     Blinky1_ctor(&blinky1);
     QACTIVE_START(&blinky1,
