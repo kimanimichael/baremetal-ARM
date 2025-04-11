@@ -1,0 +1,46 @@
+name: Build and Test Baremetal ARM
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - f/config_github_actions
+
+jobs:
+  build:
+    name: Build Baremetal ARM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize and Update Submodules
+        run: |
+          git submodule update --init --force --depth=1
+
+      - name: Install ARM GCC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+      - name: Configure and build
+        run: |
+          cmake -S . -B cmake_build/ -G Ninja
+          cmake --build cmake_build/ --verbose
+
+      - name: Check for Binary
+        run: |
+          if [ ! -f cmake_build/baremetal_arm.bin ]; then
+          echo "Binary not generated!"
+          exit 1
+          fi
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: baremetal_arm.bin
+          path: cmake_build/
+
