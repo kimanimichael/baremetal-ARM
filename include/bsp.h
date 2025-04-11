@@ -27,7 +27,7 @@ void EXTI15_10IRQHandler(void);
 
 #define SYS_CLCK_HZ 16000000U
 
-#define BSP_TICKS_PER_SEC 500
+#define BSP_TICKS_PER_SEC 1200
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
 #define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
@@ -155,6 +155,13 @@ void BSP_redLedOff();
  * @author @Mike-Kimani
 */
 void BSP_redLedToggle();
+
+/**
+ * @brief Toggles a GPIO for logic analyzer traces
+ * @author @Mike-Kimani
+*/
+void BSP_idle_toggle();
+
 /**
 * @brief blink green led to send morse code
 * @param bitmask message to be sent in bits
@@ -169,6 +176,7 @@ enum  EventSignals {
  BUTTON2_PRESSED_SIG,
  BUTTON2_RELEASED_SIG,
  TIMEOUT_SIG,
+ BLINK_PATTERN_UPDATE_SIG,
  /* */
  MAX_SIG
 };

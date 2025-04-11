@@ -185,6 +185,11 @@ void BSP_redLedToggle() {
     GPIOx_ODR ^= (0b01 << 14);
 }
 
+void BSP_idle_toggle() {
+    GPIOA_ODR |= (0b01 << 12);
+    GPIOA_ODR &= ~(0b01 << 12);
+}
+
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
     /* state of button. static to persist between func calls */
@@ -232,11 +237,11 @@ void SysTick_Handler(void) {
         if ((current & (0b01 << 12)) == 0U) { /* button pressed */
             static QEvt const button2PressedEvt
                               = QEVT_INITIALIZER(BUTTON2_PRESSED_SIG);
-            QACTIVE_POST(AO_Blinky2, &button2PressedEvt, 0U);
+            QACTIVE_POST(AO_Blinky1, &button2PressedEvt, 0U);
         } else { /* button released */
             static QEvt const button2ReleasedEvt
                               = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
-            QACTIVE_POST(AO_Blinky2, &button2ReleasedEvt, 0U);
+            // QACTIVE_POST(AO_Blinky1, &button2ReleasedEvt, 0U);
         }
     }
     QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
