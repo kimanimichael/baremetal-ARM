@@ -33,7 +33,7 @@ jobs:
 
       - name: Check for Binary
         run: |
-          if [ ! -f build/baremetal_arm.bin ]; then
+          if [ ! -f cmake_build/baremetal_arm.bin ]; then
           echo "Binary not generated!"
           exit 1
           fi
@@ -41,6 +41,6 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: baremetal_arm
+          name: baremetal_arm.bin
           path: cmake_build/
 
