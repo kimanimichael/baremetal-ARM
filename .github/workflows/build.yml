@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - main
-      - f/config_github_actions
 
 jobs:
   build:
