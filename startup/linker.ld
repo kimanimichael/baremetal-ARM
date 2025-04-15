@@ -100,12 +100,4 @@ SECTIONS
         __heap_end__ = .;
     } >RAM
     PROVIDE(end = __heap_end__);
-
-    /* Remove information from the standard libraries */
-    /DISCARD/ :
-    {
-        libc.a ( * )
-        libm.a ( * )
-        libgcc.a ( * )
-    }
 }
