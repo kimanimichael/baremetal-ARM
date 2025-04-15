@@ -101,8 +101,6 @@ void start()
         software_init_hook(); /* this will also call __libc_init_array */
     }
     else {
-        /* call all static constructors in C++ (harmless in C programs) */
-        __libc_init_array();
         (void)main(); /* application's entry point; should never return! */
     }
 
