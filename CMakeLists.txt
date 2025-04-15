@@ -14,17 +14,16 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
 target_link_options(baremetal_arm PRIVATE "-T${LINKER_SCRIPT}"
         "-nostartfiles"
-        "-lc"
-        "-lnosys")
+        "--specs=nano.specs"
+        "--specs=nosys.specs")
 
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -Wall -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib -specs=nano.specs")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib")
+set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib")
 set(CMAKE_ASM_FLAGS "${CPU_FLAGS}")
 #set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/startup/linker.ld -Wl,-Map=${CMAKE_BINARY_DIR}/${APP_TARGET}.map ${CPU_FLAGS} --specs=nosys.specs" CACHE INTERNAL "")
 
-set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lc -lnosys" CACHE INTERNAL "")
-
-set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
+set(CMAKE_EXE_LINKER_FLAGS CACHE INTERNAL "")
 
 set(QPC_CFG_KERNEL qxk)
 set(QPC_CFG_PORT arm-cm)
