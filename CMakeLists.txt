@@ -12,18 +12,31 @@ add_executable(${APP_TARGET})
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
-target_link_options(baremetal_arm PRIVATE "-T${LINKER_SCRIPT}"
+set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -march=armv7e-m -Wall -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+
+target_compile_options(baremetal_arm PRIVATE
+        -mcpu=cortex-m4
+        -mthumb
+        -march=armv7e-m
+        -Wall
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+        --specs=nano.specs
+)
+
+target_link_options(baremetal_arm PRIVATE
+        "-T${LINKER_SCRIPT}"
         "-nostartfiles"
-        "--specs=nano.specs"
-        "--specs=nosys.specs")
+        "-specs=nano.specs"
+        "-specs=nosys.specs"
+        ${CPU_FLAGS}
 
-set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -Wall -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib")
-set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -fstack-usage -nostdlib")
+)
+
+
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -nostdlib")
+set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -nostdlib")
 set(CMAKE_ASM_FLAGS "${CPU_FLAGS}")
-#set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/startup/linker.ld -Wl,-Map=${CMAKE_BINARY_DIR}/${APP_TARGET}.map ${CPU_FLAGS} --specs=nosys.specs" CACHE INTERNAL "")
-
-set(CMAKE_EXE_LINKER_FLAGS CACHE INTERNAL "")
 
 set(QPC_CFG_KERNEL qxk)
 set(QPC_CFG_PORT arm-cm)
@@ -39,6 +52,11 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 target_link_libraries(${APP_TARGET}
     PRIVATE
         qpc
+        -Wl,--start-group
+        -lc_nano           # the nano-libc implementation
+        -lnosys            # stub syscalls (sbrk/write/etc)
+        -lgcc              # compiler’s helper routines
+        -Wl,--end-group
 )
 
 target_include_directories(${APP_TARGET}
@@ -46,9 +64,6 @@ target_include_directories(${APP_TARGET}
         include/
         include/cmsis
         include/cmsis/m-profile
-#        uc_ao/include
-#        qpc/3rd_party/uC-OS2/Source
-#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
 )
 
 target_sources(${APP_TARGET}
@@ -58,22 +73,10 @@ target_sources(${APP_TARGET}
         src/bsp.c
         src/shape.c
         src/rectangle.c
+        src/syscalls.c
         core/system_stm32f4xx.c
         startup/startup.c
-#        uc_ao/uc_ao.c
-#        qpc/3rd_party/uC-OS2/Source/os_core.c
-#        qpc/3rd_party/uC-OS2/Source/os_flag.c
-#        qpc/3rd_party/uC-OS2/Source/os_mbox.c
-#        qpc/3rd_party/uC-OS2/Source/os_mem.c
-#        qpc/3rd_party/uC-OS2/Source/os_mutex.c
-#        qpc/3rd_party/uC-OS2/Source/os_q.c
-#        qpc/3rd_party/uC-OS2/Source/os_sem.c
-#        qpc/3rd_party/uC-OS2/Source/os_task.c
-#        qpc/3rd_party/uC-OS2/Source/os_time.c
-#        qpc/3rd_party/uC-OS2/Source/os_tmr.c
-#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
-#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
-#        qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
+
 )
 
 # Post-build step to generate binary
