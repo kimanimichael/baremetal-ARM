@@ -9,12 +9,14 @@ extern unsigned int _data_end;
 extern unsigned int  _bss_start;
 extern unsigned int  _bss_end;
 extern unsigned int  _data_lma;
+extern void (*__init_array_start)(void);
+extern void (*__init_array_end)(void);
 
-extern int __stack_end__;
+extern unsigned int  __initial_sp;
 
 unsigned int *vectors[] __attribute__((section(".vectors"))) = 
 {
-    (unsigned int *)0x20030000, //Pointer to the top of our stack memory
+    &__initial_sp, //Pointer to the top of our stack memory
     (unsigned int *)start, // Pointer to our reset handler - also our startup code
     (unsigned int *)NMI_Handler, //NMI
     (unsigned int *)HardFault_Handler, //HardFault
@@ -93,7 +95,17 @@ void start()
 // Initialize all uninitialized variables (bss section) to 0
    for (dest = &_bss_start; dest < &_bss_end; dest++)
        *dest = 0;
+
+
+    // Run global constructors/initializers
+    for (void (**p)(void) = &__init_array_start; p < &__init_array_end; p++) {
+        (*p)();
+    }
+
+
    SystemInit();
+
+    __libc_init_array();
 
     /* init hook provided? */
     if (&software_init_hook != (void (*)(void))(0)) {

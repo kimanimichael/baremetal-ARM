@@ -4,9 +4,7 @@ MEMORY
     ROM(rx) : ORIGIN = 0x08000000, LENGTH = 2048K
 }
 
-STACK_SIZE = 2048;
-
-HEAP_SIZE = 1024;
+STACK_SIZE = 16384;
 
 SECTIONS
 {
@@ -56,15 +54,13 @@ SECTIONS
         . = ALIGN(4);
     } >ROM
 
-    _etext = .;            /* global symbols at end of code */
+    .ARM.exidx   : {
+        __exidx_start = .;
+         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+         __exidx_end = .;
+    }>ROM
 
-     .stack :
-     {
-        __stack_start__ = .;
-        . = . + STACK_SIZE;
-        . = ALIGN(4);
-        __stack_end__ = .;
-    } >RAM
+    _etext = .;            /* global symbols at end of code */
 
     .data :
     {
@@ -74,8 +70,8 @@ SECTIONS
         . = ALIGN(4);
         _data_end = .;
     } > RAM AT > ROM
-
     _data_lma = LOADADDR(.data);
+
     . = ALIGN(4);
     .bss :
     {
@@ -87,17 +83,17 @@ SECTIONS
         _bss_end = .;
     } > RAM
 
-     __exidx_start = .;
-    .ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) } >RAM
-    __exidx_end = .;
-
-    .heap :
-    {
+    .stack :
+     {
         . = ALIGN(8);
-        __heap_start__ = .;
-        . = . + HEAP_SIZE;
+        _sstack = .;
+        . = . + STACK_SIZE;
         . = ALIGN(8);
-        __heap_end__ = .;
+        _estack = .;
     } >RAM
-    PROVIDE(end = __heap_end__);
+
+    PROVIDE(_end = .);
+
+    /* ARM Standard Symbols */
+      PROVIDE(__initial_sp = _estack);
 }
