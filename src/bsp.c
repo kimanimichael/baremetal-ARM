@@ -4,6 +4,11 @@
 #include "qpc.h"
 #include "bsp.h"
 #include "stm32f429xx.h"
+#include "stdio.h"
+
+
+
+void usart3_init();
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -82,13 +87,14 @@ uint32_t BSP_Tickr(void) {
 
 void BSP_init() {
     SystemCoreClockUpdate();
+    usart3_init();
     BSP_ledInit();
     BSP_user_button_init();
 }
 
 void BSP_ledInit() {
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 1) | (0b01 << 0);
+    RCC_AHB1ENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
@@ -101,8 +107,9 @@ void BSP_ledInit() {
 }
 
 void BSP_user_button_init() {
+    // printf("LED init");
     //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOC_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 2);
+    RCC_AHB1ENR |= (0b01 << 2);
 
     //Bitwise AND the 27th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
     GPIOC_MODER &= (0b00 << 27);
@@ -167,6 +174,7 @@ void BSP_blueLedToggle() {
 
 void BSP_blueLedOn() {
     GPIOx_ODR |= (0b01 << 7);
+    printf("Turning blue LED on");
 }
 
 void BSP_blueLedOff() {
@@ -188,6 +196,48 @@ void BSP_redLedToggle() {
 void BSP_idle_toggle() {
     GPIOA_ODR |= (0b01 << 12);
     GPIOA_ODR &= ~(0b01 << 12);
+}
+
+void usart3_init() {
+    //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOD_EN CLOCK
+    RCC_AHB1ENR |= (0b01 << 3);
+    RCC->AHB1ENR |= (0b01 << 3);
+    __DSB();
+    (void)(RCC_AHB1ENR);
+    // Enable USART3 clock
+    RCC_APB1ENR |= (0b01 << 18);
+    RCC->APB1ENR |= (0b01 << 18);
+    __DSB();
+
+    // AF7, USART3TX = PD8
+    GPIOD_AFRH |= (0b01 << 0) | (0b01 << 1) | (0b01 << 2);
+    GPIOD_AFRH &= ~(0b01 << 3);
+    // AF7, USART3RX = PD9
+    GPIOD_AFRH |= (0b01 << 4) | (0b01 << 5) | (0b01 << 6);
+    GPIOD_AFRH &= ~(0b01 << 7);
+
+    //Bitwise OR the 17th bit of GPIOD_MODER with 1 - CONFIG PD8 as alternate function
+    GPIOD_MODER |= (0b01 << 17);
+    //Bitwise AND the 16th bit of GPIOD_MODER with 0 - CONFIG PD8 as alternate function
+    GPIOD_MODER &= ~(0b01 << 16);
+
+    //Bitwise OR the 19th bit of GPIOD_MODER with 1 - CONFIG PD9 as alternate function
+    GPIOD_MODER |= (0b01 << 19);
+    //Bitwise AND the 18th bit of GPIOD_MODER with 0 - CONFIG PD9 as alternate function
+    GPIOD_MODER &= ~(0b01 << 18);
+
+    // Configure USART3
+    USART3->CR1 &= ~USART_CR1_UE;
+
+    USART3->BRR |= 0x8B;
+
+    /* Transmitter enable, send an idle frame as first transmission, */
+    USART3->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
+
+    /* Leave at reset value to keep 1 stop bit */
+    USART3->CR2 = 0;
+    /* No DMA, no flow control, disable smart card mode, no half-duplex selection, normal power mode etc. */
+    USART3->CR3 = 0;
 }
 
 void SysTick_Handler(void) {
