@@ -4,7 +4,8 @@ MEMORY
     ROM(rx) : ORIGIN = 0x08000000, LENGTH = 2048K
 }
 
-STACK_SIZE = 16384;
+_Min_Stack_Size = 16384;
+_Min_Heap_Size = 0x2000; /* required amount of heap */
 
 SECTIONS
 {
@@ -87,12 +88,21 @@ SECTIONS
      {
         . = ALIGN(8);
         _sstack = .;
-        . = . + STACK_SIZE;
+        . = . + _Min_Stack_Size;
         . = ALIGN(8);
         _estack = .;
     } >RAM
 
-    PROVIDE(_end = .);
+    /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
+      ._user_heap_stack :
+      {
+        . = ALIGN(8);
+        PROVIDE ( end = . );
+        PROVIDE ( _end = . );
+        . = . + _Min_Heap_Size;
+        . = . + _Min_Stack_Size;
+        . = ALIGN(8);
+      } >RAM
 
     /* ARM Standard Symbols */
       PROVIDE(__initial_sp = _estack);

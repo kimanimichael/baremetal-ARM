@@ -229,8 +229,8 @@ void usart3_init() {
 
     // Configure USART3
     USART3->CR1 &= ~USART_CR1_UE;
-
-    USART3->BRR |= 0x8B;
+    /* For 45 MHz uart, usb clock frequency.*/
+    USART3->BRR |= 0x187;
 
     /* Transmitter enable, send an idle frame as first transmission, */
     USART3->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
@@ -239,6 +239,23 @@ void usart3_init() {
     USART3->CR2 = 0;
     /* No DMA, no flow control, disable smart card mode, no half-duplex selection, normal power mode etc. */
     USART3->CR3 = 0;
+}
+
+void uart_write_byte(uint8_t data) {
+    /* Wait until the data has been transferred into the shift register. */
+    while ((USART3->SR & USART_SR_TXE) == 0);
+    USART3->DR = data;
+}
+
+void uart_write(uint8_t *data, const uint32_t length) {
+    for (int i =0; i < length; i++) {
+        uart_write_byte(data[i]);
+    }
+
+}
+int __io_putchar(int data) {
+    uart_write((uint8_t *)&data, 1);
+    return data;
 }
 
 void SysTick_Handler(void) {

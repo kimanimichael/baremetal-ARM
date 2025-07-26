@@ -5,7 +5,7 @@ set (APP_TARGET baremetal_arm)
 set(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-set(CMAKE_LINKER "arm-none-eabi-ld")
+set(CMAKE_LINKER "arm-none-eabi-gcc")
 
 add_executable(${APP_TARGET})
 
@@ -29,6 +29,8 @@ target_link_options(baremetal_arm PRIVATE
         "-nostartfiles"
         "-specs=nano.specs"
         "-specs=nosys.specs"
+        "-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/baremetal_arm.map"
+        "-u _printf_float"
         ${CPU_FLAGS}
 
 )
@@ -53,7 +55,8 @@ target_link_libraries(${APP_TARGET}
     PRIVATE
         qpc
         -Wl,--start-group
-        -lc_nano           # the nano-libc implementation
+        -lc
+        -lm
         -lnosys            # stub syscalls (sbrk/write/etc)
         -lgcc              # compiler’s helper routines
         -Wl,--end-group
