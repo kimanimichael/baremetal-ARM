@@ -96,13 +96,14 @@ void BSP_ledInit() {
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
     RCC_AHB1ENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
-    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
+    GPIOB_MODER &= (~(0b01 << 15) | ~(0b01 << 1) | ~(0b01 << 29) | ~(0b01 << 3));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) | (0b01 << 2));
-    /* Bitwise AND the 15th of GPIOA_MODER with 0 */
-    /* @TODO Investigate why this bricks flashing with stlink */
+    /* Bitwise AND the 25th of GPIOA_MODER with 0 */
+    /* @TODO Investigate why this bricks flashing with stlink - Now fixed in the immediate line below :) */
     // GPIOA_MODER &= (0b00 << 25);
-    /* Bite wise OR the 14th bit of GPIOA_MODER with 1*/
+    GPIOA_MODER &= ~(0b01 << 25);
+    /* Bite wise OR the 24th bit of GPIOA_MODER with 1*/
     GPIOA_MODER |= (0b01 << 24);
 }
 
@@ -112,25 +113,25 @@ void BSP_user_button_init() {
     RCC_AHB1ENR |= (0b01 << 2);
 
     //Bitwise AND the 27th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 27);
+    GPIOC_MODER &= ~(0b01 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 26);
+    GPIOC_MODER &= ~(0b01 << 26);
 
     //Bitwise AND the 25th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
-    GPIOC_MODER &= (0b00 << 25);
+    GPIOC_MODER &= ~(0b01 << 25);
     //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
-    GPIOC_MODER &= (0b00 << 24);
+    GPIOC_MODER &= ~(0b01 << 24);
 
 
     //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 27);
+    GPIOC_PUPDR &= ~(0b01 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 26);
+    GPIOC_PUPDR &= ~(0b01 << 26);
 
     //Bitwise AND the 25th bit of GPIOC_PUPDR with 0 - CONFIG PC12 as input floating
-    GPIOC_PUPDR &= (0b00 << 25);
+    GPIOC_PUPDR &= ~(0b01 << 25);
     //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input floating
-    GPIOC_PUPDR &= (0b00 << 24);
+    GPIOC_PUPDR &= ~(0b01 << 24);
 
 
     // //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
