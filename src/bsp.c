@@ -292,7 +292,7 @@ void SysTick_Handler(void) {
         } else { /* button released */
             static QEvt const button2ReleasedEvt
                               = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
-            // QACTIVE_POST(AO_Blinky1, &button2ReleasedEvt, 0U);
+            QACTIVE_POST(AO_Blinky1, &button2ReleasedEvt, 0U);
         }
     }
     QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
