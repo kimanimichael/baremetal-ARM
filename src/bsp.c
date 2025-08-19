@@ -93,6 +93,7 @@ void BSP_init() {
 }
 
 void BSP_ledInit() {
+    printf("%s init  %.2f\r\n", "LEDs", 1.01);
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
     RCC_AHB1ENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
@@ -108,7 +109,6 @@ void BSP_ledInit() {
 }
 
 void BSP_user_button_init() {
-    // printf("LED init");
     //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOC_EN CLOCK
     RCC_AHB1ENR |= (0b01 << 2);
 
@@ -175,7 +175,6 @@ void BSP_blueLedToggle() {
 
 void BSP_blueLedOn() {
     GPIOx_ODR |= (0b01 << 7);
-    printf("Turning blue LED on");
 }
 
 void BSP_blueLedOff() {
