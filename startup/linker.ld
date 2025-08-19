@@ -67,7 +67,7 @@ SECTIONS
     {
         . = ALIGN(4);
         _data_start = .;
-        *(.data)
+        *(.data*)
         . = ALIGN(4);
         _data_end = .;
     } > RAM AT > ROM
@@ -77,7 +77,7 @@ SECTIONS
     .bss :
     {
         _bss_start = .;
-        *(.bss)
+        *(.bss*)
         . = ALIGN(4);
         *(COMMON)
         . = ALIGN(4);

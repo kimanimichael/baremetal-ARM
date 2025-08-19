@@ -7,6 +7,9 @@ set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
 set(CMAKE_LINKER "arm-none-eabi-gcc")
 
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+
 add_executable(${APP_TARGET})
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
@@ -21,23 +24,21 @@ target_compile_options(baremetal_arm PRIVATE
         -Wall
         -mfpu=fpv4-sp-d16
         -mfloat-abi=hard
-        --specs=nano.specs
+        --specs=nosys.specs
 )
 
 target_link_options(baremetal_arm PRIVATE
         "-T${LINKER_SCRIPT}"
         "-nostartfiles"
-        "-specs=nano.specs"
-        "-specs=nosys.specs"
         "-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/baremetal_arm.map"
-        "-u _printf_float"
         ${CPU_FLAGS}
+        --specs=nosys.specs
 
 )
 
 
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -nostdlib")
-set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -Wdiscarded-qualifiers -nostdlib")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -O0 -g -Wall")
+set(CMAKE_CXX_FLAGS "${CPU_FLAGS} -O0 -g -Wall")
 set(CMAKE_ASM_FLAGS "${CPU_FLAGS}")
 
 set(QPC_CFG_KERNEL qxk)
@@ -54,12 +55,6 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 target_link_libraries(${APP_TARGET}
     PRIVATE
         qpc
-        -Wl,--start-group
-        -lc
-        -lm
-        -lnosys            # stub syscalls (sbrk/write/etc)
-        -lgcc              # compiler’s helper routines
-        -Wl,--end-group
 )
 
 target_include_directories(${APP_TARGET}
