@@ -4,7 +4,7 @@ MEMORY
     ROM(rx) : ORIGIN = 0x08000000, LENGTH = 2048K
 }
 
-_Min_Stack_Size = 16384;
+_Min_Stack_Size = 0x4000;
 _Min_Heap_Size = 0x2000; /* required amount of heap */
 
 SECTIONS
