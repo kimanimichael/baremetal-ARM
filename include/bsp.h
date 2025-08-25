@@ -30,7 +30,9 @@ void EXTI15_10IRQHandler(void);
 #define BSP_TICKS_PER_SEC 1200
 
 //Base RCC register 0x4002 3800 + offset 0x30 to find RCC_AHB1ENR
-#define RCC_AH1BEN (*((unsigned int *)(0x40023830)))
+#define RCC_AHB1ENR (*((unsigned int *)(0x40023830)))
+//Base RCC register 0x4002 3800 + offset 0x40 to find RCC_APB1ENR
+#define RCC_APB1ENR (*((unsigned int *)(0x40023840)))
 //Base SYSCFG register 0x4001 3800 + offset 0x14 to find SYSCFG_EXTICR4
 #define SYSCFG_EXTICR4 (*((unsigned int *)(0x40013814)))
 // Base EXTI register 0x4001 3C00 + offset 0x08 to find EXTI_RTSR(Rising trigger selection register)
@@ -65,6 +67,12 @@ void EXTI15_10IRQHandler(void);
 #define GPIOC_PUPDR (*((unsigned int *)(0x4002080c)))
 //Base GPIOC register 0x4002 0800 + offset 0x10 to find GPIOC_IDR
 #define GPIOC_IDR (*((unsigned int *)(0x40020810)))
+
+//Base GPIOD register 0x4002 0C00 + offset 0x00 to find GPIOD_MODER
+#define GPIOD_MODER (*((unsigned int *)(0x40020C00)))
+
+//Base GPIOD register 0x4002 0C00 + offset 0x24 to find GPIOD_AFRH
+#define GPIOD_AFRH (*((unsigned int *)(0x40020C24)))
 
 /**
  * @brief Implements a delay

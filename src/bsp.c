@@ -4,6 +4,11 @@
 #include "qpc.h"
 #include "bsp.h"
 #include "stm32f429xx.h"
+#include "stdio.h"
+
+
+
+void usart3_init();
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -82,48 +87,51 @@ uint32_t BSP_Tickr(void) {
 
 void BSP_init() {
     SystemCoreClockUpdate();
+    usart3_init();
     BSP_ledInit();
     BSP_user_button_init();
 }
 
 void BSP_ledInit() {
+    printf("%s init  %.2f\r\n", "LEDs", 1.01);
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 1) | (0b01 << 0);
+    RCC_AHB1ENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
-    GPIOB_MODER &= ((0b00 << 15) | (0b00 << 1) | (0b00 << 29) | (0b00 << 3));
+    GPIOB_MODER &= (~(0b01 << 15) | ~(0b01 << 1) | ~(0b01 << 29) | ~(0b01 << 3));
     //Bitwise OR the 15th bit and 1st of GPIOB_MODER with 1 - CONFIG PB7 & PB0 & PB14 & PB1 as output
     GPIOB_MODER |= ((0b01 << 14) | (0b01 << 0) | (0b01 << 28) | (0b01 << 2));
-    /* Bitwise AND the 15th of GPIOA_MODER with 0 */
-    /* @TODO Investigate why this bricks flashing with stlink */
+    /* Bitwise AND the 25th of GPIOA_MODER with 0 */
+    /* @TODO Investigate why this bricks flashing with stlink - Now fixed in the immediate line below :) */
     // GPIOA_MODER &= (0b00 << 25);
-    /* Bite wise OR the 14th bit of GPIOA_MODER with 1*/
+    GPIOA_MODER &= ~(0b01 << 25);
+    /* Bite wise OR the 24th bit of GPIOA_MODER with 1*/
     GPIOA_MODER |= (0b01 << 24);
 }
 
 void BSP_user_button_init() {
     //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOC_EN CLOCK
-    RCC_AH1BEN |= (0b01 << 2);
+    RCC_AHB1ENR |= (0b01 << 2);
 
     //Bitwise AND the 27th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 27);
+    GPIOC_MODER &= ~(0b01 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input
-    GPIOC_MODER &= (0b00 << 26);
+    GPIOC_MODER &= ~(0b01 << 26);
 
     //Bitwise AND the 25th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
-    GPIOC_MODER &= (0b00 << 25);
+    GPIOC_MODER &= ~(0b01 << 25);
     //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input
-    GPIOC_MODER &= (0b00 << 24);
+    GPIOC_MODER &= ~(0b01 << 24);
 
 
     //Bitwise AND the 27th bit of GPIOC_PUPDR with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 27);
+    GPIOC_PUPDR &= ~(0b01 << 27);
     //Bitwise AND the 26th bit of GPIOC_MODER with 0 - CONFIG PC13 as input pull-down
-    GPIOC_PUPDR &= (0b00 << 26);
+    GPIOC_PUPDR &= ~(0b01 << 26);
 
     //Bitwise AND the 25th bit of GPIOC_PUPDR with 0 - CONFIG PC12 as input floating
-    GPIOC_PUPDR &= (0b00 << 25);
+    GPIOC_PUPDR &= ~(0b01 << 25);
     //Bitwise AND the 24th bit of GPIOC_MODER with 0 - CONFIG PC12 as input floating
-    GPIOC_PUPDR &= (0b00 << 24);
+    GPIOC_PUPDR &= ~(0b01 << 24);
 
 
     // //Bitwise OR the 14th bit of RCC_APB2ENR with 1 to enable SYSCFGEN for EXTI
@@ -190,6 +198,65 @@ void BSP_idle_toggle() {
     GPIOA_ODR &= ~(0b01 << 12);
 }
 
+void usart3_init() {
+    //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOD_EN CLOCK
+    RCC_AHB1ENR |= (0b01 << 3);
+    RCC->AHB1ENR |= (0b01 << 3);
+    __DSB();
+    (void)(RCC_AHB1ENR);
+    // Enable USART3 clock
+    RCC_APB1ENR |= (0b01 << 18);
+    RCC->APB1ENR |= (0b01 << 18);
+    __DSB();
+
+    // AF7, USART3TX = PD8
+    GPIOD_AFRH |= (0b01 << 0) | (0b01 << 1) | (0b01 << 2);
+    GPIOD_AFRH &= ~(0b01 << 3);
+    // AF7, USART3RX = PD9
+    GPIOD_AFRH |= (0b01 << 4) | (0b01 << 5) | (0b01 << 6);
+    GPIOD_AFRH &= ~(0b01 << 7);
+
+    //Bitwise OR the 17th bit of GPIOD_MODER with 1 - CONFIG PD8 as alternate function
+    GPIOD_MODER |= (0b01 << 17);
+    //Bitwise AND the 16th bit of GPIOD_MODER with 0 - CONFIG PD8 as alternate function
+    GPIOD_MODER &= ~(0b01 << 16);
+
+    //Bitwise OR the 19th bit of GPIOD_MODER with 1 - CONFIG PD9 as alternate function
+    GPIOD_MODER |= (0b01 << 19);
+    //Bitwise AND the 18th bit of GPIOD_MODER with 0 - CONFIG PD9 as alternate function
+    GPIOD_MODER &= ~(0b01 << 18);
+
+    // Configure USART3
+    USART3->CR1 &= ~USART_CR1_UE;
+    /* For 45 MHz uart, usb clock frequency.*/
+    USART3->BRR |= 0x187;
+
+    /* Transmitter enable, send an idle frame as first transmission, */
+    USART3->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
+
+    /* Leave at reset value to keep 1 stop bit */
+    USART3->CR2 = 0;
+    /* No DMA, no flow control, disable smart card mode, no half-duplex selection, normal power mode etc. */
+    USART3->CR3 = 0;
+}
+
+void uart_write_byte(uint8_t data) {
+    /* Wait until the data has been transferred into the shift register. */
+    while ((USART3->SR & USART_SR_TXE) == 0);
+    USART3->DR = data;
+}
+
+void uart_write(uint8_t *data, const uint32_t length) {
+    for (int i =0; i < length; i++) {
+        uart_write_byte(data[i]);
+    }
+
+}
+int __io_putchar(int data) {
+    uart_write((uint8_t *)&data, 1);
+    return data;
+}
+
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
     /* state of button. static to persist between func calls */
@@ -241,7 +308,7 @@ void SysTick_Handler(void) {
         } else { /* button released */
             static QEvt const button2ReleasedEvt
                               = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
-            // QACTIVE_POST(AO_Blinky1, &button2ReleasedEvt, 0U);
+            QACTIVE_POST(AO_Blinky1, &button2ReleasedEvt, 0U);
         }
     }
     QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
