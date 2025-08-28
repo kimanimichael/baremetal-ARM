@@ -189,7 +189,6 @@ enum  EventSignals {
  MAX_SIG
 };
 
-extern QActive* const AO_Blinky1;
-extern QActive* const AO_Blinky2;
+extern QActive* AO_TimeBomb;
 
 #endif
