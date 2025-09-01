@@ -38,6 +38,7 @@
 /* TimeBomb/Button with QPC framework */
 #include "qpc.h"
 #include "bsp.h"
+#include "mk_printf.h"
 
 // Q_DEFINE_THIS_MODULE("main") /* this module name for Q_ASSERT() */
 
@@ -236,6 +237,7 @@ static QState TimeBomb_boom(TimeBomb * const me, QEvt const * const e) {
             BSP_redLedOn();
             BSP_greenLedOn();
             BSP_blueLedOn();
+            mk_printf("*** Boom!!!");
             status_ = Q_HANDLED();
             break;
         }

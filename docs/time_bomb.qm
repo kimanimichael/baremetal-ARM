@@ -154,7 +154,8 @@ QTimeEvt_armX(&amp;me-&gt;te, (blink_time), 0U);</entry>
      <state name="boom">
       <entry brief="All-LEDs ON">BSP_redLedOn();
 BSP_greenLedOn();
-BSP_blueLedOn();</entry>
+BSP_blueLedOn();
+mk_printf(&quot;*** Boom!!!&quot;);</entry>
       <state_glyph node="13,65,24,8">
        <entry box="0,3,18,2"/>
       </state_glyph>
@@ -188,6 +189,7 @@ BSP_blueLedOn();</entry>
     <text>/* TimeBomb/Button with QPC framework */
 #include &quot;qpc.h&quot;
 #include &quot;bsp.h&quot;
+#include &quot;mk_printf.h&quot;
 
 // Q_DEFINE_THIS_MODULE(&quot;main&quot;) /* this module name for Q_ASSERT() */
 

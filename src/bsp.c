@@ -4,11 +4,7 @@
 #include "qpc.h"
 #include "bsp.h"
 #include "stm32f429xx.h"
-#include "stdio.h"
-
-
-
-void usart3_init();
+#include "mk_printf.h"
 
 void assert_failed(char const* module, int id) {
     Q_onError(module, id);
@@ -87,13 +83,13 @@ uint32_t BSP_Tickr(void) {
 
 void BSP_init() {
     SystemCoreClockUpdate();
-    usart3_init();
+    mk_printf_init();
     BSP_ledInit();
     BSP_user_button_init();
 }
 
 void BSP_ledInit() {
-    printf("%s init  %.2f\r\n", "LEDs", 1.01);
+    mk_printf("%s init ", "LEDs");
     //Bitwise OR the second & first bit of RCC_AHB1ENR with 1 to enable GPIOB_EN CLOCK and GPIOA_EN CLOCK
     RCC_AHB1ENR |= (0b01 << 1) | (0b01 << 0);
     //Bitwise AND the 16th bit and 2nd bit of GPIOB_MODER with 0 - CONFIG PB7 & PB0 & PB14 & PB1 as output
@@ -159,38 +155,47 @@ uint32_t BSP_user_button2_read() {
 
 void BSP_greenLedToggle() {
     GPIOx_ODR ^= (0b01 << 0);
+    mk_printf("LED %s is TOGGLED", "GREEN");
 }
 
 void BSP_greenLedOn() {
     GPIOx_ODR |= (0b01 << 0);
+    mk_printf("LED %s is ON", "GREEN");
 }
 
 void BSP_greenLedOff() {
     GPIOx_ODR &= ~(0b01 << 0);
+    mk_printf("LED %s is OFF", "GREEN");
 }
 
 void BSP_blueLedToggle() {
     GPIOx_ODR ^= (0b01 << 7);
+    mk_printf("LED %s is TOGGLED", "BLUE");
 }
 
 void BSP_blueLedOn() {
     GPIOx_ODR |= (0b01 << 7);
+    mk_printf("LED %s is ON", "BLUE");
 }
 
 void BSP_blueLedOff() {
     GPIOx_ODR &= ~(0b01 << 7);
+    mk_printf("LED %s is OFF", "BLUE");
 }
 
 void BSP_redLedOn() {
     GPIOx_ODR |= (0b01 << 14);
+    mk_printf("LED %s is ON", "RED");
 }
 
 void BSP_redLedOff() {
     GPIOx_ODR &= ~(0b01 << 14);
+    mk_printf("LED %s is OFF", "RED");
 }
 
 void BSP_redLedToggle() {
     GPIOx_ODR ^= (0b01 << 14);
+    mk_printf("LED %s is TOGGLED", "RED");
 }
 
 void BSP_idle_toggle() {
@@ -198,7 +203,8 @@ void BSP_idle_toggle() {
     GPIOA_ODR &= ~(0b01 << 12);
 }
 
-void usart3_init() {
+#if SPY
+void printf_init() {
     //Bitwise OR the third bit of RCC_AHB1ENR with 1 to enable GPIOD_EN CLOCK
     RCC_AHB1ENR |= (0b01 << 3);
     RCC->AHB1ENR |= (0b01 << 3);
@@ -257,8 +263,11 @@ int __io_putchar(int data) {
     return data;
 }
 
+#endif
+
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
+    GPIOA_ODR |= (0b01 << 12);
     /* state of button. static to persist between func calls */
     static struct ButtonDebouncing {
         uint32_t depressed;
@@ -293,10 +302,12 @@ void SysTick_Handler(void) {
             static QEvt const buttonPressedEvt
                               = QEVT_INITIALIZER(BUTTON_PRESSED_SIG);
             QACTIVE_POST(AO_TimeBomb, &buttonPressedEvt, 0U);
+            mk_printf("Button %d PRESSED", 1);
         } else { /* button released */
             static QEvt const buttonReleasedEvt
                               = QEVT_INITIALIZER(BUTTON_RELEASED_SIG);
             QACTIVE_POST(AO_TimeBomb, &buttonReleasedEvt, 0U);
+            mk_printf("Button %d RELEASED", 1);
         }
     }
 
@@ -305,12 +316,15 @@ void SysTick_Handler(void) {
             static QEvt const button2PressedEvt
                               = QEVT_INITIALIZER(BUTTON2_PRESSED_SIG);
             QACTIVE_POST(AO_TimeBomb, &button2PressedEvt, 0U);
+            mk_printf("Button %d PRESSED", 2);
         } else { /* button released */
             static QEvt const button2ReleasedEvt
                               = QEVT_INITIALIZER(BUTTON2_RELEASED_SIG);
             QACTIVE_POST(AO_TimeBomb, &button2ReleasedEvt, 0U);
+            mk_printf("Button %d RELEASED", 2);
         }
     }
+    GPIOA_ODR &= ~(0b01 << 12);
     QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
 }
 /*..........................................................................*/

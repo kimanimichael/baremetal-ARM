@@ -5,7 +5,7 @@ set (APP_TARGET baremetal_arm)
 set(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-set(CMAKE_LINKER "arm-none-eabi-gcc")
+set(CMAKE_LINKER "arm-none-eabi-ld")
 
 set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_CXX_COMPILER_WORKS 1)
@@ -16,6 +16,12 @@ set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/startup/linker.ld")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -march=armv7e-m -Wall -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+
+option(SPY "Enable spy logging" OFF)
+
+if(SPY)
+    target_compile_definitions(baremetal_arm PRIVATE SPY)
+endif()
 
 target_compile_options(baremetal_arm PRIVATE
         -mcpu=cortex-m4
@@ -30,7 +36,7 @@ target_compile_options(baremetal_arm PRIVATE
 target_link_options(baremetal_arm PRIVATE
         "-T${LINKER_SCRIPT}"
         "-nostartfiles"
-        "-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/baremetal_arm.map"
+        "-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/baremetal_arm.map,--cref,--print-memory-usage"
         ${CPU_FLAGS}
         --specs=nosys.specs
 
@@ -80,6 +86,8 @@ target_sources(${APP_TARGET}
 # Post-build step to generate binary
 add_custom_command(TARGET ${APP_TARGET} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_BINARY_DIR}/${APP_TARGET} ${CMAKE_BINARY_DIR}/${APP_TARGET}.bin
+        COMMAND arm-none-eabi-nm --print-size --size-sort -g ${CMAKE_BINARY_DIR}/${APP_TARGET} > ${CMAKE_BINARY_DIR}/symbols.txt
+        COMMAND arm-none-eabi-size -A ${CMAKE_BINARY_DIR}/${APP_TARGET} > ${CMAKE_BINARY_DIR}/sections.txt
 )
 
 option(VERBOSE_BUILD "Have a verbose build process")

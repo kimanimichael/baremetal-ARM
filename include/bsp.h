@@ -175,6 +175,10 @@ void BSP_idle_toggle();
 * @param bitmask message to be sent in bits
 */
 void BSP_send_morse_code(uint32_t bitmask);
+/**
+ * @brief Initialize printf
+*/
+void printf_init();
 
 void ledOn();
 

@@ -15,19 +15,26 @@ ELF_IMAGE = "cmake_build/{APP_TARGET}.elf"
 
 APPLICATION = "./application.bin"
 
-CMAKE_GEN_CMD = '''cmake -S . -B cmake_build/ -G Ninja'''
-CMAKE_BUILD_CMD = '''cmake --build cmake_build/'''
+CMAKE_GEN_CMD = '''cmake -S . -G Ninja'''
+CMAKE_BUILD_CMD = '''cmake --build'''
 
 FLASH_APPLICATION_CMD = '''st-flash write 
 {image} 0x8000000 && st-info --reset
 '''
 
 
-def build_image():
+def build_image(spy):
     print(colorama.Fore.CYAN, "Building Image .." + colorama.Style.RESET_ALL)
 
     cmake_gen_cmd = CMAKE_GEN_CMD.format()
     cmake_build_cmd = CMAKE_BUILD_CMD.format()
+    if spy:
+        cmake_gen_cmd += " -B cmake_build/spy -DSPY=ON"
+        cmake_build_cmd += " cmake_build/spy"
+    else:
+        cmake_gen_cmd += " -B cmake_build/prod -DSPY=OFF"
+        cmake_build_cmd += " cmake_build/prod"
+
 
     print(cmake_gen_cmd)
     print(cmake_build_cmd)
@@ -86,12 +93,16 @@ def flash_application():
 
 @cli.command()
 @click.option("--compile", is_flag=True, help="compile image, default False")
+@click.option("--spy", is_flag=True, help="add debugging, default False")
 @click.option("--flash", is_flag=True, help="flash application, default False")
-def build_application(compile, flash):
+def build_application(compile, spy, flash):
     if compile:
-        build_image()
+        build_image(spy)
     if flash:
-        _flash_application("cmake_build/baremetal_arm.bin")
+        if spy:
+            _flash_application("cmake_build/spy/baremetal_arm.bin")
+        else:
+            _flash_application("cmake_build/prod/baremetal_arm.bin")
 
 
 if __name__ == "__main__":
